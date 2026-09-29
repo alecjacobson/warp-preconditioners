@@ -1,0 +1,45 @@
+{
+  "warp": "1.15.0",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40",
+  "n": 360757,
+  "nnz": 7356259,
+  "target": 1e-08,
+  "chunk": 500,
+  "schedule": "fixed",
+  "seconds_per_rhs": 15.0,
+  "results": [
+    {
+      "method": "fsai-cg",
+      "width": 16,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.16062229126691818,
+      "solve_s": 0.7472965121269226,
+      "berr": 2.8973370915282764e-15,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.25302814692258835,
+          "iterations": 500,
+          "berr": 2.811917480512906e-15,
+          "relative_residual": 5.895308625553469e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 0.24712814018130302,
+          "iterations": 500,
+          "berr": 2.8973370915282764e-15,
+          "relative_residual": 3.977135669290035e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 0.24714022502303123,
+          "iterations": 500,
+          "berr": 2.8826760583231393e-15,
+          "relative_residual": 9.812223899364616e-08,
+          "converged": true
+        }
+      ]
+    }
+  ]
+}

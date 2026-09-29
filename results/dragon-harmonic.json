@@ -1,0 +1,82 @@
+{
+  "warp": "1.15.0",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40",
+  "k": 1,
+  "n": 360757,
+  "nnz": 2525287,
+  "target": 1e-08,
+  "chunk": 500,
+  "schedule": "fixed",
+  "seconds_per_rhs": 10.0,
+  "results": [
+    {
+      "method": "jacobi-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.0002907887101173401,
+      "factor_nnz": null,
+      "truncated_rows": null,
+      "solve_s": 0.5128705129027367,
+      "berr": 4.4027313383193103e-13,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.13996917381882668,
+          "iterations": 1000,
+          "berr": 3.112512528538736e-13,
+          "relative_residual": 7.17736467248897e-13,
+          "converged": true
+        },
+        {
+          "solve_s": 0.19742723926901817,
+          "iterations": 1000,
+          "berr": 8.726057983142942e-14,
+          "relative_residual": 2.71279546327412e-13,
+          "converged": true
+        },
+        {
+          "solve_s": 0.17547409981489182,
+          "iterations": 1000,
+          "berr": 4.4027313383193103e-13,
+          "relative_residual": 1.850221532316408e-12,
+          "converged": true
+        }
+      ]
+    },
+    {
+      "method": "fsai-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.010274633765220642,
+      "factor_nnz": 2163969,
+      "truncated_rows": 0,
+      "solve_s": 0.35134923085570335,
+      "berr": 2.1962877904824813e-14,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.028208520263433456,
+          "iterations": 76,
+          "berr": 1.7448659953164788e-14,
+          "relative_residual": 1.696727304595355e-13,
+          "converged": true
+        },
+        {
+          "solve_s": 0.1334955021739006,
+          "iterations": 76,
+          "berr": 1.513303135561305e-14,
+          "relative_residual": 6.25184663101058e-14,
+          "converged": true
+        },
+        {
+          "solve_s": 0.1896452084183693,
+          "iterations": 76,
+          "berr": 2.1962877904824813e-14,
+          "relative_residual": 7.393851177896552e-14,
+          "converged": true
+        }
+      ]
+    }
+  ]
+}

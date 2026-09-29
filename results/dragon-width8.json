@@ -1,0 +1,174 @@
+{
+  "warp": "1.15.0",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40",
+  "n": 360757,
+  "nnz": 7356259,
+  "target": 1e-08,
+  "chunk": 500,
+  "results": [
+    {
+      "method": "jacobi-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.0003537796437740326,
+      "solve_s": 105.18373462930322,
+      "berr": 5.2230051159392606e-05,
+      "converged": false,
+      "columns": [
+        {
+          "solve_s": 35.0255801230669,
+          "iterations": 137500,
+          "berr": 2.2082305269782796e-05,
+          "relative_residual": 0.09046372418519691,
+          "converged": false
+        },
+        {
+          "solve_s": 35.042991042137146,
+          "iterations": 136000,
+          "berr": 4.162635297329178e-05,
+          "relative_residual": 0.052523233607817466,
+          "converged": false
+        },
+        {
+          "solve_s": 35.11516346409917,
+          "iterations": 141000,
+          "berr": 5.2230051159392606e-05,
+          "relative_residual": 0.10669655422723062,
+          "converged": false
+        }
+      ]
+    },
+    {
+      "method": "jacobi-cr",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.0003673955798149109,
+      "solve_s": 105.16192357242107,
+      "berr": 4.7738412007364554e-08,
+      "converged": false,
+      "columns": [
+        {
+          "solve_s": 35.04339610785246,
+          "iterations": 119500,
+          "berr": 1.6950576642381245e-08,
+          "relative_residual": 0.0899019362046834,
+          "converged": false
+        },
+        {
+          "solve_s": 35.09642254933715,
+          "iterations": 119500,
+          "berr": 4.7738412007364554e-08,
+          "relative_residual": 0.05185685613692177,
+          "converged": false
+        },
+        {
+          "solve_s": 35.022104915231466,
+          "iterations": 118500,
+          "berr": 1.562331659064019e-08,
+          "relative_residual": 0.10401799276087038,
+          "converged": false
+        }
+      ]
+    },
+    {
+      "method": "fsai-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.03013121336698532,
+      "solve_s": 0.6353761404752731,
+      "berr": 8.831911345319855e-11,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.2116071730852127,
+          "iterations": 500,
+          "berr": 2.4338902258636946e-11,
+          "relative_residual": 1.0104454011651543e-07,
+          "converged": true
+        },
+        {
+          "solve_s": 0.21166568621993065,
+          "iterations": 500,
+          "berr": 8.831911345319855e-11,
+          "relative_residual": 7.674704903288141e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 0.21210328117012978,
+          "iterations": 500,
+          "berr": 1.7658611780241072e-11,
+          "relative_residual": 6.621126296780433e-08,
+          "converged": true
+        }
+      ]
+    },
+    {
+      "method": "fsai-cr",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.030103255063295364,
+      "solve_s": 0.6558960676193237,
+      "berr": 8.541261985298198e-12,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.2192033939063549,
+          "iterations": 500,
+          "berr": 7.991008631449373e-12,
+          "relative_residual": 1.2201991737775697e-07,
+          "converged": true
+        },
+        {
+          "solve_s": 0.2187821976840496,
+          "iterations": 500,
+          "berr": 8.541261985298198e-12,
+          "relative_residual": 2.5714420752944385e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 0.21791047602891922,
+          "iterations": 500,
+          "berr": 1.8350372506654194e-12,
+          "relative_residual": 6.216211234372812e-08,
+          "converged": true
+        }
+      ]
+    },
+    {
+      "method": "lifted-gmres",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.01588679850101471,
+      "solve_s": 1.7394777163863182,
+      "berr": 3.865503994890214e-10,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.5559208132326603,
+          "iterations": 526,
+          "berr": 1.0887765752554913e-10,
+          "relative_residual": 3.165156947993582e-06,
+          "converged": true
+        },
+        {
+          "solve_s": 0.5451545603573322,
+          "iterations": 526,
+          "berr": 3.865503994890214e-10,
+          "relative_residual": 1.3861257611758266e-06,
+          "converged": true
+        },
+        {
+          "solve_s": 0.6384023427963257,
+          "iterations": 526,
+          "berr": 5.788983732766004e-11,
+          "relative_residual": 1.756945659739751e-06,
+          "converged": true
+        }
+      ]
+    }
+  ],
+  "schedule": "fixed",
+  "seconds_per_rhs": 35,
+  "notes": "Initial experiment, before removing the extra output combination kernel; see repeat files for final implementation."
+}

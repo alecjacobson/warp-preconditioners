@@ -1,0 +1,109 @@
+{
+  "warp": "1.15.0",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40",
+  "n": 360757,
+  "nnz": 7356259,
+  "target": 1e-08,
+  "chunk": 500,
+  "schedule": "upstream",
+  "seconds_per_rhs": 20.0,
+  "results": [
+    {
+      "method": "fsai-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.038058243691921234,
+      "solve_s": 1.2595843896269798,
+      "berr": 3.914642748131189e-15,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.33660343661904335,
+          "iterations": 760,
+          "berr": 3.3057478071793084e-15,
+          "relative_residual": 1.0703561763827458e-07,
+          "converged": true
+        },
+        {
+          "solve_s": 0.43374471366405487,
+          "iterations": 759,
+          "berr": 3.615545390334536e-15,
+          "relative_residual": 5.265452244638273e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 0.4892362393438816,
+          "iterations": 763,
+          "berr": 3.914642748131189e-15,
+          "relative_residual": 1.748086646284866e-08,
+          "converged": true
+        }
+      ]
+    },
+    {
+      "method": "fsai-cr",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.030944272875785828,
+      "solve_s": 3.8112094700336456,
+      "berr": 2.4970705786748436e-13,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 1.9541460685431957,
+          "iterations": 5010,
+          "berr": 3.350882629717677e-15,
+          "relative_residual": 1.2594656385796347e-07,
+          "converged": true
+        },
+        {
+          "solve_s": 0.45784132182598114,
+          "iterations": 574,
+          "berr": 2.4970705786748436e-13,
+          "relative_residual": 1.392774386203525e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 1.3992220796644688,
+          "iterations": 3364,
+          "berr": 3.3943487402472936e-15,
+          "relative_residual": 6.094979331423311e-08,
+          "converged": true
+        }
+      ]
+    },
+    {
+      "method": "lifted-gmres",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.014949306845664978,
+      "solve_s": 7.531685695052147,
+      "berr": 1.786111178946574e-15,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 2.7670199163258076,
+          "iterations": 846,
+          "berr": 1.786111178946574e-15,
+          "relative_residual": 2.3019672138156545e-08,
+          "converged": true
+        },
+        {
+          "solve_s": 1.137620858848095,
+          "iterations": 947,
+          "berr": 1.6733253149436578e-15,
+          "relative_residual": 9.205406463743318e-09,
+          "converged": true
+        },
+        {
+          "solve_s": 3.6270449198782444,
+          "iterations": 3489,
+          "berr": 9.103405537162015e-16,
+          "relative_residual": 9.678930971018696e-09,
+          "converged": true
+        }
+      ]
+    }
+  ]
+}

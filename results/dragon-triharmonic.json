@@ -1,0 +1,82 @@
+{
+  "warp": "1.15.0",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40",
+  "k": 3,
+  "n": 360757,
+  "nnz": 15169333,
+  "target": 1e-08,
+  "chunk": 500,
+  "schedule": "fixed",
+  "seconds_per_rhs": 15.0,
+  "results": [
+    {
+      "method": "fsai-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.0965333916246891,
+      "factor_nnz": 2504963,
+      "truncated_rows": 0,
+      "solve_s": 41.17604112997651,
+      "berr": 1.6622933100673976e-06,
+      "converged": false,
+      "columns": [
+        {
+          "solve_s": 15.038959670811892,
+          "iterations": 16500,
+          "berr": 9.508961572216495e-07,
+          "relative_residual": 9.78162334170742,
+          "converged": false
+        },
+        {
+          "solve_s": 11.729554291814566,
+          "iterations": 13000,
+          "berr": 1.6622933100673976e-06,
+          "relative_residual": 5.069952644273383,
+          "converged": false
+        },
+        {
+          "solve_s": 14.407527167350054,
+          "iterations": 16000,
+          "berr": 1.0395529362049912e-07,
+          "relative_residual": 0.9705571959858069,
+          "converged": false
+        }
+      ]
+    },
+    {
+      "method": "fsai-cr",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.09606848657131195,
+      "factor_nnz": 2504963,
+      "truncated_rows": 0,
+      "solve_s": 36.79634890705347,
+      "berr": 6.014031502237902e-08,
+      "converged": false,
+      "columns": [
+        {
+          "solve_s": 12.817643214017153,
+          "iterations": 14000,
+          "berr": 6.014031502237902e-08,
+          "relative_residual": 1.5826118504166757,
+          "converged": false
+        },
+        {
+          "solve_s": 13.780485861003399,
+          "iterations": 15000,
+          "berr": 3.053698295019566e-08,
+          "relative_residual": 0.9584543990806716,
+          "converged": false
+        },
+        {
+          "solve_s": 10.198219832032919,
+          "iterations": 11000,
+          "berr": 9.768743259563076e-09,
+          "relative_residual": 1.307278873919346,
+          "converged": true
+        }
+      ]
+    }
+  ]
+}

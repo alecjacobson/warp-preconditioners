@@ -1,0 +1,50 @@
+{
+  "warp": "1.15.0",
+  "device": "cuda:0",
+  "gpu": "NVIDIA L40",
+  "n": 360757,
+  "nnz": 7356259,
+  "target": 1e-08,
+  "chunk": 500,
+  "results": [
+    {
+      "method": "fsai-cg",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.033758778125047684,
+      "solve_s": 0.2228490635752678,
+      "berr": 2.4338902258636946e-11,
+      "converged": true,
+      "columns": [
+        {
+          "solve_s": 0.2228490635752678,
+          "iterations": 500,
+          "berr": 2.4338902258636946e-11,
+          "relative_residual": 1.0104454011651543e-07,
+          "converged": true
+        }
+      ]
+    },
+    {
+      "method": "lifted-bicgstab",
+      "width": 8,
+      "kap_tolerance": 0.001,
+      "setup_s": 0.03808348625898361,
+      "solve_s": 2.800138685852289,
+      "berr": null,
+      "converged": false,
+      "columns": [
+        {
+          "solve_s": 2.800138685852289,
+          "iterations": 2179,
+          "berr": null,
+          "relative_residual": null,
+          "converged": false
+        }
+      ]
+    }
+  ],
+  "schedule": "fixed",
+  "seconds_per_rhs": 30,
+  "notes": "Initial experiment, before removing the extra output combination kernel; see repeat files for final implementation."
+}
