@@ -1,0 +1,207 @@
+{
+  "mesh": "xyzrgb_dragon-720K.ply",
+  "mesh_sha256": "36de4549989dd359bfb9d703cd7431da30b24b223db3c1027c5ac4551b4e51d0",
+  "warp": "1.15.0",
+  "gpu": "NVIDIA L40",
+  "vertices": 360757,
+  "faces": 721510,
+  "system": "(M + K M^-1 K) u = M z",
+  "rhs_column": 2,
+  "scalar_range": [
+    0.4161728637958665,
+    90.44734270829584
+  ],
+  "field_units": "original mesh coordinate units",
+  "display": "original mesh, no geometry deformation or postprocessing of either scalar field",
+  "difference": {
+    "max_abs": 50.67704726782984,
+    "relative_l2": 0.014726988063363738
+  },
+  "results": {
+    "jacobi_cr": {
+      "solver": "warp.optim.linear.cr",
+      "preconditioner": "Jacobi",
+      "setup_s": 0.0003531910479068756,
+      "solve_s": 35.76833450049162,
+      "selected_iterations": 118500,
+      "budget_iterations": 118500,
+      "total_run_s": 35.76871841773391,
+      "selection": "lowest independently measured backward error among 500-iteration checkpoints",
+      "backward_error": 1.562331659064019e-08,
+      "relative_residual": 0.10401799276087041
+    },
+    "fsai_cg": {
+      "solver": "warp.optim.linear.cg",
+      "preconditioner": "FSAI, max_row_size=8",
+      "setup_s": 0.039579570293426514,
+      "solve_s": 0.20798516646027565,
+      "selected_iterations": 500,
+      "budget_iterations": 500,
+      "total_run_s": 0.20832430571317673,
+      "selection": "lowest independently measured backward error among 500-iteration checkpoints",
+      "backward_error": 1.7658611780241072e-11,
+      "relative_residual": 6.621126296780435e-08
+    }
+  },
+  "render": {
+    "renderer": "4.5.3 LTS",
+    "engine": "Cycles",
+    "device": "OptiX",
+    "samples": 128,
+    "camera": {
+      "azimuth": -70,
+      "elevation": 19,
+      "orthographic_scale": 2.4200000762939453
+    },
+    "panel_size": [
+      1600,
+      1240
+    ],
+    "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
+    "scalar_range": [
+      0.4161728637958665,
+      90.44734270829584
+    ],
+    "bands": 26,
+    "interpolation": "scalar interpolated on triangles, then constant color ramp per shading sample",
+    "geometry": "original mesh; uniform scale and translation for scene placement only",
+    "display_transform": "Standard sRGB",
+    "palette_srgb": [
+      [
+        0.5591498501792953,
+        0.6636115086857188,
+        0.9993940485718457
+      ],
+      [
+        0.409922536648003,
+        0.5889193978511272,
+        0.8974936016204962
+      ],
+      [
+        0.43247349870062796,
+        0.6998986688688721,
+        0.9881678566963495
+      ],
+      [
+        0.2635294479717083,
+        0.6233478462597191,
+        0.8714825016048129
+      ],
+      [
+        0.28870772085045343,
+        0.7331640730643494,
+        0.9461553409543545
+      ],
+      [
+        0.0,
+        0.6532394631870981,
+        0.8169861715739699
+      ],
+      [
+        0.12252464016152248,
+        0.760055885040849,
+        0.876823751586618
+      ],
+      [
+        0.0,
+        0.6754374497499179,
+        0.7384775007604176
+      ],
+      [
+        0.01088544183991462,
+        0.7776752540008811,
+        0.785788565833554
+      ],
+      [
+        0.0,
+        0.6874712769303336,
+        0.6420289586269615
+      ],
+      [
+        0.19442700487142803,
+        0.7840072167337905,
+        0.6800009658810392
+      ],
+      [
+        0.14362309892136557,
+        0.6878974545654507,
+        0.5343141093809717
+      ],
+      [
+        0.35658211107951376,
+        0.7781618275863575,
+        0.5669589212888059
+      ],
+      [
+        0.3363870998356391,
+        0.6764194131453034,
+        0.42170168668305263
+      ],
+      [
+        0.5004859799804087,
+        0.7604325158428143,
+        0.45449790036557375
+      ],
+      [
+        0.4773085739005373,
+        0.6538564380932868,
+        0.3101186490182084
+      ],
+      [
+        0.6274327453383038,
+        0.7322528667844175,
+        0.35233842059425874
+      ],
+      [
+        0.5940647125235667,
+        0.622072938412234,
+        0.2080061667945754
+      ],
+      [
+        0.7363385028085822,
+        0.6961395162562625,
+        0.2773377124177572
+      ],
+      [
+        0.6900799845439514,
+        0.5839508738067741,
+        0.14141018277352924
+      ],
+      [
+        0.8253744592719137,
+        0.6556503309008973,
+        0.25674593478637603
+      ],
+      [
+        0.765126062121843,
+        0.5433944540755442,
+        0.16105449131418645
+      ],
+      [
+        0.8926365395646133,
+        0.6152751831349027,
+        0.3011511490538727
+      ],
+      [
+        0.8181718929814286,
+        0.5052075234834885,
+        0.24531494649796853
+      ],
+      [
+        0.9365848399895731,
+        0.5800520868804823,
+        0.3866795147442834
+      ],
+      [
+        0.8483432175216958,
+        0.4745398920902925,
+        0.34863962786920777
+      ]
+    ]
+  },
+  "figure_size": [
+    3320,
+    1730
+  ],
+  "note": "Single scalar RHS timings from this reproduction; not the three-RHS benchmark totals."
+}

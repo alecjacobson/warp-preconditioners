@@ -10,6 +10,15 @@ right-hand sides in **0.708 seconds median total**, including setup, at
 backward error **8.83e-11**. See [measurements and caveats](results/README.md)
 for repeated trials, Jacobi comparisons, and the upstream timing schedule.
 
+![Biharmonic height field on two dragons: Warp CR with Jacobi on the left, and Warp CG with adaptive FSAI on the right. Both use the same 26 crisp OKLab color intervals.](assets/dragon-biharmonic-comparison.png)
+
+The original mesh colored by the scalar solution of `(M + K M^-1 K)u = Mz`.
+Left: the best recorded Jacobi-CR checkpoint within 118,500 iterations.
+Right: FSAI-CG after 500 iterations. Both share the same camera and scalar
+range, using `isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))`.
+Figure timings are for **one scalar RHS**, not the three-RHS totals above.
+[Rendering details and reproduction](visualization/README.md).
+
 ```bash
 python -m pip install -e '.[test]'
 pytest -q

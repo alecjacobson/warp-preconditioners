@@ -11,6 +11,7 @@ dependencies = ["warp-lang>=1.15"]
 
 [project.optional-dependencies]
 test = ["numpy", "scipy", "pytest"]
+visualization = ["numpy", "scipy", "libigl", "Pillow"]
 
 [tool.setuptools.packages.find]
 include = ["warp_preconditioners*"]
