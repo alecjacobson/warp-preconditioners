@@ -38,6 +38,7 @@
   "data_weight": 0.0001,
   "smoothing_weight": 1.0,
   "display_order": [
+    "target",
     "fsai_cg_28688",
     "jacobi_cr_28688",
     "jacobi_cr_286880",
@@ -54,8 +55,8 @@
     "field_stability_threshold": 1e-06
   },
   "scalar_range": [
-    -1.2253850919668856,
-    1.753178310729396
+    -1.5784301741324263,
+    1.8346457943562138
   ],
   "field_units": "dimensionless nonlinear signal",
   "display": "original geometry colored by u, no scalar filtering or geometry deformation",
@@ -206,22 +207,41 @@
     "camera": {
       "azimuth": -70,
       "elevation": 19,
-      "orthographic_scale": 8.84000015258789
+      "orthographic_scale": 10.920000076293945
     },
     "image_size": [
-      4800,
+      6000,
       1120
     ],
-    "scene": "four simultaneous dragon objects, one camera, shared lights and ground",
+    "scene": "five simultaneous dragons: raw data plus four solves; one camera, shared lights and ground",
+    "display_order": [
+      "target",
+      "fsai_cg_28688",
+      "jacobi_cr_28688",
+      "jacobi_cr_286880",
+      "jacobi_cr_2868800"
+    ],
     "objects": [
+      {
+        "name": "target",
+        "location": [
+          -3.909121036529541,
+          -1.4228037595748901,
+          -0.0
+        ],
+        "label_x_fraction": 0.11904762170919048,
+        "field_sha256": "9a67d957b6987bcbfda31e44a237f34bf40c05151fbcd14f7a40495fee20cb0f",
+        "attribute_float32_max_abs_error": 5.960385873748919e-08,
+        "attribute_verified": true
+      },
       {
         "name": "fsai_cg_28688",
         "location": [
-          -2.9318408966064453,
-          -1.0671027898788452,
+          -1.9545605182647705,
+          -0.7114018797874451,
           -0.0
         ],
-        "label_x_fraction": 0.14705882962155525,
+        "label_x_fraction": 0.30952381085459524,
         "field_sha256": "575e9b1932d8ac6d751df80e06c32f51df3dc84c083ae4b2a934872e329619a3",
         "attribute_float32_max_abs_error": 5.9604575719518493e-08,
         "attribute_verified": true
@@ -229,11 +249,11 @@
       {
         "name": "jacobi_cr_28688",
         "location": [
-          -0.9772802591323853,
-          -0.35570093989372253,
-          -0.0
+          0.0,
+          0.0,
+          0.0
         ],
-        "label_x_fraction": 0.3823529432071851,
+        "label_x_fraction": 0.5,
         "field_sha256": "f370e75420fcf38c64068c4ec6b07122eaccfa8b5af5ea69657403e6f6230711",
         "attribute_float32_max_abs_error": 5.9604478019892326e-08,
         "attribute_verified": true
@@ -241,11 +261,11 @@
       {
         "name": "jacobi_cr_286880",
         "location": [
-          0.9772802591323853,
-          0.35570093989372253,
+          1.9545605182647705,
+          0.7114018797874451,
           0.0
         ],
-        "label_x_fraction": 0.617647056792815,
+        "label_x_fraction": 0.6904761891454048,
         "field_sha256": "9baab26409f2ab588413a9deae109b0e7a49dec8f8ee4e16d274468f2ea159ac",
         "attribute_float32_max_abs_error": 5.9603400881513835e-08,
         "attribute_verified": true
@@ -253,11 +273,11 @@
       {
         "name": "jacobi_cr_2868800",
         "location": [
-          2.9318408966064453,
-          1.0671027898788452,
+          3.909121036529541,
+          1.4228037595748901,
           0.0
         ],
-        "label_x_fraction": 0.8529411703784447,
+        "label_x_fraction": 0.8809523782908095,
         "field_sha256": "32cf41fb4c3f35b15901990414fb2c67acec37cb3b2a63ac6d5fb18e61dcdc8f",
         "attribute_float32_max_abs_error": 5.960450577546794e-08,
         "attribute_verified": true
@@ -265,8 +285,8 @@
     ],
     "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
     "scalar_range": [
-      -1.2253850919668856,
-      1.753178310729396
+      -1.5784301741324263,
+      1.8346457943562138
     ],
     "bands": 26,
     "interpolation": "scalar interpolated on triangles, then constant color ramp per shading sample",
@@ -405,8 +425,28 @@
       ]
     ]
   },
+  "solver_display_order": [
+    "fsai_cg_28688",
+    "jacobi_cr_28688",
+    "jacobi_cr_286880",
+    "jacobi_cr_2868800"
+  ],
+  "solver_scalar_range": [
+    -1.2253850919668856,
+    1.753178310729396
+  ],
+  "raw_data_comparison": {
+    "reference_field": "fsai_cg_28688",
+    "mass_weighted_rms_change": 0.1365199298906113,
+    "rms_change_over_data_std": 0.19159597147263896,
+    "max_abs_change": 0.7150701303525814,
+    "data_std": 0.7125407117973102,
+    "smoothed_std": 0.662988101543695,
+    "std_reduction_fraction": 0.06954354948873565,
+    "bending_reduction_fraction": 0.9988823038287898
+  },
   "figure_size": [
-    4800,
+    6000,
     1665
   ],
   "note": "One scene render; labels and legend added afterward. Single scalar RHS timings, excluding setup."

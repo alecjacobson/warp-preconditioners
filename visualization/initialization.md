@@ -3,7 +3,7 @@
 **For this example, yes—especially for early field accuracy.** Starting from
 the data reduces the FSAI convergence count by about 2.7%, and produces much
 better Jacobi-CR fields at equal iteration budgets. This is a separate
-paired experiment, not a conclusion inferred from the four-dragon picture.
+paired experiment, not a conclusion inferred from the main comparison figure.
 
 ![Independent initial-guess comparison](../assets/dragon-initialization-comparison.png)
 

@@ -1,15 +1,16 @@
 # Nonlinear data smoothing on the dragon
 
-The figure contains **four dragons in one Blender scene**, under a single
+The figure contains **five dragons in one Blender scene**, under a single
 orthographic camera with shared lighting and ground. The centers are 2.08
 scene units apart. Left to right:
 
-1. Warp CG + adaptive FSAI (width 8), **converged at $k=28{,}688$ iterations**.
-2. Warp CR + Jacobi, **$k=28{,}688$ iterations**.
-3. Warp CR + Jacobi, **$10k=286{,}880$ iterations**.
-4. Warp CR + Jacobi, **$100k=2{,}868{,}800$ iterations**.
+1. **Raw data $f$**, before any solve or smoothing.
+2. Warp CG + adaptive FSAI (width 8), **converged at $k=28{,}688$ iterations**.
+3. Warp CR + Jacobi, **$k=28{,}688$ iterations**.
+4. Warp CR + Jacobi, **$10k=286{,}880$ iterations**.
+5. Warp CR + Jacobi, **$100k=2{,}868{,}800$ iterations**.
 
-**All four start from the same data function, $u_0=f$.** A separate
+**All four solvers start from the same data function, $u_0=f$.** A separate
 [initialization experiment](initialization.md) compares this with zero:
 FSAI uses about 2.7% fewer iterations, while the early Jacobi fields are
 substantially closer to the converged solution. This is evidence for the
@@ -58,6 +59,33 @@ reduction, while the RMS change from the data is about 0.1365. The curves
 in the new field therefore belong to the converged solution, rather than
 being an artifact of stopping the solver early. Affine fitting is only a
 diagnostic and is never rendered or subtracted from the field.
+
+## How much does smoothing change the data?
+
+The first dragon shows the stored raw input `target` directly. It is next to
+the converged FSAI result, and **all five dragons use one scalar range**, now
+including the raw data extrema. No separate normalization or clipping hides
+the input's larger range. The smoothing problem and all four previously
+computed solver fields are unchanged; adding the raw-data view requires no
+new solves.
+
+| Measure | Raw data | Converged FSAI result |
+| --- | ---: | ---: |
+| Scalar range | −1.5784 to 1.8346 | −1.2218 to 1.7389 |
+| Mass-weighted standard deviation | 0.71254 | 0.66299 |
+| Bending energy | 44.12668 | 0.04932 |
+
+The mass-weighted RMS change is **0.13652**, or **19.16% of the input's
+standard deviation**. The maximum vertexwise absolute change is **0.71507**,
+while the overall standard deviation decreases by only **6.95%**.
+
+The broad signal is therefore substantially preserved. The large bending
+energy reduction measures curvature suppression, not the amount of visible
+change in the field's overall values. High-frequency or localized changes
+can account for a large energy reduction. The earlier 99.89% figure should
+not be interpreted as evidence of a comparably dramatic visual change.
+These direct input/output measurements are stored under `raw_data_comparison`
+in the figure JSON and summarized below the shared legend.
 
 ## Budgets and convergence checks
 
@@ -113,7 +141,7 @@ changes lighting, not the scalar data or geometry.
 
 ## Colors and rendering
 
-All dragons share their combined scalar extrema and the same 26 intervals.
+The raw-data dragon and all four solved dragons share their combined scalar extrema and the same 26 intervals.
 Scalars are interpolated over each original triangle **before** the constant
 color ramp. No object has its own normalization, and prequantized vertex
 RGB values are not interpolated.
@@ -125,7 +153,7 @@ alternate interval lightness multiplied by 0.9. Its source functions are in
 under `imageprocessing/` and `mesh/isolines_stripe_map.m`. The translation's
 license is retained in `third_party/gptoolbox-LICENSE-MIT.txt`.
 
-Cycles/OptiX renders the four meshes simultaneously with shared contact
+Cycles/OptiX renders all five meshes simultaneously with shared contact
 shadows. Composition adds labels and an unlit sRGB colorbar to this **single
 render**, rather than combining separate dragon renders. Camera settings,
 object positions, target definition, field hashes, and diagnostics are in
@@ -141,7 +169,7 @@ OPENBLAS_NUM_THREADS=1 python visualization/solve_fields.py \
   --dir /tmp/dump --mesh /path/to/xyzrgb_dragon-720K.ply \
   --data-weight 0.0001 --initial-guess data --fsai-rtol 1e-8
 blender -b --factory-startup --python visualization/render_dragon.py -- \
-  --width 4800 --height 1120 --samples 64
+  --width 6000 --height 1120 --samples 64
 python visualization/compose.py
 ```
 
@@ -150,7 +178,7 @@ The optional `--audit-weights` mode tests its specified positive coefficients
 on the **new nonlinear target**, independently of the displayed fields.
 
 Solving uses `cuda:0`; rendering uses an OptiX GPU and Blender 4.5.3. The
-editable scene is `data/visualization/four_dragons.blend`. Intermediate
+editable scene is `data/visualization/five_dragons.blend`. Intermediate
 fields (including the input `target`) and renders are also in ignored
 `data/visualization/`. Published PNGs use Git LFS. The numerical solver
 library still depends only on Warp; Matplotlib is an optional dependency

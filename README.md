@@ -10,18 +10,21 @@ right-hand sides in **0.708 seconds median total**, including setup, at
 backward error **8.83e-11**. See [measurements and caveats](results/README.md)
 for repeated trials, Jacobi comparisons, and the upstream timing schedule.
 
-![Four dragons in one scene: converged FSAI-CG at k iterations, followed by Jacobi-CR at k, 10k and 100k. All use the same 26 crisp OKLab intervals.](assets/dragon-biharmonic-comparison.png)
+![Five dragons in one scene: raw input f, converged FSAI-CG at k, and Jacobi-CR at k, 10k and 100k. All use the same 26 crisp OKLab intervals.](assets/dragon-biharmonic-comparison.png)
 
-Four copies of the original mesh solve `(α M + K M^-1 K)u = α Mf`, with
+The first dragon shows **raw input f**; the next four show solutions of `(α M + K M^-1 K)u = α Mf`, with
 **α = 0.0001** and a **nonlinear combination of x, y, z and xz** as the data
 function. The converged field remains strongly non-affine while bending
-energy falls by about **99.89%**. All methods start from the same data
+energy falls by about **99.89%**. The raw-versus-smoothed comparison shows
+that broad variation remains: RMS change is **19.2% of the input standard
+deviation**, while standard deviation decreases by only **7.0%**. The energy
+reduction alone is not a measure of visible change. All methods start from the same data
 function; a [separate initialization experiment](visualization/initialization.md)
 finds modest FSAI iteration savings and substantially better early Jacobi fields.
 
 FSAI-CG reaches its relative stopping tolerance of **1e-8 at k = 28,688**.
-Left to right: **FSAI-CG at k; Jacobi-CR at k, 10k = 286,880, and
-100k = 2,868,800**. Each is one uninterrupted solve. All four share a scene,
+Left to right after the raw data: **FSAI-CG at k; Jacobi-CR at k, 10k = 286,880, and
+100k = 2,868,800**. Each is one uninterrupted solve. All five share a scene,
 scalar range, and `isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))` palette.
 The figure shows independently recomputed residuals; a longer FSAI run
 also verifies field stability. This nonlinear, stronger-smoothing example

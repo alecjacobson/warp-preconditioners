@@ -36,7 +36,7 @@ def area(name, pos, power, size):
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--data", type=Path, default=Path("data/visualization"))
-    parser.add_argument("--width", type=int, default=4800)
+    parser.add_argument("--width", type=int, default=6000)
     parser.add_argument("--height", type=int, default=1120)
     parser.add_argument("--samples", type=int, default=96)
     parser.add_argument("--azimuth", type=float, default=-70)
@@ -45,6 +45,12 @@ def main():
     args.data = args.data.resolve()
     data = np.load(args.data / "fields.npz")
     meta = json.loads((args.data / "solve.json").read_text())
+    display_order = ["target", *meta["display_order"]]
+    scalar_range = [
+        min(float(data[name].min()) for name in display_order),
+        max(float(data[name].max()) for name in display_order),
+    ]
+    middle = (len(display_order) - 1) / 2
     linear, srgb = striped_okloop()
     scene = bpy.context.scene
     bpy.ops.object.select_all(action="SELECT")
@@ -102,8 +108,8 @@ def main():
     attr = nodes.new("ShaderNodeAttribute")
     attr.attribute_name = "biharmonic_u"
     normalize = nodes.new("ShaderNodeMapRange")
-    normalize.inputs["From Min"].default_value = meta["scalar_range"][0]
-    normalize.inputs["From Max"].default_value = meta["scalar_range"][1]
+    normalize.inputs["From Min"].default_value = scalar_range[0]
+    normalize.inputs["From Max"].default_value = scalar_range[1]
     normalize.clamp = True
     links.new(attr.outputs["Fac"], normalize.inputs["Value"])
     ramp = nodes.new("ShaderNodeValToRGB")
@@ -127,7 +133,7 @@ def main():
     floor_mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (1, 1, 1, 1)
     floor_mat.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 1
     ground.data.materials.append(floor_mat)
-    # Broad lights illuminate all four objects in the SAME scene.
+    # Broad lights illuminate the raw data and all solves in the SAME scene.
     area("large soft key", (-3, -6, 9), 1000, 9)
     area("front fill", (5, -3, 6), 380, 8)
     area("soft rim", (1, 5, 8), 800, 9)
@@ -140,18 +146,21 @@ def main():
     camera.location = target + 5 * direction
     look_at(camera, target)
     camera_data.type = "ORTHO"
-    camera_data.ortho_scale = 8.84
+    camera_data.ortho_scale = 2.60 + (len(display_order) - 1) * 2.08
     scene.camera = camera
     scene.render.use_persistent_data = True
     # Space copies along the camera's horizontal axis, at identical depth.
     # Each object owns its scalar attribute; all share one unmodified color ramp.
     right = Vector((-math.sin(az), math.cos(az), 0))
     objects = []
-    for i, name in enumerate(meta["display_order"]):
+    for i, name in enumerate(display_order):
         copy = mesh.copy()
         copy.name = f"original geometry | {name}"
         u = data[name]
-        assert hashlib.sha256(u.tobytes()).hexdigest() == meta["results"][name]["field_sha256"]
+        expected_hash = (
+            meta["target"]["sha256"] if name == "target" else meta["results"][name]["field_sha256"]
+        )
+        assert hashlib.sha256(u.tobytes()).hexdigest() == expected_hash
         values = u.astype(np.float32)
         copy.attributes["biharmonic_u"].data.foreach_set("value", values)
         # Read back the actual Blender attribute to detect assignment/ordering bugs.
@@ -160,20 +169,20 @@ def main():
         np.testing.assert_array_equal(check, values)
         dragon = bpy.data.objects.new(name, copy)
         bpy.context.collection.objects.link(dragon)
-        dragon.location = (i - 1.5) * 2.08 * right
+        dragon.location = (i - middle) * 2.08 * right
         objects.append(
             dict(
                 name=name,
                 location=list(dragon.location),
-                label_x_fraction=0.5 + (i - 1.5) * 2.08 / camera_data.ortho_scale,
+                label_x_fraction=0.5 + (i - middle) * 2.08 / camera_data.ortho_scale,
                 field_sha256=hashlib.sha256(u.tobytes()).hexdigest(),
                 attribute_float32_max_abs_error=float(np.max(np.abs(check - u))),
                 attribute_verified=True,
             )
         )
     bpy.data.meshes.remove(mesh)
-    scene.render.filepath = str(args.data / "four_dragons.png")
-    bpy.ops.wm.save_as_mainfile(filepath=str(args.data / "four_dragons.blend"))
+    scene.render.filepath = str(args.data / "five_dragons.png")
+    bpy.ops.wm.save_as_mainfile(filepath=str(args.data / "five_dragons.blend"))
     bpy.ops.render.render(write_still=True)
     render_meta = dict(
         renderer=bpy.app.version_string,
@@ -186,10 +195,11 @@ def main():
             orthographic_scale=camera_data.ortho_scale,
         ),
         image_size=[args.width, args.height],
-        scene="four simultaneous dragon objects, one camera, shared lights and ground",
+        scene="five simultaneous dragons: raw data plus four solves; one camera, shared lights and ground",
+        display_order=display_order,
         objects=objects,
         colormap="isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
-        scalar_range=meta["scalar_range"],
+        scalar_range=scalar_range,
         bands=26,
         interpolation="scalar interpolated on triangles, then constant color ramp per shading sample",
         geometry="original mesh; uniform scale and translation for scene placement only",

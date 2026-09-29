@@ -1,4 +1,4 @@
-"""Annotate one four-dragon scene render with solver labels and a common legend."""
+"""Annotate the raw-data dragon and four solves with a common scalar legend."""
 
 import argparse
 import json
@@ -18,7 +18,22 @@ def main():
     args = parser.parse_args()
     meta = json.loads((args.data / "solve.json").read_text())
     render = json.loads((args.data / "render.json").read_text())
-    scene = Image.open(args.data / "four_dragons.png").convert("RGBA")
+    scene = Image.open(args.data / "five_dragons.png").convert("RGBA")
+    data = np.load(args.data / "fields.npz")
+    reference_name = meta["display_order"][0]
+    reference_stats = meta["results"][reference_name]
+    data_std = meta["target_statistics"]["mass_weighted_std"]
+    comparison = dict(
+        reference_field=reference_name,
+        mass_weighted_rms_change=reference_stats["data_fit_rms"],
+        rms_change_over_data_std=reference_stats["data_fit_rms"] / data_std,
+        max_abs_change=float(np.max(np.abs(data[reference_name] - data["target"]))),
+        data_std=data_std,
+        smoothed_std=reference_stats["mass_weighted_std"],
+        std_reduction_fraction=1 - reference_stats["mass_weighted_std"] / data_std,
+        bending_reduction_fraction=1
+        - reference_stats["bending_energy"] / meta["target_bending_energy"],
+    )
     width, ph = scene.size
     header, footer = 260, 285
     height = ph + header + footer
@@ -37,7 +52,7 @@ def main():
             anchor="mt",
         )
 
-    text(width / 2, 24, "Nonlinear data · biharmonic smoothing", 66, True)
+    text(width / 2, 24, "Raw data and biharmonic smoothing", 66, True)
     text(
         width / 2,
         111,
@@ -47,15 +62,28 @@ def main():
     )
     for ob in render["objects"]:
         name = ob["name"]
-        r = meta["results"][name]
         cx = ob["label_x_fraction"] * width
+        y = header + ph - 25
+        if name == "target":
+            text(cx, 185, "Raw data f", 44, True)
+            text(cx, 239, "Unsmoothed input", 37)
+            text(cx, y, "No solve", 36, True)
+            text(
+                cx,
+                y + 49,
+                f"Bending energy  {meta['target_bending_energy']:.2f}",
+                29,
+                color="#657083",
+            )
+            text(cx, y + 88, f"Mass-weighted std  {data_std:.3f}", 27, color="#657083")
+            continue
+        r = meta["results"][name]
         label = "Warp CG + FSAI" if name.startswith("fsai") else "Warp CR + Jacobi"
         text(cx, 185, label, 44, True)
         multiplier = r["iteration_multiplier"]
         budget_label = "k" if multiplier == 1 else f"{multiplier}k"
         status = " · converged" if name.startswith("fsai") else ""
         text(cx, 239, f"{budget_label} = {r['actual_iterations']:,}{status}", 37)
-        y = header + ph - 25
         text(cx, y, f"{r['solve_s']:.2f} s solve", 36, True)
         text(cx, y + 49, f"Relative residual  {r['relative_residual']:.2e}", 29, color="#657083")
         text(cx, y + 88, f"Backward error  {r['backward_error']:.2e}", 27, color="#657083")
@@ -67,7 +95,7 @@ def main():
         x0 = legend_x + round(i * legend_w / 26)
         x1 = legend_x + round((i + 1) * legend_w / 26)
         draw.rectangle((x0, legend_y, x1, legend_y + 33), fill=tuple(np.rint(c * 255).astype(int)))
-    lo, hi = meta["scalar_range"]
+    lo, hi = render["scalar_range"]
     for t in [0, 0.25, 0.5, 0.75, 1]:
         x = legend_x + t * legend_w
         draw.line((x, legend_y + 35, x, legend_y + 43), fill="#8B94A1", width=2)
@@ -75,13 +103,18 @@ def main():
     text(
         width / 2,
         height - 42,
-        f"Computed scalar u · dimensionless · k from FSAI stopping tolerance {meta['convergence']['fsai_rtol']:.0e}; independently recomputed residuals shown above",
+        f"Same scale for f and u · k from FSAI stopping tolerance {meta['convergence']['fsai_rtol']:.0e} · RMS change {comparison['mass_weighted_rms_change']:.3f} ({100 * comparison['rms_change_over_data_std']:.1f}% of data std) · std reduction {100 * comparison['std_reduction_fraction']:.1f}%",
         27,
         color="#657083",
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(args.output, optimize=True)
     meta["render"] = render
+    meta["solver_display_order"] = meta["display_order"]
+    meta["display_order"] = render["display_order"]
+    meta["solver_scalar_range"] = meta["scalar_range"]
+    meta["scalar_range"] = render["scalar_range"]
+    meta["raw_data_comparison"] = comparison
     meta["figure_size"] = list(canvas.size)
     meta["note"] = (
         "One scene render; labels and legend added afterward. Single scalar RHS timings, excluding setup."
