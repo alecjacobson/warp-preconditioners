@@ -1,19 +1,56 @@
 # Dragon scalar-field comparison
 
 The figure contains **four dragons in one Blender scene**, under a single
-orthographic camera with shared lighting and ground. From left to right:
+orthographic camera with shared lighting and ground. The dragon centers are
+2.08 scene units apart (previously 2.34), with tighter camera framing. From left to right:
 
-1. Warp CG + adaptive FSAI (width 8), **500 iterations**.
-2. Warp CR + Jacobi, **500 iterations**.
-3. Warp CR + Jacobi, **5,000 iterations**.
-4. Warp CR + Jacobi, **50,000 iterations**.
+1. Warp CG + adaptive FSAI (width 8), **converged at $k=10{,}075$ iterations**.
+2. Warp CR + Jacobi, **$k=10{,}075$ iterations**.
+3. Warp CR + Jacobi, **$10k=100{,}750$ iterations**.
+4. Warp CR + Jacobi, **$100k=1{,}007{,}500$ iterations**.
 
-Each field is the final iterate of one uninterrupted solve from zero. There
-are no 500-step restarts and no selection of a best intermediate iterate.
-The actual iteration counts returned by Warp are checked against these
-budgets. Setup and solver kernels are warmed before timing; setup times
-are recorded separately. The comparison is by iteration budget, not equal
+The script determines $k$ afresh from FSAI reaching Warp's recursive relative
+residual tolerance of $10^{-8}$; the listed counts are the recorded run.
+Jacobi's budgets are derived from that actual returned count, not hard-coded.
+Each field is the final iterate of one uninterrupted solve from zero, with
+no restarts or selection of a best intermediate iterate. Jacobi uses zero
+stopping tolerance to reach the requested budgets, and actual counts are
+checked. Setup and solver kernels are warmed before timing; setup times are
+recorded separately. The comparison is by iteration budget, not equal
 wall-clock time. Timings refer to one scalar right-hand side.
+
+### Meaning of convergence
+
+The FSAI caption means **the solver reached its stated stopping tolerance**.
+For this ill-conditioned system, recursive and independently recomputed
+residuals differ: the recorded recursive relative residual is approximately
+$7.81\times10^{-9}$, while direct evaluation of $\|b-Au\|_2/\|b\|_2$
+gives approximately $1.52\times10^{-4}$. Its componentwise backward error
+is approximately $1.37\times10^{-13}$. The figure prints the independent
+residual, not the smaller internal estimate.
+
+An additional, unrendered FSAI run with budget $2k$ checks field stability:
+its mass-weighted relative difference from the displayed FSAI field must be
+below $10^{-6}$. The recorded run changes by only approximately
+$5.00\times10^{-11}$ in that norm (maximum absolute change
+$8.01\times10^{-9}$). The measured change, actual iteration count, and
+residual are saved in the figure JSON. This check is separate from the displayed
+solve timing and does not alter the scalar field. Jacobi's field differences
+from the converged FSAI field are also recorded, without treating that field
+as an exact-arithmetic solution.
+
+Recorded single-RHS solve times exclude preconditioner setup:
+
+| Method | Iterations | Solve time (s) | Relative mass-norm field difference from FSAI |
+| --- | ---: | ---: | ---: |
+| FSAI-CG | 10,075 | 3.52 | 0 |
+| Jacobi-CR, k | 10,075 | 2.22 | 2.60e-1 |
+| Jacobi-CR, 10k | 100,750 | 22.61 | 7.26e-2 |
+| Jacobi-CR, 100k | 1,007,500 | 228.67 | 1.50e-8 |
+
+At the largest budget the scalar fields agree closely, even though their
+independently recomputed relative residuals differ because of accumulated
+floating-point error. The full residual measurements are retained in JSON.
 
 ## Equation and stronger smoothing
 
@@ -41,13 +78,11 @@ was approximately 0.5% of the field's standard deviation. A 5,000-step
 FSAI diagnostic at the new weight increases that fraction to approximately
 4.6%. The weight sweep and its residuals are included in the figure JSON.
 
-**These displayed fields are finite-budget iterates, not converged reference
-solutions.** Stronger smoothing also makes the linear system harder. In
-particular, the extra variation in the 500-step FSAI field includes iteration
-error; it must not all be interpreted as the converged smoothing effect.
-Both true relative residual and componentwise backward error are printed
-under each dragon. Small backward error alone can conceal a substantial
-relative residual in this poorly conditioned system.
+The converged FSAI field separates the smoothing effect from the transient
+variation present in the earlier 500-step example. The three Jacobi fields
+remain iteration-budget comparisons; they are not assumed converged merely
+because their budgets are larger. Both true relative residual and
+componentwise backward error are printed under each dragon.
 
 ## Checking what is visualized
 
@@ -98,7 +133,7 @@ Generate the C++ benchmark dumps using the main README instructions, then:
 python -m pip install -e '.[visualization]'
 OPENBLAS_NUM_THREADS=1 python visualization/solve_fields.py \
   --dir /tmp/dump --mesh /path/to/xyzrgb_dragon-720K.ply \
-  --data-weight 0.001
+  --data-weight 0.001 --fsai-rtol 1e-8
 blender -b --factory-startup --python visualization/render_dragon.py -- \
   --width 4800 --height 1120 --samples 64
 python visualization/compose.py

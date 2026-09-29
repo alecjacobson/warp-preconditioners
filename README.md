@@ -10,18 +10,20 @@ right-hand sides in **0.708 seconds median total**, including setup, at
 backward error **8.83e-11**. See [measurements and caveats](results/README.md)
 for repeated trials, Jacobi comparisons, and the upstream timing schedule.
 
-![Four dragons in one scene: FSAI-CG at 500 iterations, followed by Jacobi-CR at 500, 5,000 and 50,000 iterations. All use the same 26 crisp OKLab intervals.](assets/dragon-biharmonic-comparison.png)
+![Four dragons in one scene: converged FSAI-CG at k iterations, followed by Jacobi-CR at k, 10k and 100k. All use the same 26 crisp OKLab intervals.](assets/dragon-biharmonic-comparison.png)
 
-Four copies of the original mesh, colored by fixed-budget iterates of
-`(α M + K M^-1 K)u = α Mz`, with **α = 0.001** for stronger smoothing.
-Left to right: **FSAI-CG, 500 iterations; Jacobi-CR, 500, 5,000, and 50,000**.
-Each is one uninterrupted solve from zero. All four occupy one rendered
-scene and use the same scalar range and
+Four copies of the original mesh solve `(α M + K M^-1 K)u = α Mz`, with
+**α = 0.001** for stronger smoothing. FSAI-CG reaches its relative stopping
+tolerance of **1e-8 at k = 10,075 iterations**. Left to right: **FSAI-CG at k;
+Jacobi-CR at k, 10k = 100,750, and 100k = 1,007,500**. Each is one
+uninterrupted solve from zero. All four occupy one scene, packed closer
+together, and share the same scalar range and
 `isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))`.
-These are **finite-budget iterates, not converged reference solutions**;
-both residual measures are shown. This stronger-smoothing illustration is
+The figure reports independently recomputed residuals; FSAI's convergence
+label refers to its internal stopping tolerance, with an additional longer
+solve verifying field stability. This stronger-smoothing illustration is
 a different system from the α = 1 benchmark timings above.
-[Field verification, diagnostics, and reproduction](visualization/README.md).
+[Convergence checks, field verification, and reproduction](visualization/README.md).
 
 ```bash
 python -m pip install -e '.[test]'

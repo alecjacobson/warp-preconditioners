@@ -39,7 +39,7 @@ def main():
             anchor="mt",
         )
 
-    text(width / 2, 24, "Biharmonic smoothing · fixed iteration budgets", 66, True)
+    text(width / 2, 24, "Biharmonic smoothing · iterations to FSAI convergence", 66, True)
     text(
         width / 2,
         111,
@@ -53,7 +53,10 @@ def main():
         cx = ob["label_x_fraction"] * width
         label = "Warp CG + FSAI" if name.startswith("fsai") else "Warp CR + Jacobi"
         text(cx, 185, label, 44, True)
-        text(cx, 239, f"k = {r['actual_iterations']:,}", 37)
+        multiplier = r["iteration_multiplier"]
+        budget_label = "k" if multiplier == 1 else f"{multiplier}k"
+        status = " · converged" if name.startswith("fsai") else ""
+        text(cx, 239, f"{budget_label} = {r['actual_iterations']:,}{status}", 37)
         y = header + ph - 25
         text(cx, y, f"{r['solve_s']:.2f} s solve", 36, True)
         text(cx, y + 49, f"Relative residual  {r['relative_residual']:.2e}", 29, color="#657083")
@@ -70,11 +73,11 @@ def main():
     for t in [0, 0.25, 0.5, 0.75, 1]:
         x = legend_x + t * legend_w
         draw.line((x, legend_y + 35, x, legend_y + 43), fill="#8B94A1", width=2)
-        text(x, legend_y + 48, f"{lo + t * (hi - lo):.1f}", 25, color="#657083")
+        text(x, legend_y + 48, f"{lo + t * (hi - lo):.3g}", 25, color="#657083")
     text(
         width / 2,
         height - 42,
-        "Computed height u · original mesh units · finite-budget iterates, not converged references",
+        f"Computed height u · shared scale · k from FSAI stopping tolerance {meta['convergence']['fsai_rtol']:.0e}; independently recomputed residuals shown above",
         27,
         color="#657083",
     )

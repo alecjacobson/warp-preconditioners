@@ -140,7 +140,7 @@ def main():
     camera.location = target + 5 * direction
     look_at(camera, target)
     camera_data.type = "ORTHO"
-    camera_data.ortho_scale = 9.68
+    camera_data.ortho_scale = 8.84
     scene.camera = camera
     scene.render.use_persistent_data = True
     # Space copies along the camera's horizontal axis, at identical depth.
@@ -160,12 +160,12 @@ def main():
         np.testing.assert_array_equal(check, values)
         dragon = bpy.data.objects.new(name, copy)
         bpy.context.collection.objects.link(dragon)
-        dragon.location = (i - 1.5) * 2.34 * right
+        dragon.location = (i - 1.5) * 2.08 * right
         objects.append(
             dict(
                 name=name,
                 location=list(dragon.location),
-                label_x_fraction=0.5 + (i - 1.5) * 2.34 / camera_data.ortho_scale,
+                label_x_fraction=0.5 + (i - 1.5) * 2.08 / camera_data.ortho_scale,
                 field_sha256=hashlib.sha256(u.tobytes()).hexdigest(),
                 attribute_float32_max_abs_error=float(np.max(np.abs(check - u))),
                 attribute_verified=True,

@@ -1,4 +1,4 @@
-"""Compute fixed-budget Warp iterates of a screened biharmonic height field.
+"""Compare converged FSAI with Warp CR/Jacobi at k, 10k, and 100k iterations.
 
 Every displayed field is an unfiltered solver output from a zero initial guess.
 Each budget uses one uninterrupted Krylov solve, without checkpoint restarts.
@@ -45,7 +45,7 @@ def field_statistics(u, vertices, mass):
     )
 
 
-def run(a, b_np, method, budget):
+def run(a, b_np, method, budget, rtol=0.0):
     A = upload(a, "cuda:0")
     b = wp.array(b_np, dtype=wp.float64, device="cuda:0")
     solver = linear.cg if method == "fsai_cg" else linear.cr
@@ -64,11 +64,12 @@ def run(a, b_np, method, budget):
     x.zero_()
     wp.synchronize()
     start = time.perf_counter()
-    nit, _, _ = solver(A, b, x, M=pre, tol=0.0, atol=0.0, maxiter=budget, check_every=0)
+    nit, recursive_sq, _ = solver(A, b, x, M=pre, tol=rtol, atol=0.0, maxiter=budget, check_every=0)
     wp.synchronize()
     elapsed = time.perf_counter() - start
     actual = int(nit.numpy()[0]) if isinstance(nit, wp.array) else int(nit)
     sol = x.numpy()
+    recursive_relative = float(np.sqrt(recursive_sq.numpy()[0])) / norm(b_np)
     assert np.isfinite(sol).all()
     return sol, dict(
         solver="warp.optim.linear." + solver.__name__,
@@ -80,8 +81,10 @@ def run(a, b_np, method, budget):
         initial_guess="zero",
         restarts=0,
         selection="final iterate of a single solver call; no best-checkpoint selection",
-        tol=0.0,
+        tol=rtol,
         atol=0.0,
+        recursive_relative_residual=recursive_relative,
+        reached_stopping_tolerance=bool(rtol > 0 and recursive_relative <= rtol),
         backward_error=berr(a, abs(a), b_np, sol),
         relative_residual=norm(b_np - a @ sol) / norm(b_np),
     )
@@ -93,10 +96,14 @@ def main():
     parser.add_argument("--mesh", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("data/visualization"))
     parser.add_argument("--data-weight", type=float, default=0.001)
+    parser.add_argument("--fsai-rtol", type=float, default=1e-8)
+    parser.add_argument("--fsai-maxiter", type=int, default=50000)
     parser.add_argument("--audit-weights", type=float, nargs="+")
     args = parser.parse_args()
     if args.data_weight <= 0 or (args.audit_weights and min(args.audit_weights) <= 0):
         parser.error("data weights must be positive")
+    if args.fsai_rtol <= 0 or args.fsai_maxiter <= 0:
+        parser.error("FSAI tolerance and maximum iterations must be positive")
     args.output.mkdir(parents=True, exist_ok=True)
     wp.init()
     wp.config.log_level = wp.LOG_WARNING
@@ -137,11 +144,39 @@ def main():
 
     a, b_np = equation(args.data_weight)
     fields, records = {}, {}
-    order = ["fsai_cg_500", "jacobi_cr_500", "jacobi_cr_5000", "jacobi_cr_50000"]
-    for name in order:
+    u_fsai, fsai_record = run(a, b_np, "fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol)
+    assert fsai_record["reached_stopping_tolerance"], fsai_record
+    k = fsai_record["actual_iterations"]
+    print("FSAI CONVERGED", k, json.dumps(fsai_record), flush=True)
+    # Check forward stability, rather than treating the recursive residual as
+    # an independently verified residual of the ill-conditioned matrix.
+    extended, check_record = run(a, b_np, "fsai_cg", 2 * k)
+    change = float(np.sqrt(np.sum(mass * (extended - u_fsai) ** 2) / np.sum(mass * u_fsai**2)))
+    assert change < 1e-6, ("FSAI field has not stabilized", change)
+    convergence_check = dict(
+        criterion="Warp recursive relative residual <= fsai_rtol",
+        fsai_rtol=args.fsai_rtol,
+        k=k,
+        extended_actual_iterations=check_record["actual_iterations"],
+        extended_relative_residual=check_record["relative_residual"],
+        relative_mass_norm_field_change=change,
+        max_abs_field_change=float(np.max(np.abs(extended - u_fsai))),
+        field_stability_threshold=1e-6,
+    )
+    print("CONVERGENCE CHECK", json.dumps(convergence_check), flush=True)
+    order = [f"fsai_cg_{k}"] + [f"jacobi_cr_{factor * k}" for factor in [1, 10, 100]]
+    for i, name in enumerate(order):
         method, budget = name.rsplit("_", 1)
-        u, record = run(a, b_np, method, int(budget))
+        if i == 0:
+            u, record = u_fsai, fsai_record
+        else:
+            print("START", name, flush=True)
+            u, record = run(a, b_np, method, int(budget))
         assert record["actual_iterations"] == int(budget), record
+        record["iteration_multiplier"] = [1, 1, 10, 100][i]
+        record["relative_mass_norm_difference_from_fsai"] = float(
+            np.sqrt(np.sum(mass * (u - u_fsai) ** 2) / np.sum(mass * u_fsai**2))
+        )
         record.update(field_statistics(u, vertices, mass))
         record["field_sha256"] = hashlib.sha256(u.tobytes()).hexdigest()
         record["data_energy"] = float(
@@ -165,6 +200,7 @@ def main():
         smoothing_weight=1.0,
         rhs_column=2,
         display_order=order,
+        convergence=convergence_check,
         scalar_range=[lo, hi],
         field_units="original mesh coordinate units",
         display="original geometry colored by u, no scalar filtering or geometry deformation",
