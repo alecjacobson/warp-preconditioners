@@ -4,6 +4,7 @@ Run: blender -b --factory-startup --python visualization/render_dragon.py -- ...
 """
 
 import argparse
+import hashlib
 import json
 import math
 import sys
@@ -35,12 +36,11 @@ def area(name, pos, power, size):
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--data", type=Path, default=Path("data/visualization"))
-    parser.add_argument("--width", type=int, default=1600)
-    parser.add_argument("--height", type=int, default=1240)
+    parser.add_argument("--width", type=int, default=4800)
+    parser.add_argument("--height", type=int, default=1120)
     parser.add_argument("--samples", type=int, default=96)
     parser.add_argument("--azimuth", type=float, default=-70)
     parser.add_argument("--elevation", type=float, default=19)
-    parser.add_argument("--preview", action="store_true")
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else [])
     args.data = args.data.resolve()
     data = np.load(args.data / "fields.npz")
@@ -91,9 +91,7 @@ def main():
     mesh.polygons.foreach_set("loop_total", np.full(len(f), 3, dtype=np.int32))
     mesh.polygons.foreach_set("use_smooth", np.ones(len(f), dtype=bool))
     mesh.update()
-    dragon = bpy.data.objects.new("dragon", mesh)
-    bpy.context.collection.objects.link(dragon)
-    attribute = mesh.attributes.new("biharmonic_u", "FLOAT", "POINT")
+    mesh.attributes.new("biharmonic_u", "FLOAT", "POINT")
     material = bpy.data.materials.new("26 crisp OKLab isointervals")
     material.use_nodes = True
     nodes = material.node_tree.nodes
@@ -129,9 +127,10 @@ def main():
     floor_mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (1, 1, 1, 1)
     floor_mat.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 1
     ground.data.materials.append(floor_mat)
-    area("large soft key", (-3, -4, 6), 440, 4)
-    area("front fill", (4, -2, 3), 170, 3.5)
-    area("soft rim", (1, 4, 5), 360, 3)
+    # Broad lights illuminate all four objects in the SAME scene.
+    area("large soft key", (-3, -6, 9), 1000, 9)
+    area("front fill", (5, -3, 6), 380, 8)
+    area("soft rim", (1, 5, 8), 800, 9)
     camera_data = bpy.data.cameras.new("orthographic comparison")
     camera = bpy.data.objects.new("camera", camera_data)
     bpy.context.collection.objects.link(camera)
@@ -141,15 +140,41 @@ def main():
     camera.location = target + 5 * direction
     look_at(camera, target)
     camera_data.type = "ORTHO"
-    camera_data.ortho_scale = 2.42
+    camera_data.ortho_scale = 9.68
     scene.camera = camera
     scene.render.use_persistent_data = True
-    names = ["fsai_cg"] if args.preview else ["jacobi_cr", "fsai_cg"]
-    for name in names:
-        attribute.data.foreach_set("value", data[name].astype(np.float32))
-        mesh.update()
-        scene.render.filepath = str(args.data / f"{name}.png")
-        bpy.ops.render.render(write_still=True)
+    # Space copies along the camera's horizontal axis, at identical depth.
+    # Each object owns its scalar attribute; all share one unmodified color ramp.
+    right = Vector((-math.sin(az), math.cos(az), 0))
+    objects = []
+    for i, name in enumerate(meta["display_order"]):
+        copy = mesh.copy()
+        copy.name = f"original geometry | {name}"
+        u = data[name]
+        assert hashlib.sha256(u.tobytes()).hexdigest() == meta["results"][name]["field_sha256"]
+        values = u.astype(np.float32)
+        copy.attributes["biharmonic_u"].data.foreach_set("value", values)
+        # Read back the actual Blender attribute to detect assignment/ordering bugs.
+        check = np.empty(len(v), dtype=np.float32)
+        copy.attributes["biharmonic_u"].data.foreach_get("value", check)
+        np.testing.assert_array_equal(check, values)
+        dragon = bpy.data.objects.new(name, copy)
+        bpy.context.collection.objects.link(dragon)
+        dragon.location = (i - 1.5) * 2.34 * right
+        objects.append(
+            dict(
+                name=name,
+                location=list(dragon.location),
+                label_x_fraction=0.5 + (i - 1.5) * 2.34 / camera_data.ortho_scale,
+                field_sha256=hashlib.sha256(u.tobytes()).hexdigest(),
+                attribute_float32_max_abs_error=float(np.max(np.abs(check - u))),
+                attribute_verified=True,
+            )
+        )
+    bpy.data.meshes.remove(mesh)
+    scene.render.filepath = str(args.data / "four_dragons.png")
+    bpy.ops.wm.save_as_mainfile(filepath=str(args.data / "four_dragons.blend"))
+    bpy.ops.render.render(write_still=True)
     render_meta = dict(
         renderer=bpy.app.version_string,
         engine="Cycles",
@@ -160,7 +185,9 @@ def main():
             elevation=args.elevation,
             orthographic_scale=camera_data.ortho_scale,
         ),
-        panel_size=[args.width, args.height],
+        image_size=[args.width, args.height],
+        scene="four simultaneous dragon objects, one camera, shared lights and ground",
+        objects=objects,
         colormap="isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
         scalar_range=meta["scalar_range"],
         bands=26,
