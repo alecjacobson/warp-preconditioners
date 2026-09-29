@@ -1,0 +1,48 @@
+{
+  "problem": "unchanged head/tail Dirichlet; zero free initial guess",
+  "reference": "CHOLMOD AMD; mass relative error target 1e-4",
+  "results": [
+    {
+      "config": {
+        "width": 8,
+        "solver": "cr"
+      },
+      "ordering_s": 0.00021106749773025513,
+      "setup_s": 0.02541287988424301,
+      "solve_s": 39.125373885035515,
+      "total_s": 39.15078676491976,
+      "iterations": 121318,
+      "us_per_iteration": 322.5026285055434,
+      "recursive_relative_residual": 9.650056526231469e-13,
+      "relative_residual": 8.727182556344819e-10,
+      "backward_error": 5.836315076334875e-12,
+      "mass_relative_error": 4.918652432146638e-05,
+      "max_abs_error": 9.298450990424811e-05,
+      "factor_nnz": 2129097,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    },
+    {
+      "config": {
+        "width": 32,
+        "solver": "cr"
+      },
+      "ordering_s": 0.00021106749773025513,
+      "setup_s": 0.8795364834368229,
+      "solve_s": 24.35949433222413,
+      "total_s": 25.239030815660954,
+      "iterations": 47368,
+      "us_per_iteration": 514.2605626630664,
+      "recursive_relative_residual": 9.676085268387905e-13,
+      "relative_residual": 6.670880410783309e-09,
+      "backward_error": 1.110658069489559e-11,
+      "mass_relative_error": 4.425813050457586e-05,
+      "max_abs_error": 6.952563016263125e-05,
+      "factor_nnz": 4814243,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    }
+  ]
+}

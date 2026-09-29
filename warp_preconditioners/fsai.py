@@ -6,6 +6,8 @@ import warp as wp
 import warp.sparse as sp
 from warp.optim.linear import LinearOperator
 
+from .sparse_operator import _matvec
+
 
 @lru_cache(None)
 def _kernels(dtype, width):
@@ -152,6 +154,24 @@ def _kernels(dtype, width):
     return diagonal, build
 
 
+@wp.kernel(enable_backward=False, module="unique")
+def _validate_float32_factor(
+    offsets: wp.array(dtype=int),
+    columns: wp.array(dtype=int),
+    values: wp.array(dtype=wp.float32),
+    status: wp.array(dtype=int),
+):
+    row = wp.tid()
+    invalid = bool(False)
+    for e in range(offsets[row], offsets[row + 1]):
+        if not wp.isfinite(values[e]):
+            invalid = True
+        if columns[e] == row and values[e] <= wp.float32(0):
+            invalid = True
+    if invalid:
+        wp.atomic_add(status, 0, 1)
+
+
 class FSAI(LinearOperator):
     """Approximate inverse ``G.T @ G`` of an SPD BSR matrix.
 
@@ -159,14 +179,27 @@ class FSAI(LinearOperator):
     entry from the lower-triangular graph frontier (one entry per step).
     ``kap_tolerance`` stops rows whose relative energy improvement stagnates.
     Square blocks are scalarized on device. Float32 and float64 are supported.
-    Setup synchronizes once to validate diagonals; apply is graph-capturable.
+    ``apply_lanes`` selects cooperative CUDA factor products (1 keeps CSR).
+    It changes application arithmetic/order, not the factor construction.
+    ``factor_dtype=wp.float32`` optionally compresses the completed factor;
+    products still accumulate in the matrix scalar type. The transpose is
+    formed from the same rounded factor, retaining the Gram form.
+    Setup synchronizes to validate diagonals and optional factor compression; apply is graph-capturable.
     Matrix symmetry/positive definiteness are caller preconditions.
 
     Instances own scratch storage; do not apply one instance concurrently on
     independent streams. Rebuild after changing the source matrix.
     """
 
-    def __init__(self, A, max_row_size=8, kap_tolerance=1.0e-3, pivot_floor=None):
+    def __init__(
+        self,
+        A,
+        max_row_size=8,
+        kap_tolerance=1.0e-3,
+        pivot_floor=None,
+        apply_lanes=1,
+        factor_dtype=None,
+    ):
         if (
             not isinstance(A, sp.BsrMatrix)
             or A.shape[0] != A.shape[1]
@@ -183,6 +216,14 @@ class FSAI(LinearOperator):
             pivot_floor = 1.0e-6 if A.scalar_type == wp.float32 else 1.0e-12
         if not 0 < pivot_floor < 1:
             raise ValueError("pivot_floor must be in (0, 1)")
+        if not isinstance(apply_lanes, int) or apply_lanes not in (1, 2, 4, 8, 16, 32):
+            raise ValueError("apply_lanes must be one of 1, 2, 4, 8, 16, 32")
+        if factor_dtype is None:
+            factor_dtype = A.scalar_type
+        if factor_dtype not in (A.scalar_type, wp.float32):
+            raise ValueError("factor_dtype must be the matrix scalar type or wp.float32")
+        self.factor_dtype = factor_dtype
+        self.apply_lanes = apply_lanes
         self.source = A
         # Also canonicalizes padded storage. No host matrix staging.
         scalar = sp.bsr_copy(A, block_shape=(1, 1))
@@ -224,6 +265,19 @@ class FSAI(LinearOperator):
             )
         self.truncated_rows = int(diagnostics[1])
         self.G = sp.bsr_from_triplets(n, n, rows, cols, vals)
+        if factor_dtype != dtype:
+            self.G = sp.bsr_copy(self.G, scalar_type=factor_dtype)
+            status.zero_()
+            wp.launch(
+                _validate_float32_factor,
+                n,
+                [self.G.offsets, self.G.columns, self.G.values, status],
+                device=device,
+            )
+            if status.numpy()[0]:
+                raise ValueError(
+                    "factor_dtype conversion lost finite entries or a positive diagonal"
+                )
         self.GT = sp.bsr_transposed(self.G)
         self._tmp = wp.empty(n, dtype=dtype, device=device)
         super().__init__(A.shape, A.dtype, device, self._apply)
@@ -231,8 +285,7 @@ class FSAI(LinearOperator):
     def _apply(self, x, y, z, alpha, beta):
         x = x.view(self.scalar_type).flatten()
         z = z.view(self.scalar_type).flatten()
-        sp.bsr_mv(self.G, x, self._tmp)
+        y = y.view(self.scalar_type).flatten()
+        _matvec(self.G, x, self._tmp, self._tmp, 1.0, 0.0, self.apply_lanes)
         # x is fully consumed before writing z, including when x, y, z alias.
-        if beta != 0.0 and z.ptr != y.ptr:
-            wp.copy(dest=z, src=y.view(self.scalar_type).flatten())
-        sp.bsr_mv(self.GT, self._tmp, z, alpha=alpha, beta=beta)
+        _matvec(self.GT, self._tmp, y, z, alpha, beta, self.apply_lanes)

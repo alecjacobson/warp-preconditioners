@@ -1,5 +1,13 @@
 # Head-to-tail biharmonic interpolation
 
+**Later tuning and precision audit:** the [FSAI tuning study](../results/dirichlet-tuning/README.md)
+reduces this solve from about 43 seconds to about 10 seconds including
+setup. Applying the squared energy in factored form also improves accuracy:
+the previously displayed FSAI and Cholesky fields differ from a refined
+energy reference by about $1.38\times10^{-4}$ and $1.03\times10^{-4}$,
+respectively, in relative mass norm. The figures and measurements below
+preserve the original comparison and its explicitly assembled operator.
+
 ![Prescribed head and tail regions, followed by FSAI-CG and Jacobi-CR solutions at k, 10k and 100k.](../assets/dragon-dirichlet-comparison.png)
 
 This comparison has **no data term**. On the original dragon surface mesh,

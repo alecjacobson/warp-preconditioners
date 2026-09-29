@@ -1,0 +1,1 @@
+[{"width": 64, "kap_tolerance": 0.03, "apply_format": "compact_grouped", "factor_lanes": 4, "matrix_format": "squared", "squared_lanes": 4, "rhs_format": "factored", "save_field": "data/tuning/production-64-0.03-compact_grouped.npy"}]

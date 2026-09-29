@@ -1,0 +1,136 @@
+{
+  "problem": "unchanged head/tail Dirichlet; zero free initial guess",
+  "reference": "CHOLMOD AMD; mass relative error target 1e-4",
+  "results": [
+    {
+      "config": {
+        "width": 8,
+        "apply_format": "ell"
+      },
+      "ordering_s": 0.00030650943517684937,
+      "setup_s": 0.026000771671533585,
+      "solve_s": 45.56120041012764,
+      "total_s": 45.58720118179917,
+      "iterations": 138856,
+      "us_per_iteration": 328.1183413761569,
+      "recursive_relative_residual": 9.988483898422364e-13,
+      "relative_residual": 2.948091789991768e-09,
+      "backward_error": 7.625573031998709e-12,
+      "mass_relative_error": 4.404814637035183e-05,
+      "max_abs_error": 6.78168184774508e-05,
+      "factor_nnz": 2129097,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    },
+    {
+      "config": {
+        "width": 32,
+        "apply_format": "ell"
+      },
+      "ordering_s": 0.00030650943517684937,
+      "setup_s": 0.8685330934822559,
+      "solve_s": 24.277699433267117,
+      "total_s": 25.146232526749372,
+      "iterations": 52307,
+      "us_per_iteration": 464.138632176709,
+      "recursive_relative_residual": 9.94561403445408e-13,
+      "relative_residual": 2.554567724279893e-09,
+      "backward_error": 9.757860072828777e-12,
+      "mass_relative_error": 4.560238572529532e-05,
+      "max_abs_error": 7.056271991004448e-05,
+      "factor_nnz": 4814243,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    },
+    {
+      "config": {
+        "width": 8,
+        "ordering": "morton",
+        "apply_format": "ell"
+      },
+      "ordering_s": 0.10126978158950806,
+      "setup_s": 0.030375443398952484,
+      "solve_s": 39.906826231628656,
+      "total_s": 39.93720167502761,
+      "iterations": 117559,
+      "us_per_iteration": 339.46211035844686,
+      "recursive_relative_residual": 9.15714250224951e-13,
+      "relative_residual": 1.8713833636468858e-09,
+      "backward_error": 8.651749910120714e-12,
+      "mass_relative_error": 4.508832181735821e-05,
+      "max_abs_error": 6.946050194173159e-05,
+      "factor_nnz": 2439850,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    },
+    {
+      "config": {
+        "width": 32,
+        "ordering": "morton",
+        "apply_format": "ell"
+      },
+      "ordering_s": 0.10126978158950806,
+      "setup_s": 1.0355336777865887,
+      "solve_s": 22.6978643797338,
+      "total_s": 23.73339805752039,
+      "iterations": 43580,
+      "us_per_iteration": 520.8321335413906,
+      "recursive_relative_residual": 8.562197982808805e-13,
+      "relative_residual": 2.2775730229719696e-09,
+      "backward_error": 1.1162438867093111e-11,
+      "mass_relative_error": 4.4935004432393806e-05,
+      "max_abs_error": 6.921129394157899e-05,
+      "factor_nnz": 6451520,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    },
+    {
+      "config": {
+        "width": 8,
+        "ordering": "rcm",
+        "apply_format": "ell"
+      },
+      "ordering_s": 0.06410018727183342,
+      "setup_s": 0.03289826959371567,
+      "solve_s": 39.780454244464636,
+      "total_s": 39.81335251405835,
+      "iterations": 116340,
+      "us_per_iteration": 341.9327337499109,
+      "recursive_relative_residual": 9.752472449302839e-13,
+      "relative_residual": 1.3938237289223615e-08,
+      "backward_error": 5.58212429269452e-12,
+      "mass_relative_error": 4.581153941595089e-05,
+      "max_abs_error": 7.029938798353008e-05,
+      "factor_nnz": 2492297,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    },
+    {
+      "config": {
+        "width": 32,
+        "ordering": "rcm",
+        "apply_format": "ell"
+      },
+      "ordering_s": 0.06410018727183342,
+      "setup_s": 1.050405576825142,
+      "solve_s": 22.940959084779024,
+      "total_s": 23.991364661604166,
+      "iterations": 42504,
+      "us_per_iteration": 539.7364738560847,
+      "recursive_relative_residual": 9.526299099574656e-13,
+      "relative_residual": 4.618417239129874e-09,
+      "backward_error": 7.800951776379717e-12,
+      "mass_relative_error": 4.544455139650529e-05,
+      "max_abs_error": 6.951833052815104e-05,
+      "factor_nnz": 6822897,
+      "truncated_rows": 0,
+      "reached_tolerance": true,
+      "accuracy_pass": true
+    }
+  ]
+}

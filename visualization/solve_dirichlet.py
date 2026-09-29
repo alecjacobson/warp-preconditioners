@@ -24,6 +24,11 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("data/dirichlet"))
     parser.add_argument("--fsai-rtol", type=float, default=1e-12)
     parser.add_argument("--fsai-maxiter", type=int, default=500000)
+    parser.add_argument(
+        "--prepare-only",
+        action="store_true",
+        help="Write assembled inputs without running the solver comparison",
+    )
     args = parser.parse_args()
     if args.fsai_rtol <= 0 or args.fsai_maxiter <= 0:
         parser.error("FSAI tolerance and maximum iterations must be positive")
@@ -146,6 +151,8 @@ def main():
     meta["initial_bending_energy"] = float(0.5 * np.sum((L @ initial) ** 2 / mass))
     save()
     print("ASSEMBLY", json.dumps(meta), flush=True)
+    if args.prepare_only:
+        return
     sol, result = run(A, rhs, "fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol)
     assert result["reached_stopping_tolerance"], result
     k = result["actual_iterations"]

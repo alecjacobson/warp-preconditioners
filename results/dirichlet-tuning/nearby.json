@@ -1,0 +1,66 @@
+{
+  "problem": "unchanged head/tail Dirichlet; zero free initial guess",
+  "reference": "CHOLMOD AMD; mass relative error target 1e-4",
+  "results": [
+    {
+      "config": {
+        "width": 32,
+        "kap_tolerance": 0.003,
+        "apply_format": "compact_grouped",
+        "factor_lanes": 4,
+        "matrix_format": "squared",
+        "squared_lanes": 4,
+        "rhs_format": "factored",
+        "save_field": "data/tuning/production-32-0.003-compact_grouped.npy"
+      },
+      "ordering_s": 0.0002231113612651825,
+      "setup_s": 0.7496159598231316,
+      "solve_s": 10.073835425078869,
+      "total_s": 10.824863579124212,
+      "operator_setup_s": 0.0014121942222118378,
+      "iterations": 41348,
+      "us_per_iteration": 243.63537353871695,
+      "recursive_relative_residual": 8.741090244382459e-13,
+      "relative_residual": 1.928350197046909e-09,
+      "backward_error": 4.951839259944606e-12,
+      "mass_relative_error": 0.00010299588298439437,
+      "max_abs_error": 0.00027278573967959296,
+      "factor_nnz": 3891492,
+      "truncated_rows": 0,
+      "physical_mass_relative_error": 1.454379615506542e-09,
+      "physical_accuracy_pass": true,
+      "reached_tolerance": true,
+      "accuracy_pass": false
+    },
+    {
+      "config": {
+        "width": 48,
+        "kap_tolerance": 0.003,
+        "apply_format": "compact_grouped",
+        "factor_lanes": 4,
+        "matrix_format": "squared",
+        "squared_lanes": 4,
+        "rhs_format": "factored",
+        "save_field": "data/tuning/production-48-0.003-compact_grouped.npy"
+      },
+      "ordering_s": 0.0002231113612651825,
+      "setup_s": 1.0471497140824795,
+      "solve_s": 8.751597672700882,
+      "total_s": 9.800180833786726,
+      "operator_setup_s": 0.001433447003364563,
+      "iterations": 33374,
+      "us_per_iteration": 262.22801200637866,
+      "recursive_relative_residual": 9.75629409318686e-13,
+      "relative_residual": 9.234304073666733e-10,
+      "backward_error": 6.340461767608511e-12,
+      "mass_relative_error": 0.0001029958729062437,
+      "max_abs_error": 0.00027278526368434974,
+      "factor_nnz": 4228590,
+      "truncated_rows": 0,
+      "physical_mass_relative_error": 1.28590901791643e-09,
+      "physical_accuracy_pass": true,
+      "reached_tolerance": true,
+      "accuracy_pass": false
+    }
+  ]
+}

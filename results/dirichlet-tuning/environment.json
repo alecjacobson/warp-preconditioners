@@ -1,0 +1,25 @@
+{
+  "mesh_sha256": "f5de5c737e931acc3f32f23ec77bed532620b95ae70866681ecf81da0035e125",
+  "faces_sha256": "20064b4da979aef1f8e1294635bbb089b0173678b497f0063fb7f34d2f9d95f4",
+  "vertices": 360757,
+  "triangles": 721510,
+  "matrix_shape": [
+    320495,
+    320495
+  ],
+  "matrix_nnz": 6525939,
+  "full_matrix_nnz": 7356259,
+  "initial_guess": "zero on free vertices; prescribed values on fixed vertices",
+  "problem": "minimize 0.5*u^T L M^-1 L u; u[tail]=-1, u[head]=1; no data term",
+  "gpu": "NVIDIA L40",
+  "gpu_l2_bytes": 100663296,
+  "warp": "1.15.0",
+  "numpy": "2.2.6",
+  "scipy": "1.15.0",
+  "python": "3.10.12",
+  "date": "2026-09-29",
+  "trials": 3,
+  "clock_policy": "No GPU clock locking; sequential runs with per-recipe warmup",
+  "tests": "60 passed; CPU and CUDA; pytest -q",
+  "base_commit": "05daf30"
+}

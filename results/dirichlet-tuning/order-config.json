@@ -1,0 +1,1 @@
+[{"width": 8, "apply_format": "ell"}, {"width": 32, "apply_format": "ell"}, {"width": 8, "ordering": "morton", "apply_format": "ell"}, {"width": 32, "ordering": "morton", "apply_format": "ell"}, {"width": 8, "ordering": "rcm", "apply_format": "ell"}, {"width": 32, "ordering": "rcm", "apply_format": "ell"}]

@@ -1,0 +1,185 @@
+[
+  {
+    "label": "baseline",
+    "width": 8,
+    "repeat": 1,
+    "save_field": "data/tuning/repeat-baseline-1.npy"
+  },
+  {
+    "label": "total48",
+    "width": 48,
+    "kap_tolerance": 0.003,
+    "repeat": 1,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-total48-1.npy"
+  },
+  {
+    "label": "total64",
+    "width": 64,
+    "kap_tolerance": 0.003,
+    "repeat": 1,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-total64-1.npy"
+  },
+  {
+    "label": "lean64",
+    "width": 64,
+    "kap_tolerance": 0.03,
+    "repeat": 1,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-lean64-1.npy"
+  },
+  {
+    "label": "jacobi_stored",
+    "width": 0,
+    "solver": "cr",
+    "tol": 0,
+    "maxiter": 5000,
+    "repeat": 1
+  },
+  {
+    "label": "jacobi_factored",
+    "width": 0,
+    "solver": "cr",
+    "tol": 0,
+    "maxiter": 5000,
+    "repeat": 1,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored"
+  },
+  {
+    "label": "baseline",
+    "width": 8,
+    "repeat": 2,
+    "save_field": "data/tuning/repeat-baseline-2.npy"
+  },
+  {
+    "label": "total48",
+    "width": 48,
+    "kap_tolerance": 0.003,
+    "repeat": 2,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-total48-2.npy"
+  },
+  {
+    "label": "total64",
+    "width": 64,
+    "kap_tolerance": 0.003,
+    "repeat": 2,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-total64-2.npy"
+  },
+  {
+    "label": "lean64",
+    "width": 64,
+    "kap_tolerance": 0.03,
+    "repeat": 2,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-lean64-2.npy"
+  },
+  {
+    "label": "jacobi_stored",
+    "width": 0,
+    "solver": "cr",
+    "tol": 0,
+    "maxiter": 5000,
+    "repeat": 2
+  },
+  {
+    "label": "jacobi_factored",
+    "width": 0,
+    "solver": "cr",
+    "tol": 0,
+    "maxiter": 5000,
+    "repeat": 2,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored"
+  },
+  {
+    "label": "baseline",
+    "width": 8,
+    "repeat": 3,
+    "save_field": "data/tuning/repeat-baseline-3.npy"
+  },
+  {
+    "label": "total48",
+    "width": 48,
+    "kap_tolerance": 0.003,
+    "repeat": 3,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-total48-3.npy"
+  },
+  {
+    "label": "total64",
+    "width": 64,
+    "kap_tolerance": 0.003,
+    "repeat": 3,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-total64-3.npy"
+  },
+  {
+    "label": "lean64",
+    "width": 64,
+    "kap_tolerance": 0.03,
+    "repeat": 3,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored",
+    "apply_format": "compact_grouped",
+    "factor_lanes": 4,
+    "save_field": "data/tuning/repeat-lean64-3.npy"
+  },
+  {
+    "label": "jacobi_stored",
+    "width": 0,
+    "solver": "cr",
+    "tol": 0,
+    "maxiter": 5000,
+    "repeat": 3
+  },
+  {
+    "label": "jacobi_factored",
+    "width": 0,
+    "solver": "cr",
+    "tol": 0,
+    "maxiter": 5000,
+    "repeat": 3,
+    "matrix_format": "squared",
+    "squared_lanes": 4,
+    "rhs_format": "factored"
+  }
+]

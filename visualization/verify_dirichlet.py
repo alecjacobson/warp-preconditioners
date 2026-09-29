@@ -64,8 +64,9 @@ def main():
                 energy / (0.5 * np.sum((L @ reference) ** 2 / mass)) - 1
             ),
         )
-    fsai = meta["display_order"][0]
-    assert checks[fsai]["mass_relative_error_to_cholesky"] < 1e-4, checks[fsai]
+    if meta["display_order"]:
+        fsai = meta["display_order"][0]
+        assert checks[fsai]["mass_relative_error_to_cholesky"] < 1e-4, checks[fsai]
     audit = dict(
         method="CHOLMOD Cholesky with AMD ordering; no diagonal shift",
         factor_and_solve_s=elapsed,

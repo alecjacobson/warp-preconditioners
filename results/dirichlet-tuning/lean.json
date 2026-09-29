@@ -1,0 +1,36 @@
+{
+  "problem": "unchanged head/tail Dirichlet; zero free initial guess",
+  "reference": "CHOLMOD AMD; mass relative error target 1e-4",
+  "results": [
+    {
+      "config": {
+        "width": 64,
+        "kap_tolerance": 0.03,
+        "apply_format": "compact_grouped",
+        "factor_lanes": 4,
+        "matrix_format": "squared",
+        "squared_lanes": 4,
+        "rhs_format": "factored",
+        "save_field": "data/tuning/production-64-0.03-compact_grouped.npy"
+      },
+      "ordering_s": 0.0001939237117767334,
+      "setup_s": 0.19844026118516922,
+      "solve_s": 14.682610593736172,
+      "total_s": 14.882563844323158,
+      "operator_setup_s": 0.0015129894018173218,
+      "iterations": 89859,
+      "us_per_iteration": 163.39610493925116,
+      "recursive_relative_residual": 9.89585964564604e-13,
+      "relative_residual": 6.925441485754429e-10,
+      "backward_error": 7.33804022908476e-12,
+      "mass_relative_error": 0.00010299587951138675,
+      "max_abs_error": 0.0002727854885800074,
+      "factor_nnz": 1798024,
+      "truncated_rows": 0,
+      "physical_mass_relative_error": 1.949987264757743e-09,
+      "physical_accuracy_pass": true,
+      "reached_tolerance": true,
+      "accuracy_pass": false
+    }
+  ]
+}

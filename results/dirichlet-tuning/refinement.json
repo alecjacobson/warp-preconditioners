@@ -1,0 +1,42 @@
+{
+  "arithmetic": "L and M promoted before assembly; long-double factored energy gradient L.T((Lu)/mass) and updates; diagonally equilibrated float64 AMD Cholesky corrections",
+  "long_double_epsilon": 1.0842021724855044e-19,
+  "iterations": [
+    {
+      "step": 1,
+      "mass_relative_correction": 2.9750720780395135e-06
+    },
+    {
+      "step": 2,
+      "mass_relative_correction": 7.942903865526356e-12
+    },
+    {
+      "step": 3,
+      "mass_relative_correction": 6.42831104423775e-17
+    },
+    {
+      "step": 4,
+      "mass_relative_correction": 6.579906272114983e-17
+    },
+    {
+      "step": 5,
+      "mass_relative_correction": 5.863597791789259e-17
+    },
+    {
+      "step": 6,
+      "mass_relative_correction": 3.941095087488137e-17
+    }
+  ],
+  "original_cholesky_mass_relative_error": 0.00010300203389836965,
+  "energy": 0.00020634215116509188,
+  "range": [
+    -1.1514028896008028,
+    1.0209006896202097
+  ],
+  "original_fields": {
+    "fsai_cg_139136": 0.0001375238673920471,
+    "jacobi_cr_139136": 0.7656228230178235,
+    "jacobi_cr_1391360": 0.14293060047808204,
+    "jacobi_cr_13913600": 0.00013741228440789817
+  }
+}

@@ -43,6 +43,16 @@ falls from **76.6% at k**, to **14.3% at 10k**, to **1.22e-7 at 100k**
 (2,425.32 s). A separate Cholesky solve with AMD ordering checks the result.
 [Region definitions, convergence checks, and reproduction](visualization/dirichlet.md).
 
+The subsequent [FSAI tuning study](results/dirichlet-tuning/README.md) reduces
+this unregularized solve to about **10 seconds including setup**, using
+wider adaptive factors and a factored squared-Laplacian operator. A sparser
+alternative roughly halves the original cost per iteration. Controlled
+tests explain the large timing change when the data term is removed, and a
+higher-precision reference exposes an accuracy limit in the previously
+assembled squared matrix.
+
+![FSAI tuning: conditioning, total time, per-iteration cost, and parameter tradeoffs.](assets/dragon-dirichlet-tuning.png)
+
 ```bash
 python -m pip install -e '.[test]'
 pytest -q
@@ -103,6 +113,13 @@ again. The resulting lower triangular `G` has a positive diagonal, so
 - `pivot_floor`: stop growing a row if an equilibrated local pivot is too
   small (defaults: `1e-12` in float64, `1e-6` in float32). The accepted
   positive factor is retained; `P.truncated_rows` counts these events.
+- `apply_lanes=1`: CUDA threads cooperating on each factor row; accepts
+  1, 2, 4, 8, 16, or 32. Four helps the tuned dragon. CPU uses ordinary CSR.
+- `factor_dtype=None`: defaults to matrix precision. `wp.float32` stores
+  the completed factors in float32 while accumulating in matrix precision.
+  The rounded factor is validated before constructing its transpose;
+  this option adds a setup synchronization. Validate solution accuracy
+  for the intended problem.
 - `P.G`, `P.GT`: the scalar Warp BSR factors, available for inspection.
 
 This is an independent implementation inspired by [hypre's adaptive
@@ -117,6 +134,15 @@ A sparse approximate inverse is not a mesh-independent method: increasing
 the mesh resolution or worsening the low-frequency spectrum can still
 increase iteration counts. Large supports/high-valence graphs also make
 the serial work within each setup row expensive.
+
+`SparseOperator(A, row_lanes=4)` exposes the cooperative matrix product as
+a Warp linear operator. For a full symmetric scalar Laplacian and lumped
+mass, `SquaredLaplacianOperator(L, mass, free_indices, row_lanes=4)` applies
+the reduced squared energy through two Laplacian products; its
+`rhs(prescribed)` method eliminates fixed values while retaining all rows
+of the full energy. Both support CUDA graph capture after construction.
+See the [tested Dirichlet recipe](results/dirichlet-tuning/README.md#recommended-usage)
+for FSAI parameters, input conventions, and accuracy checks.
 
 ## Biharmonic structure experiment
 

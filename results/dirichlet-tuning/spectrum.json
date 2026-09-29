@@ -1,0 +1,29 @@
+{
+  "generalized_lambda_min": 1.1225618437589071e-07,
+  "lambda_min_energy_rayleigh": 1.1223677696013082e-07,
+  "generalized_lambda_max": 374270659186.04565,
+  "min_eigenvector_backward_error": 0.053057419154514646,
+  "method": "ARPACK generalized eigsh; smallest via sigma=0 Cholesky-AMD shift-invert, largest algebraic",
+  "shifts": [
+    {
+      "alpha": 1.0,
+      "condition_estimate": 374270617180.11786
+    },
+    {
+      "alpha": 0.01,
+      "condition_estimate": 37426645853995.26
+    },
+    {
+      "alpha": 0.0001,
+      "condition_estimate": 3738510608047672.5
+    },
+    {
+      "alpha": 1e-06,
+      "condition_estimate": 3.365026826472775e+17
+    },
+    {
+      "alpha": 0.0,
+      "condition_estimate": 3.334652591805942e+18
+    }
+  ]
+}
