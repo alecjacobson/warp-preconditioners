@@ -1,6 +1,6 @@
 """Compare converged FSAI with Warp CR/Jacobi at k, 10k, and 100k iterations.
 
-Every displayed field is an unfiltered solver output from a zero initial guess.
+Every displayed field is an unfiltered solver output from its stated initial guess.
 Each budget uses one uninterrupted Krylov solve, without checkpoint restarts.
 """
 
@@ -24,9 +24,29 @@ from dragon import berr, norm, upload
 from warp_preconditioners import FSAI
 
 
-def field_statistics(u, vertices, mass):
+def data_function(vertices):
+    """A deterministic nonlinear signal; X,Y,Z each span [-1,1]."""
+    low, high = vertices.min(axis=0), vertices.max(axis=0)
+    q = 2 * (vertices - low) / (high - low) - 1
+    X, Y, Z = q.T
+    f = (
+        np.sin(np.pi * (0.9 * X + 0.45 * Y - 0.65 * Z))
+        + 0.65 * np.cos(np.pi * (0.35 * X - 0.8 * Y + 0.9 * Z))
+        + 0.35 * np.sin(2 * np.pi * (X * Z + 0.2 * Y))
+    )
+    return f, dict(
+        name="nonlinear_xyz",
+        formula="sin(pi*(0.9X+0.45Y-0.65Z)) + 0.65*cos(pi*(0.35X-0.8Y+0.9Z)) + 0.35*sin(2*pi*(XZ+0.2Y))",
+        normalized_coordinates="(X,Y,Z) = 2*(V-bbox_min)/(bbox_max-bbox_min)-1",
+        bbox_min=low.tolist(),
+        bbox_max=high.tolist(),
+        sha256=hashlib.sha256(f.tobytes()).hexdigest(),
+    )
+
+
+def field_statistics(u, vertices, mass, target=None):
     """Area-weighted diagnostics; the fitted affine field is NEVER rendered."""
-    z = vertices[:, 2]
+    target = vertices[:, 2] if target is None else target
     design = np.column_stack([np.ones(len(u)), vertices])
     coeff = np.linalg.solve(design.T @ (mass[:, None] * design), design.T @ (mass * u))
     mean = np.average(u, weights=mass)
@@ -39,13 +59,13 @@ def field_statistics(u, vertices, mass):
         range=[float(u.min()), float(u.max())],
         mass_weighted_mean=float(mean),
         mass_weighted_std=variation,
-        height_change_rms=rms(u - z),
+        data_fit_rms=rms(u - target),
         affine_fit_rms=rms(u - design @ coeff),
         nonaffine_fraction=rms(u - design @ coeff) / max(variation, np.finfo(float).tiny),
     )
 
 
-def run(a, b_np, method, budget, rtol=0.0):
+def run(a, b_np, method, budget, rtol=0.0, initial=None):
     A = upload(a, "cuda:0")
     b = wp.array(b_np, dtype=wp.float64, device="cuda:0")
     solver = linear.cg if method == "fsai_cg" else linear.cr
@@ -55,13 +75,19 @@ def run(a, b_np, method, budget, rtol=0.0):
 
     pre = make()
     x = wp.zeros_like(b)
+    initial_gpu = None if initial is None else wp.array(initial, dtype=wp.float64, device="cuda:0")
+    if initial_gpu is not None:
+        wp.copy(x, initial_gpu)
     solver(A, b, x, M=pre, tol=0.0, atol=0.0, maxiter=10, check_every=0)
     wp.synchronize()
     start = time.perf_counter()
     pre = make()
     wp.synchronize()
     setup_s = time.perf_counter() - start
-    x.zero_()
+    if initial_gpu is None:
+        x.zero_()
+    else:
+        wp.copy(x, initial_gpu)
     wp.synchronize()
     start = time.perf_counter()
     nit, recursive_sq, _ = solver(A, b, x, M=pre, tol=rtol, atol=0.0, maxiter=budget, check_every=0)
@@ -78,7 +104,10 @@ def run(a, b_np, method, budget, rtol=0.0):
         solve_s=elapsed,
         requested_iterations=budget,
         actual_iterations=actual,
-        initial_guess="zero",
+        initial_guess="zero" if initial is None else "data function",
+        initial_relative_residual=(
+            1.0 if initial is None else norm(b_np - a @ initial) / norm(b_np)
+        ),
         restarts=0,
         selection="final iterate of a single solver call; no best-checkpoint selection",
         tol=rtol,
@@ -95,10 +124,12 @@ def main():
     parser.add_argument("--dir", type=Path, default=Path("/tmp/dump"))
     parser.add_argument("--mesh", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("data/visualization"))
-    parser.add_argument("--data-weight", type=float, default=0.001)
+    parser.add_argument("--data-weight", type=float, default=0.0001)
+    parser.add_argument("--initial-guess", choices=["data", "zero"], default="data")
     parser.add_argument("--fsai-rtol", type=float, default=1e-8)
-    parser.add_argument("--fsai-maxiter", type=int, default=50000)
+    parser.add_argument("--fsai-maxiter", type=int, default=100000)
     parser.add_argument("--audit-weights", type=float, nargs="+")
+    parser.add_argument("--audit-initial-guess", action="store_true")
     args = parser.parse_args()
     if args.data_weight <= 0 or (args.audit_weights and min(args.audit_weights) <= 0):
         parser.error("data weights must be positive")
@@ -126,31 +157,106 @@ def main():
     assembly_error = float(abs(original_q - expected).max()) / float(abs(original_q).max())
     assert assembly_error < 1e-12
     del mixed, expected
+    target, target_spec = data_function(vertices)
+    initial = target if args.initial_guess == "data" else None
 
     def equation(weight):
-        return original_q + ss.diags((weight - 1) * mass), weight * rhs[:, 2]
+        return original_q + ss.diags((weight - 1) * mass), weight * mass * target
 
     if args.audit_weights:
         sweep = []
         for weight in args.audit_weights:
             a, b_np = equation(weight)
             for budget in [500, 5000]:
-                u, record = run(a, b_np, "fsai_cg", budget)
-                record.update(data_weight=weight, **field_statistics(u, vertices, mass))
+                u, record = run(a, b_np, "fsai_cg", budget, initial=initial)
+                record.update(data_weight=weight, **field_statistics(u, vertices, mass, target))
                 sweep.append(record)
                 print(json.dumps(record), flush=True)
-        (args.output / "weight_sweep.json").write_text(json.dumps(sweep, indent=2) + "\n")
+        (args.output / "weight_sweep.json").write_text(
+            json.dumps(dict(target=target_spec, results=sweep), indent=2) + "\n"
+        )
         return
 
     a, b_np = equation(args.data_weight)
+    if args.audit_initial_guess:
+        # Independent experiment: change ONLY the initial guess, keeping the
+        # equation, preconditioner, tolerance and paired budgets identical.
+        trials, audit_fields = [], {}
+        for guess in ["data", "zero"]:
+            u, record = run(
+                a,
+                b_np,
+                "fsai_cg",
+                args.fsai_maxiter,
+                rtol=args.fsai_rtol,
+                initial=target if guess == "data" else None,
+            )
+            assert record["reached_stopping_tolerance"], record
+            audit_fields[f"fsai_{guess}"] = u
+            record["name"] = f"fsai_{guess}"
+            trials.append(record)
+            print("INITIALIZATION AUDIT", record["name"], json.dumps(record), flush=True)
+        reference = audit_fields["fsai_data"]
+        k = trials[0]["actual_iterations"]
+        for budget in [1000, k]:
+            for guess in ["data", "zero"]:
+                u, record = run(
+                    a, b_np, "jacobi_cr", budget, initial=target if guess == "data" else None
+                )
+                assert record["actual_iterations"] == budget
+                name = f"jacobi_{guess}_{budget}"
+                audit_fields[name] = u
+                record["name"] = name
+                trials.append(record)
+                print("INITIALIZATION AUDIT", name, json.dumps(record), flush=True)
+
+        def diagnostics(u):
+            fit = float(0.5 * args.data_weight * np.sum(mass * (u - target) ** 2))
+            bending = float(0.5 * np.sum((K @ u) ** 2 / mass))
+            return dict(
+                relative_mass_norm_difference_from_fsai=float(
+                    np.sqrt(np.sum(mass * (u - reference) ** 2) / np.sum(mass * reference**2))
+                ),
+                data_energy=fit,
+                bending_energy=bending,
+                total_energy=fit + bending,
+            )
+
+        for record in trials:
+            record.update(diagnostics(audit_fields[record["name"]]))
+        report = dict(
+            target=target_spec,
+            data_weight=args.data_weight,
+            fsai_rtol=args.fsai_rtol,
+            equation="(alpha M + K M^-1 K)u = alpha M f",
+            protocol="same problem, preconditioner and stopping tolerance; paired initial guesses; no restarts",
+            reference="converged fsai_data; approximate, not exact arithmetic",
+            initial_fields={
+                guess: diagnostics(u)
+                for guess, u in [("data", target), ("zero", np.zeros_like(target))]
+            },
+            results=trials,
+        )
+        (args.output / "initialization_audit.json").write_text(json.dumps(report, indent=2) + "\n")
+        np.savez_compressed(
+            args.output / "initialization_fields.npz",
+            vertices=vertices,
+            faces=faces,
+            target=target,
+            **audit_fields,
+        )
+        return
+
     fields, records = {}, {}
-    u_fsai, fsai_record = run(a, b_np, "fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol)
+    u_fsai, fsai_record = run(
+        a, b_np, "fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol, initial=initial
+    )
     assert fsai_record["reached_stopping_tolerance"], fsai_record
     k = fsai_record["actual_iterations"]
     print("FSAI CONVERGED", k, json.dumps(fsai_record), flush=True)
     # Check forward stability, rather than treating the recursive residual as
     # an independently verified residual of the ill-conditioned matrix.
-    extended, check_record = run(a, b_np, "fsai_cg", 2 * k)
+    extended, check_record = run(a, b_np, "fsai_cg", 2 * k, initial=initial)
     change = float(np.sqrt(np.sum(mass * (extended - u_fsai) ** 2) / np.sum(mass * u_fsai**2)))
     assert change < 1e-6, ("FSAI field has not stabilized", change)
     convergence_check = dict(
@@ -171,23 +277,23 @@ def main():
             u, record = u_fsai, fsai_record
         else:
             print("START", name, flush=True)
-            u, record = run(a, b_np, method, int(budget))
+            u, record = run(a, b_np, method, int(budget), initial=initial)
         assert record["actual_iterations"] == int(budget), record
         record["iteration_multiplier"] = [1, 1, 10, 100][i]
         record["relative_mass_norm_difference_from_fsai"] = float(
             np.sqrt(np.sum(mass * (u - u_fsai) ** 2) / np.sum(mass * u_fsai**2))
         )
-        record.update(field_statistics(u, vertices, mass))
+        record.update(field_statistics(u, vertices, mass, target))
         record["field_sha256"] = hashlib.sha256(u.tobytes()).hexdigest()
-        record["data_energy"] = float(
-            0.5 * args.data_weight * np.sum(mass * (u - vertices[:, 2]) ** 2)
-        )
+        record["data_energy"] = float(0.5 * args.data_weight * np.sum(mass * (u - target) ** 2))
         record["bending_energy"] = float(0.5 * np.sum((K @ u) ** 2 / mass))
         fields[name], records[name] = u, record
         print(name, json.dumps(record), flush=True)
     lo = float(min(v.min() for v in fields.values()))
     hi = float(max(v.max() for v in fields.values()))
-    np.savez_compressed(args.output / "fields.npz", vertices=vertices, faces=faces, **fields)
+    np.savez_compressed(
+        args.output / "fields.npz", vertices=vertices, faces=faces, target=target, **fields
+    )
     meta = dict(
         mesh=args.mesh.name,
         mesh_sha256=hashlib.sha256(args.mesh.read_bytes()).hexdigest(),
@@ -195,17 +301,21 @@ def main():
         gpu=wp.get_device().name,
         vertices=n,
         faces=len(faces),
-        system="(alpha M + K M^-1 K) u = alpha M z",
+        system="(alpha M + K M^-1 K) u = alpha M f",
+        target=target_spec,
+        target_statistics=field_statistics(target, vertices, mass, target),
+        target_bending_energy=float(0.5 * np.sum((K @ target) ** 2 / mass)),
+        initial_guess=args.initial_guess,
         data_weight=args.data_weight,
         smoothing_weight=1.0,
-        rhs_column=2,
         display_order=order,
         convergence=convergence_check,
         scalar_range=[lo, hi],
-        field_units="original mesh coordinate units",
+        field_units="dimensionless nonlinear signal",
         display="original geometry colored by u, no scalar filtering or geometry deformation",
         verification=dict(
-            rhs="all three original RHS columns equal M times the original vertex coordinates",
+            original_rhs="all three original RHS columns equal M times the original vertex coordinates",
+            rhs="alpha times M times the explicitly defined nonlinear target f",
             stiffness="dumped K agrees with independently assembled -igl.cotmatrix(V,F)",
             stiffness_max_abs_difference=cot_error,
             stiffness_relative_max_difference=cot_relative_error,
@@ -216,7 +326,9 @@ def main():
     )
     sweep = args.output / "weight_sweep.json"
     if sweep.exists():
-        meta["weight_sweep"] = json.loads(sweep.read_text())
+        audit = json.loads(sweep.read_text())
+        if isinstance(audit, dict) and audit["target"]["sha256"] == target_spec["sha256"]:
+            meta["weight_sweep"] = audit
     (args.output / "solve.json").write_text(json.dumps(meta, indent=2) + "\n")
 
 

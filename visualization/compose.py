@@ -17,8 +17,6 @@ def main():
     )
     args = parser.parse_args()
     meta = json.loads((args.data / "solve.json").read_text())
-    if (args.data / "weight_sweep.json").exists():
-        meta["weight_sweep"] = json.loads((args.data / "weight_sweep.json").read_text())
     render = json.loads((args.data / "render.json").read_text())
     scene = Image.open(args.data / "four_dragons.png").convert("RGBA")
     width, ph = scene.size
@@ -39,11 +37,11 @@ def main():
             anchor="mt",
         )
 
-    text(width / 2, 24, "Biharmonic smoothing · iterations to FSAI convergence", 66, True)
+    text(width / 2, 24, "Nonlinear data · biharmonic smoothing", 66, True)
     text(
         width / 2,
         111,
-        f"Data weight α = {meta['data_weight']:g}  ·  Smoothing weight = 1  ·  Zero initial guesses  ·  One shared scalar scale",
+        f"Data weight α = {meta['data_weight']:g}  ·  Smoothing weight = 1  ·  Initial guess = {'data f' if meta['initial_guess'] == 'data' else 'zero'}  ·  One shared scalar scale",
         31,
         color="#657083",
     )
@@ -77,7 +75,7 @@ def main():
     text(
         width / 2,
         height - 42,
-        f"Computed height u · shared scale · k from FSAI stopping tolerance {meta['convergence']['fsai_rtol']:.0e}; independently recomputed residuals shown above",
+        f"Computed scalar u · dimensionless · k from FSAI stopping tolerance {meta['convergence']['fsai_rtol']:.0e}; independently recomputed residuals shown above",
         27,
         color="#657083",
     )
