@@ -5,6 +5,10 @@ this problem. Wider adaptive supports, cooperative sparse products, and a
 factored squared-Laplacian application substantially reduce the total time.
 There is a tradeoff between cheapest iteration and fastest complete solve.
 
+The [regenerated dragon figure](../../visualization/dirichlet.md) uses the
+width-48 recipe, with Jacobi on the same factored operator at its new
+$k$, $10k$, and $100k$ budgets.
+
 ![Controlled mass-term experiment, repeated solve timings, per-iteration costs, and parameter sweep.](../../assets/dragon-dirichlet-tuning.png)
 
 ## Why 0.1 seconds became 43 seconds

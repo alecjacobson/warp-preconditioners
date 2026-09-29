@@ -3,18 +3,97 @@
 import argparse
 import hashlib
 import json
+import time
 from pathlib import Path
 
 import igl
 import numpy as np
 import scipy.io as sio
 import scipy.sparse as ss
+import warp as wp
 from scipy.sparse.csgraph import connected_components
-from solve_fields import run
+from solve_fields import norm, run, upload
+from warp.optim import linear
+
+from warp_preconditioners import FSAI, SquaredLaplacianOperator
 
 
 def digest(x):
     return hashlib.sha256(x.tobytes()).hexdigest()
+
+
+def run_tuned(a, laplacian, mass, free, prescribed, method, budget, rtol=0.0):
+    """Both methods use the same factored operator and zero free initial guess."""
+    matrix = upload(a, "cuda:0")
+    L = upload(laplacian, "cuda:0")
+    mw = wp.array(mass, dtype=wp.float64, device="cuda:0")
+    fw = wp.array(free.astype(np.int32), dtype=wp.int32, device="cuda:0")
+
+    def make_operator():
+        return SquaredLaplacianOperator(L, mw, fw, row_lanes=4)
+
+    def make_preconditioner():
+        if method == "fsai_cg":
+            return FSAI(
+                matrix,
+                max_row_size=48,
+                kap_tolerance=0.003,
+                apply_lanes=4,
+                factor_dtype=wp.float32,
+            )
+        return linear.preconditioner(matrix, "diag")
+
+    operator = make_operator()
+    b = operator.rhs(wp.array(prescribed, dtype=wp.float64, device="cuda:0"))
+    b_np = b.numpy()
+    x = wp.zeros_like(b)
+    solver = linear.cg if method == "fsai_cg" else linear.cr
+    pre = make_preconditioner()
+    solver(operator, b, x, M=pre, tol=0.0, atol=0.0, maxiter=10, check_every=0)
+    wp.synchronize()
+    start = time.perf_counter()
+    operator = make_operator()
+    pre = make_preconditioner()
+    wp.synchronize()
+    setup_s = time.perf_counter() - start
+    x.zero_()
+    wp.synchronize()
+    start = time.perf_counter()
+    nit, residual_sq, _ = solver(
+        operator, b, x, M=pre, tol=rtol, atol=0.0, maxiter=budget, check_every=0
+    )
+    wp.synchronize()
+    elapsed = time.perf_counter() - start
+    sol = x.numpy()
+    assert np.isfinite(sol).all()
+    full = prescribed.copy()
+    full[free] = sol
+    # Independent CPU energy gradient, retaining every full Laplacian row.
+    residual = (laplacian.T @ ((laplacian @ full) / mass))[free]
+    recursive_relative = float(np.sqrt(residual_sq.numpy()[0])) / norm(b_np)
+    return sol, dict(
+        solver="warp.optim.linear." + solver.__name__,
+        preconditioner=(
+            "FSAI, width=48, kap_tolerance=0.003, float32 storage, float64 accumulation, apply_lanes=4"
+            if method == "fsai_cg"
+            else "Jacobi"
+        ),
+        operator="full L.T M^-1 L, factored application; row_lanes=4; exact elimination",
+        setup_s=setup_s,
+        solve_s=elapsed,
+        requested_iterations=budget,
+        actual_iterations=int(nit.numpy()[0]),
+        initial_guess="zero",
+        initial_relative_residual=1.0,
+        restarts=0,
+        selection="final iterate of a single solver call; no best-checkpoint selection",
+        tol=rtol,
+        atol=0.0,
+        recursive_relative_residual=recursive_relative,
+        reached_stopping_tolerance=bool(rtol > 0 and recursive_relative <= rtol),
+        relative_residual=norm(residual) / norm(b_np),
+        residual_definition="norm((L.T @ ((L @ full_u)/mass))[free]) / norm(eliminated_rhs), CPU float64",
+    )
 
 
 def main():
@@ -24,6 +103,11 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("data/dirichlet"))
     parser.add_argument("--fsai-rtol", type=float, default=1e-12)
     parser.add_argument("--fsai-maxiter", type=int, default=500000)
+    parser.add_argument(
+        "--tuned",
+        action="store_true",
+        help="Use tuned FSAI and the factored operator for both solvers",
+    )
     parser.add_argument(
         "--prepare-only",
         action="store_true",
@@ -114,6 +198,7 @@ def main():
         ),
         results={},
         display_order=[],
+        tuned=args.tuned,
     )
 
     def save():
@@ -153,12 +238,18 @@ def main():
     print("ASSEMBLY", json.dumps(meta), flush=True)
     if args.prepare_only:
         return
-    sol, result = run(A, rhs, "fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol)
+
+    def solve(method, budget, rtol=0.0):
+        if args.tuned:
+            return run_tuned(A, L, mass, free, initial, method, budget, rtol)
+        return run(A, rhs, method, budget, rtol=rtol)
+
+    sol, result = solve("fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol)
     assert result["reached_stopping_tolerance"], result
     k = result["actual_iterations"]
     meta["convergence"]["k"] = k
     reference = record(sol, result, 1)
-    extended, check = run(A, rhs, "fsai_cg", 2 * k)
+    extended, check = solve("fsai_cg", 2 * k)
     stability = float(
         np.sqrt(np.sum(mass[free] * (extended - sol) ** 2) / np.sum(mass * reference**2))
     )
@@ -168,7 +259,7 @@ def main():
     save()
     assert stability < 1e-6
     for multiplier in [1, 10, 100]:
-        sol, result = run(A, rhs, "jacobi_cr", multiplier * k)
+        sol, result = solve("jacobi_cr", multiplier * k)
         assert result["actual_iterations"] == multiplier * k, result
         record(sol, result, multiplier)
     meta["scalar_range"] = [

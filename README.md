@@ -38,12 +38,16 @@ minimizes $u^TLM^{-1}Lu/2$ with **no data term**. Free vertices start at zero.
 The first dragon marks the fixed regions; the next four compare converged
 FSAI-CG with Jacobi-CR at matched iteration budgets. The reduced system is
 SPD with 320,495 unknowns; constraints are enforced exactly by elimination.
-Here **k = 139,136**: FSAI takes **43.29 s**. Jacobi's relative field error
-falls from **76.6% at k**, to **14.3% at 10k**, to **1.22e-7 at 100k**
-(2,425.32 s). A separate Cholesky solve with AMD ordering checks the result.
+The regenerated figure uses tuned width-48 FSAI and the same factored
+operator for both solvers. Here **k = 33,374**: FSAI takes **8.56 s to solve
+plus 1.07 s setup**. Jacobi's relative field error is **83.7% at k**, **84.0%
+at 10k**, and **1.28e-9 at 100k** (403.77 s). The nonmonotonic early field
+error is reported directly. A long-double energy reference with AMD
+Cholesky corrections independently checks the result; the
+[original width-eight figure](visualization/dirichlet-original.md) is archived.
 [Region definitions, convergence checks, and reproduction](visualization/dirichlet.md).
 
-The subsequent [FSAI tuning study](results/dirichlet-tuning/README.md) reduces
+The [FSAI tuning study](results/dirichlet-tuning/README.md) reduces
 this unregularized solve to about **10 seconds including setup**, using
 wider adaptive factors and a factored squared-Laplacian operator. A sparser
 alternative roughly halves the original cost per iteration. Controlled

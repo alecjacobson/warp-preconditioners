@@ -5,6 +5,7 @@ Run after solve_dirichlet.py has finished.
 """
 
 import argparse
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -19,9 +20,14 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--dir", type=Path, default=Path("/tmp/dump"))
     parser.add_argument("--data", type=Path, default=Path("data/dirichlet"))
+    parser.add_argument("--refined-reference", type=Path)
     args = parser.parse_args()
     data = np.load(args.data / "fields.npz")
     meta = json.loads((args.data / "solve.json").read_text())
+    if meta.get("tuned") and args.refined_reference is None:
+        parser.error(
+            "The tuned operator requires --refined-reference; run benchmarks/refine_dirichlet.py first"
+        )
     n = len(data["vertices"])
     free, fixed, initial = data["free"], data["fixed"], data["constraints"]
     mixed = sio.mmread(args.dir / "k4_Q.mtx").tocsr()
@@ -37,6 +43,11 @@ def main():
     reference[free] = factor(rhs)
     elapsed = time.perf_counter() - start
     assert factor.D().min() > 0
+    refined = None
+    if args.refined_reference:
+        refined = np.load(args.refined_reference)
+        assert refined.shape == initial.shape and np.isfinite(refined).all()
+        np.testing.assert_array_equal(refined[fixed], initial[fixed])
     checks = {}
     for name in meta["display_order"]:
         u = data[name]
@@ -64,9 +75,27 @@ def main():
                 energy / (0.5 * np.sum((L @ reference) ** 2 / mass)) - 1
             ),
         )
+        if refined is not None:
+            checks[name]["mass_relative_error_to_refined"] = float(
+                np.sqrt(np.sum(mass * (u - refined) ** 2) / np.sum(mass * refined**2))
+            )
+        if meta.get("tuned"):
+            factored_rhs = -(L.T @ ((L @ initial) / mass))[free]
+            stationarity = (L.T @ ((L @ u) / mass))[free]
+            checks[name]["factored_relative_residual"] = float(
+                np.linalg.norm(stationarity) / np.linalg.norm(factored_rhs)
+            )
+            np.testing.assert_allclose(
+                checks[name]["factored_relative_residual"],
+                meta["results"][name]["relative_residual"],
+                rtol=1e-10,
+            )
     if meta["display_order"]:
         fsai = meta["display_order"][0]
-        assert checks[fsai]["mass_relative_error_to_cholesky"] < 1e-4, checks[fsai]
+        if refined is not None:
+            assert checks[fsai]["mass_relative_error_to_refined"] < 1e-6, checks[fsai]
+        else:
+            assert checks[fsai]["mass_relative_error_to_cholesky"] < 1e-4, checks[fsai]
     audit = dict(
         method="CHOLMOD Cholesky with AMD ordering; no diagonal shift",
         factor_and_solve_s=elapsed,
@@ -75,6 +104,15 @@ def main():
         energy=float(0.5 * np.sum((L @ reference) ** 2 / mass)),
         relative_residual=float(np.linalg.norm(rhs - A @ reference[free]) / np.linalg.norm(rhs)),
         comparisons=checks,
+        refined_reference=(
+            dict(
+                path=str(args.refined_reference),
+                sha256=hashlib.sha256(refined.tobytes()).hexdigest(),
+                method="long-double factored energy gradient with AMD Cholesky correction solves",
+            )
+            if refined is not None
+            else None
+        ),
     )
     np.save(args.data / "cholesky.npy", reference)
     (args.data / "cholesky.json").write_text(json.dumps(audit, indent=2) + "\n")

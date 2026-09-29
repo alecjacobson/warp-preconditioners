@@ -1,5 +1,6 @@
 """Higher-precision energy reference using Cholesky and long-double refinement."""
 
+import argparse
 import json
 from pathlib import Path
 
@@ -10,7 +11,12 @@ from sksparse.cholmod import cholesky
 
 
 def main():
-    p = Path("data/dirichlet")
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--data", type=Path, default=Path("data/dirichlet"))
+    parser.add_argument("--output", type=Path, default=Path("data/tuning"))
+    args = parser.parse_args()
+    p = args.data
+    args.output.mkdir(parents=True, exist_ok=True)
     d = np.load(p / "fields.npz")
     n = len(d["vertices"])
     free = d["free"]
@@ -44,7 +50,7 @@ def main():
     full = initial.copy()
     full[free] = x
     reference = np.asarray(full, dtype=np.float64)
-    old = np.load(p / "cholesky.npy")
+    old = np.load(p / "cholesky.npy") if (p / "cholesky.npy").exists() else None
 
     def error(u):
         return float(np.sqrt(np.sum(mass * (u - full) ** 2) / np.sum(mass * full**2)))
@@ -53,7 +59,7 @@ def main():
         arithmetic="L and M promoted before assembly; long-double factored energy gradient L.T((Lu)/mass) and updates; diagonally equilibrated float64 AMD Cholesky corrections",
         long_double_epsilon=float(np.finfo(np.longdouble).eps),
         iterations=records,
-        original_cholesky_mass_relative_error=error(old),
+        original_cholesky_mass_relative_error=error(old) if old is not None else None,
         energy=float(0.5 * np.sum((L @ full) ** 2 / mass)),
         range=[float(full.min()), float(full.max())],
         original_fields={
@@ -61,10 +67,10 @@ def main():
             for name in json.loads((p / "solve.json").read_text())["display_order"]
         },
     )
-    np.save("data/tuning/refined_reference.npy", reference)
+    np.save(args.output / "refined_reference.npy", reference)
     # This RHS is for matrix-free experiments; it does not overwrite the benchmark RHS.
-    np.save("data/tuning/refined_rhs.npy", np.asarray(b, dtype=np.float64))
-    Path("data/tuning/refinement.json").write_text(json.dumps(result, indent=2) + "\n")
+    np.save(args.output / "refined_rhs.npy", np.asarray(b, dtype=np.float64))
+    (args.output / "refinement.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
 
 

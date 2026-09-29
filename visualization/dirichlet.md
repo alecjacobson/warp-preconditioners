@@ -1,30 +1,26 @@
 # Head-to-tail biharmonic interpolation
 
-**Later tuning and precision audit:** the [FSAI tuning study](../results/dirichlet-tuning/README.md)
-reduces this solve from about 43 seconds to about 10 seconds including
-setup. Applying the squared energy in factored form also improves accuracy:
-the previously displayed FSAI and Cholesky fields differ from a refined
-energy reference by about $1.38\times10^{-4}$ and $1.03\times10^{-4}$,
-respectively, in relative mass norm. The figures and measurements below
-preserve the original comparison and its explicitly assembled operator.
+![Prescribed regions, tuned FSAI-CG at convergence, and Jacobi-CR at k, 10k, and 100k.](../assets/dragon-dirichlet-comparison.png)
 
-![Prescribed head and tail regions, followed by FSAI-CG and Jacobi-CR solutions at k, 10k and 100k.](../assets/dragon-dirichlet-comparison.png)
+This regenerated comparison uses the [tuned FSAI recipe](../results/dirichlet-tuning/README.md):
+maximum width 48, `kap_tolerance=0.003`, float32 factor storage with float64
+accumulation, and four cooperating CUDA lanes per row. **Both solvers use
+the same factored squared-Laplacian operator.** The earlier width-eight,
+explicitly assembled comparison is [archived here](dirichlet-original.md).
 
-This comparison has **no data term**. On the original dragon surface mesh,
-we minimize
+The problem and mesh are unchanged:
 
 $$
-E(u)=\frac{1}{2}u^TQu,
-\qquad Q=LM^{-1}L,
+E(u)=\frac12 u^TLM^{-1}Lu,
 \qquad u_i=-1\text{ on the tail},\quad u_i=1\text{ on the head}.
 $$
 
-Here $L$ is the positive cotangent stiffness matrix and $M$ is the positive
-diagonal mass matrix from the benchmark. Reversing the sign convention for
-$L$ leaves $Q$ unchanged. Every solve starts from **zero on the free
-vertices**, with the prescribed values already assigned on the fixed
-vertices. There is no diagonal regularizer or penalty approximation to the
-constraints.
+There is **no data term or diagonal regularizer**. All free values start at
+zero. The first dragon shows the fixed regions; the next four show the
+actual final iterates of independent, uninterrupted solves. All solution
+dragons use the same 26-band striped colormap and scalar range, without
+clipping overshoot. Geometry, camera, lights, and spacing match the original
+scene.
 
 ## Regions and reduced system
 
@@ -60,98 +56,94 @@ removes that nullspace: $Q_{ff}$ is symmetric positive definite. An
 independent Cholesky factorization with AMD ordering checks this without
 any diagonal shift.
 
-## Solver comparison and convergence
+## Updated solver comparison
 
-All displayed fields come directly from one uninterrupted float64 Warp
-solve from zero. FSAI uses adaptive width 8 with CG. Its actual stopping
-iteration sets $k$; Warp CR with Jacobi runs for exactly $k$, $10k$, and
-$100k$. Setup and kernels are warmed before timing. Solve times exclude
-setup, field downloads, and verification.
+FSAI-CG reaches recursive relative tolerance $10^{-12}$ at
+**$k=33{,}374$ iterations**. Jacobi-CR runs for exactly $k$, $10k=333{,}740$,
+and $100k=3{,}337{,}400$ iterations. These budgets are smaller than in the
+original figure because $k$ now comes from the faster FSAI method.
 
-The FSAI recursive relative residual tolerance is **$10^{-12}$** for this
-example. A trial at $10^{-8}$ stopped at 97,746 iterations but differed from
-a longer solve by **0.895% in relative mass norm**. That threshold was not
-sufficient to declare the field converged. The published run uses the
-tighter threshold and checks both a $2k$ FSAI solve and an independent
-Cholesky solution.
+| Method | Iterations | Solve (s) | Setup (s) | Relative mass-norm difference from FSAI | Energy |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Tuned FSAI-CG | 33,374 | 8.56 | 1.073 | 0 | 0.0002063421512 |
+| Jacobi-CR, $k$ | 33,374 | 4.01 | 0.001 | 0.8374 | 0.04425449381 |
+| Jacobi-CR, $10k$ | 333,740 | 39.95 | 0.001 | 0.8403 | 0.006240283998 |
+| Jacobi-CR, $100k$ | 3,337,400 | 403.77 | 0.002 | 1.284e-09 | 0.0002063421512 |
 
-The final FSAI run stops at **$k=139{,}136$**, in **43.29 seconds**. A separate
-$2k$ run changes the field by only **$3.35\times10^{-8}$** in relative mass
-norm. The FSAI field differs from the independent Cholesky result by
-**$4.53\times10^{-5}$** in relative mass norm, with maximum absolute
-difference $6.98\times10^{-5}$. Its energy differs by about
-$2.00\times10^{-7}$ relatively. These numbers describe the accuracy actually
-checked, rather than interpreting the stopping tolerance as a field-error
-bound.
+Timings are single runs on the L40 after warmup. Figure labels show solve
+time; the FSAI label also reports setup. Setup includes construction of the
+factored operator and preconditioner. Host assembly, uploads, RHS construction,
+verification, and rendering are excluded. For repeated timing estimates,
+see the tuning report.
 
-| Method | Iterations | Solve time (s) | Relative mass-norm difference from FSAI | Energy |
-| --- | ---: | ---: | ---: | ---: |
-| FSAI-CG | 139,136 | 43.29 | 0 | 0.0002063423 |
-| Jacobi-CR, $k$ | 139,136 | 23.94 | 0.7657 | 0.01005694 |
-| Jacobi-CR, $10k$ | 1,391,360 | 242.65 | 0.1430 | 0.0002694790 |
-| Jacobi-CR, $100k$ | 13,913,600 | 2,425.32 | 1.223e-7 | 0.0002063423 |
-
-At the same iteration count, Jacobi is faster per iteration but its field
-is still **76.6%** away from FSAI. At ten times the iterations the difference
-is **14.3%**. At one hundred times the iterations it agrees visually and to
-about $1.22\times10^{-7}$ in relative mass norm. These are single-run GPU
-timings on the L40, not repeated-trial performance estimates.
-
-The independently recomputed relative residuals are $2.97\times10^{-9}$
-for FSAI and $1.50\times10^{-6}$, $5.53\times10^{-8}$, and
-$9.94\times10^{-8}$ for the three Jacobi budgets. In particular, the last
-Jacobi run has a slightly larger recomputed residual than the $10k$ run,
-even though its field is much more accurate. Its internal recursive
-residual is $9.26\times10^{-17}$; finite-precision residual drift makes
-that number an unreliable standalone accuracy measure here. The figure
-shows the independently recomputed residuals.
-
-All four fields satisfy the constraints **exactly**. The FSAI solution
-ranges from **−1.151744 to 1.020902**. The common colorbar extends to 1.156399
-to include the larger overshoot in the unconverged Jacobi-$k$ field.
-
-The field errors use the mass norm
+The factored operator applies
 
 $$
-\frac{\|u-u_{\mathrm{ref}}\|_M}{\|u_{\mathrm{ref}}\|_M},
-\qquad \|v\|_M=\sqrt{v^TMv}.
+Ax=R^TL^TM^{-1}LRx,
+\qquad b=-R^TL^TM^{-1}Lu_b,
 $$
 
-Independently recomputed residuals and the internal stopping residual are
-reported separately in the figure metadata. Reaching a small recursive
-residual is not, by itself, a guarantee of small solution error on this
-ill-conditioned problem. The Cholesky comparison is an independent
-floating-point check, not an exact-arithmetic reference.
+where $R$ inserts free values into a full vector and $u_b$ contains the
+prescribed values with zeros on free vertices. All rows of $L$ participate.
+The explicitly assembled $Q_{ff}$ is used to construct the preconditioners;
+the Krylov products use the factored form. No materialized squared matrix
+is used in those products. The problem remains float64; only the FSAI
+factor storage is compressed.
 
-Biharmonic interpolation has no general maximum principle: the solution
-can exceed the prescribed interval $[-1,1]$. We preserve this overshoot
-in the fields and in the shared color range.
+## Numerical and rendering checks
 
-## Verification and reproduction
+The FSAI field differs from the independently refined energy reference by
+**1.29e-09** in relative mass norm. A separate $2k$ run changes it
+by **1.29e-09**. The Jacobi-$100k$ field differs
+from the refined reference by **3.59e-11**. All fields satisfy the
+prescribed values exactly. FSAI's range is **-1.151402890 to 1.020900690**;
+this genuine overshoot is retained in the shared color scale.
 
-The script checks the dumped stiffness against a fresh cotangent assembly,
-mesh connectivity, matrix symmetry, exact constraints, solver iteration
-counts, and stability of the converged FSAI field. The optional Cholesky
-check also verifies the energy as $\frac12\sum_i (Lu)_i^2/M_{ii}$ and free
-stationarity against the full squared operator. Every rendered field is
-hash checked, and Blender's actual scalar attribute is read back and
-compared with the float32 conversion of the saved float64 solution.
+Field errors are relative mass norms of full fields. The figure's residuals
+are independently recomputed on the CPU from the full energy gradient:
 
-Generate the benchmark matrix dumps as described in the main README, then:
+$$
+\frac{\|(L^TM^{-1}Lu)_f\|_2}{\|b\|_2}.
+$$
+
+These differ from the internal recursive residuals. Neither a small residual
+nor a lower bending energy guarantees that an unconverged iterate is close
+to the final field in mass norm. In particular, Jacobi's field error need
+not decrease monotonically with iteration budget.
+
+The refined reference evaluates stationarity in long double, using
+AMD Cholesky correction solves. Agreement with the old explicitly assembled
+Cholesky solution is also recorded, but is not used as the accuracy gate:
+that matrix has a documented cancellation-error limit. The verification
+checks exact constraints, the full-energy restriction, energies, independent
+residuals, and agreement of FSAI with the refined reference.
+
+Every rendered field is SHA-256 checked. Blender's actual scalar attribute
+is read back and compared exactly with the float32 conversion of the saved
+float64 field. Colors are assigned after scalar interpolation on each
+triangle, yielding crisp isointervals rather than interpolated vertex colors.
+
+## Reproduction
+
+Generate the benchmark dumps in `/tmp/dump` as in the main README, then:
 
 ```bash
 OPENBLAS_NUM_THREADS=1 python visualization/solve_dirichlet.py \
-  --dir /tmp/dump --mesh /path/to/xyzrgb_dragon-720K.ply
-# Optional independent verification; requires scikit-sparse and SuiteSparse:
-OPENBLAS_NUM_THREADS=1 python visualization/verify_dirichlet.py
+  --dir /tmp/dump --mesh /path/to/xyzrgb_dragon-720K.ply \
+  --output data/dirichlet-tuned --tuned
+# Independent reference requires SuiteSparse and scikit-sparse.
+OPENBLAS_NUM_THREADS=1 python benchmarks/refine_dirichlet.py \
+  --data data/dirichlet-tuned --output data/dirichlet-tuned
+OPENBLAS_NUM_THREADS=1 python visualization/verify_dirichlet.py \
+  --data data/dirichlet-tuned \
+  --refined-reference data/dirichlet-tuned/refined_reference.npy
 blender -b --factory-startup --python visualization/render_dragon.py -- \
-  --data data/dirichlet --width 6000 --height 1120 --samples 64
-python visualization/compose_dirichlet.py
+  --data data/dirichlet-tuned --width 6000 --height 1120 --samples 64
+python visualization/compose_dirichlet.py --data data/dirichlet-tuned
 ```
 
-The numerical data and editable scene are saved in ignored
-`data/dirichlet/`, including `fields.npz`, `solve.json`, `cholesky.json`, and
-`five_dragons.blend`. Published measurements are in
-[`dragon-dirichlet-comparison.json`](../assets/dragon-dirichlet-comparison.json),
-and the figure uses Git LFS. The existing
+The saved fields and editable Blender scene are in ignored
+`data/dirichlet-tuned/`. Published [figure metadata](../assets/dragon-dirichlet-comparison.json)
+contains timings, diagnostics, hashes, the Cholesky/refined-reference audit,
+and render settings. The PNG uses Git LFS. The
 [nonlinear data-smoothing comparison](README.md) is a separate experiment.

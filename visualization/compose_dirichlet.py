@@ -73,7 +73,9 @@ def main():
         text(cx, y, f"{r['solve_s']:.2f} s solve", 36, True)
         text(cx, y + 49, f"Relative residual  {r['relative_residual']:.2e}", 29, color="#657083")
         metric = (
-            f"Energy  {r['bending_energy']:.5g}"
+            f"Setup {r['setup_s']:.2f} s · width 48 · κ = 0.003"
+            if fsai and meta.get("tuned")
+            else f"Energy  {r['bending_energy']:.5g}"
             if fsai
             else f"Field error vs FSAI  {100 * r['mass_relative_error_to_fsai']:.3g}%"
         )
@@ -94,15 +96,23 @@ def main():
     text(
         width / 2,
         height - 42,
-        f"k from FSAI recursive stopping tolerance {meta['convergence']['fsai_rtol']:.0e} · Residuals recomputed independently · Constraints exact in every field · No clipping of overshoot",
+        (
+            f"Both methods: factored L M⁻¹ L · FSAI: float32 factors / float64 arithmetic · k from tolerance {meta['convergence']['fsai_rtol']:.0e} · Independently recomputed residuals · Exact constraints"
+            if meta.get("tuned")
+            else f"k from FSAI recursive stopping tolerance {meta['convergence']['fsai_rtol']:.0e} · Residuals recomputed independently · Constraints exact in every field · No clipping of overshoot"
+        ),
         27,
         color="#657083",
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(args.output, optimize=True)
-    audit_path = args.data / "cholesky.json"
-    if audit_path.exists():
-        meta["cholesky_audit"] = json.loads(audit_path.read_text())
+    for filename, key in [
+        ("cholesky.json", "cholesky_audit"),
+        ("refinement.json", "refinement_audit"),
+    ]:
+        audit_path = args.data / filename
+        if audit_path.exists():
+            meta[key] = json.loads(audit_path.read_text())
     meta["render"] = render
     meta["figure_size"] = list(canvas.size)
     meta["note"] = (

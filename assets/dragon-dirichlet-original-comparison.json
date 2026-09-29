@@ -36,157 +36,151 @@
     "fsai_rtol": 1e-12,
     "fsai_maxiter": 500000,
     "criterion": "Warp recursive relative residual; independently verify field stability",
-    "k": 33374,
+    "k": 139136,
     "extended_solve": {
       "solver": "warp.optim.linear.cg",
-      "preconditioner": "FSAI, width=48, kap_tolerance=0.003, float32 storage, float64 accumulation, apply_lanes=4",
-      "operator": "full L.T M^-1 L, factored application; row_lanes=4; exact elimination",
-      "setup_s": 1.041819117963314,
-      "solve_s": 16.704991027712822,
-      "requested_iterations": 66748,
-      "actual_iterations": 66748,
+      "preconditioner": "FSAI, max_row_size=8",
+      "setup_s": 0.02690420299768448,
+      "solve_s": 86.62812099978328,
+      "requested_iterations": 278272,
+      "actual_iterations": 278272,
       "initial_guess": "zero",
       "initial_relative_residual": 1.0,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 1.1361794953368682e-24,
+      "recursive_relative_residual": 7.992506299083617e-21,
       "reached_stopping_tolerance": false,
-      "relative_residual": 2.7909376025541897e-09,
-      "residual_definition": "norm((L.T @ ((L @ full_u)/mass))[free]) / norm(eliminated_rhs), CPU float64"
+      "backward_error": 8.570655832280731e-13,
+      "relative_residual": 1.923731383303422e-09
     },
-    "extended_mass_relative_change": 1.286144561741872e-09
+    "extended_mass_relative_change": 3.350830028579651e-08
   },
   "results": {
-    "fsai_cg_33374": {
+    "fsai_cg_139136": {
       "solver": "warp.optim.linear.cg",
-      "preconditioner": "FSAI, width=48, kap_tolerance=0.003, float32 storage, float64 accumulation, apply_lanes=4",
-      "operator": "full L.T M^-1 L, factored application; row_lanes=4; exact elimination",
-      "setup_s": 1.0731503814458847,
-      "solve_s": 8.564266826957464,
+      "preconditioner": "FSAI, max_row_size=8",
+      "setup_s": 0.029803749173879623,
+      "solve_s": 43.29103225469589,
       "requested_iterations": 500000,
-      "actual_iterations": 33374,
+      "actual_iterations": 139136,
       "initial_guess": "zero",
       "initial_relative_residual": 1.0,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 1e-12,
       "atol": 0.0,
-      "recursive_relative_residual": 9.75629409318686e-13,
+      "recursive_relative_residual": 9.892878259255314e-13,
       "reached_stopping_tolerance": true,
-      "relative_residual": 8.82045191900914e-10,
-      "residual_definition": "norm((L.T @ ((L @ full_u)/mass))[free]) / norm(eliminated_rhs), CPU float64",
+      "backward_error": 9.07087152222475e-12,
+      "relative_residual": 2.9709733926035524e-09,
       "iteration_multiplier": 1,
-      "field_sha256": "e5a0d750faef7cc6ae19db5436b845f8a61ad1fac56d64eac02c96b6d246547b",
+      "field_sha256": "8fb9a21bc9360f793d5b2f32b2249e8c63fe41fbed9698ac50c9877266e71800",
       "range": [
-        -1.151402889980055,
-        1.020900690043738
+        -1.1517439512512895,
+        1.0209021131363973
       ],
-      "bending_energy": 0.00020634215116510066,
+      "bending_energy": 0.00020634226682454606,
       "constraint_max_error": 0.0,
       "mass_relative_error_to_fsai": 0.0
     },
-    "jacobi_cr_33374": {
+    "jacobi_cr_139136": {
       "solver": "warp.optim.linear.cr",
       "preconditioner": "Jacobi",
-      "operator": "full L.T M^-1 L, factored application; row_lanes=4; exact elimination",
-      "setup_s": 0.0011382251977920532,
-      "solve_s": 4.007860321551561,
-      "requested_iterations": 33374,
-      "actual_iterations": 33374,
+      "setup_s": 0.0003071539103984833,
+      "solve_s": 23.9416608735919,
+      "requested_iterations": 139136,
+      "actual_iterations": 139136,
       "initial_guess": "zero",
       "initial_relative_residual": 1.0,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 4.876996382374821e-06,
+      "recursive_relative_residual": 1.5026632912956697e-06,
       "reached_stopping_tolerance": false,
-      "relative_residual": 4.876996529713385e-06,
-      "residual_definition": "norm((L.T @ ((L @ full_u)/mass))[free]) / norm(eliminated_rhs), CPU float64",
+      "backward_error": 1.4963413634371445e-07,
+      "relative_residual": 1.5026622343973896e-06,
       "iteration_multiplier": 1,
-      "field_sha256": "c4f5d82fde53c469e5531c7f74a5813365d20f39a781c7614534d16e96c791b4",
+      "field_sha256": "4cc253e7a567e974c0d7d89d69612358dc247ce5787900abca8b35753216cbcb",
       "range": [
-        -1.1335539501347711,
-        1.0066078643369296
+        -1.087900765567275,
+        1.156398613747817
       ],
-      "bending_energy": 0.04425449381294611,
+      "bending_energy": 0.010056941182916775,
       "constraint_max_error": 0.0,
-      "mass_relative_error_to_fsai": 0.8374134339780586
+      "mass_relative_error_to_fsai": 0.7656652982738005
     },
-    "jacobi_cr_333740": {
+    "jacobi_cr_1391360": {
       "solver": "warp.optim.linear.cr",
       "preconditioner": "Jacobi",
-      "operator": "full L.T M^-1 L, factored application; row_lanes=4; exact elimination",
-      "setup_s": 0.0014876499772071838,
-      "solve_s": 39.946188274770975,
-      "requested_iterations": 333740,
-      "actual_iterations": 333740,
+      "setup_s": 0.00031246989965438843,
+      "solve_s": 242.64627624303102,
+      "requested_iterations": 1391360,
+      "actual_iterations": 1391360,
       "initial_guess": "zero",
       "initial_relative_residual": 1.0,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 1.2243298180735034e-06,
+      "recursive_relative_residual": 4.1184864895842345e-08,
       "reached_stopping_tolerance": false,
-      "relative_residual": 1.22438505246304e-06,
-      "residual_definition": "norm((L.T @ ((L @ full_u)/mass))[free]) / norm(eliminated_rhs), CPU float64",
+      "backward_error": 4.795123871428087e-11,
+      "relative_residual": 5.527112980424311e-08,
       "iteration_multiplier": 10,
-      "field_sha256": "116a22a20b21a5996416d04c1fb8dd2bbf621bc1a1feda65bb2d2fc9fd499277",
+      "field_sha256": "729e94f6bef321fff9c8b8383c083b1f8c3210c1cb0d45941441c343ddb4a7d4",
       "range": [
-        -1.0896281156875292,
-        1.091876054274117
+        -1.0840375701978688,
+        1.080248849081053
       ],
-      "bending_energy": 0.006240283997622225,
+      "bending_energy": 0.0002694789543798244,
       "constraint_max_error": 0.0,
-      "mass_relative_error_to_fsai": 0.8403395793481454
+      "mass_relative_error_to_fsai": 0.1429939550716316
     },
-    "jacobi_cr_3337400": {
+    "jacobi_cr_13913600": {
       "solver": "warp.optim.linear.cr",
       "preconditioner": "Jacobi",
-      "operator": "full L.T M^-1 L, factored application; row_lanes=4; exact elimination",
-      "setup_s": 0.001670781522989273,
-      "solve_s": 403.7746232897043,
-      "requested_iterations": 3337400,
-      "actual_iterations": 3337400,
+      "setup_s": 0.0002921484410762787,
+      "solve_s": 2425.3156089298427,
+      "requested_iterations": 13913600,
+      "actual_iterations": 13913600,
       "initial_guess": "zero",
       "initial_relative_residual": 1.0,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 8.84103321984725e-17,
+      "recursive_relative_residual": 9.258334061438354e-17,
       "reached_stopping_tolerance": false,
-      "relative_residual": 8.437920791410661e-08,
-      "residual_definition": "norm((L.T @ ((L @ full_u)/mass))[free]) / norm(eliminated_rhs), CPU float64",
+      "backward_error": 1.0847016747099509e-11,
+      "relative_residual": 9.944562533213683e-08,
       "iteration_multiplier": 100,
-      "field_sha256": "53f3e37af57e7101bd51665095834f67705aa922f63fd9cea24f74d6a981c62e",
+      "field_sha256": "b23bf9942905a0ac5e794f23be236bc93d67dfd815e8a791f15f958b10c8502e",
       "range": [
-        -1.1514028895943031,
-        1.0209006896224884
+        -1.1517436504490974,
+        1.0209021134553233
       ],
-      "bending_energy": 0.00020634215116510795,
+      "bending_energy": 0.00020634226662603563,
       "constraint_max_error": 0.0,
-      "mass_relative_error_to_fsai": 1.2838037661941034e-09
+      "mass_relative_error_to_fsai": 1.2230932769616302e-07
     }
   },
   "display_order": [
-    "fsai_cg_33374",
-    "jacobi_cr_33374",
-    "jacobi_cr_333740",
-    "jacobi_cr_3337400"
+    "fsai_cg_139136",
+    "jacobi_cr_139136",
+    "jacobi_cr_1391360",
+    "jacobi_cr_13913600"
   ],
-  "tuned": true,
   "initial_bending_energy": 28603.06559430908,
   "scalar_range": [
-    -1.151402889980055,
-    1.091876054274117
+    -1.1517439512512895,
+    1.156398613747817
   ],
   "cholesky_audit": {
     "method": "CHOLMOD Cholesky with AMD ordering; no diagonal shift",
-    "factor_and_solve_s": 6.6855809055268764,
+    "factor_and_solve_s": 6.543717745691538,
     "minimum_D": 0.0019809982002151347,
     "range": [
       -1.1516756752437394,
@@ -195,85 +189,30 @@
     "energy": 0.0002063422255678233,
     "relative_residual": 6.963948567684276e-11,
     "comparisons": {
-      "fsai_cg_33374": {
-        "elimination_error_over_roundoff_bound": 0.009825922430590902,
-        "mass_relative_error_to_cholesky": 0.00010299587290624369,
-        "max_abs_error_to_cholesky": 0.00027278526368434974,
-        "energy_relative_difference": -3.6057923891164023e-07,
-        "mass_relative_error_to_refined": 1.28590901791643e-09,
-        "factored_relative_residual": 8.820451919009136e-10
+      "fsai_cg_139136": {
+        "elimination_error_over_roundoff_bound": 0.010320646423046871,
+        "mass_relative_error_to_cholesky": 4.529754576426458e-05,
+        "max_abs_error_to_cholesky": 6.980665099795558e-05,
+        "energy_relative_difference": 1.9994318978255876e-07
       },
-      "jacobi_cr_33374": {
-        "elimination_error_over_roundoff_bound": 0.01060645472690378,
-        "mass_relative_error_to_cholesky": 0.8374347756488112,
-        "max_abs_error_to_cholesky": 1.3988882494999437,
-        "energy_relative_difference": 213.47134095391425,
-        "mass_relative_error_to_refined": 0.837413433956066,
-        "factored_relative_residual": 4.876996529713388e-06
+      "jacobi_cr_139136": {
+        "elimination_error_over_roundoff_bound": 0.009968424651657919,
+        "mass_relative_error_to_cholesky": 0.7656595522691084,
+        "max_abs_error_to_cholesky": 1.2268784325124957,
+        "energy_relative_difference": 47.73913303610814
       },
-      "jacobi_cr_333740": {
-        "elimination_error_over_roundoff_bound": 0.00883516425643126,
-        "mass_relative_error_to_cholesky": 0.8403819384123605,
-        "max_abs_error_to_cholesky": 1.7300373753327898,
-        "energy_relative_difference": 29.24239939474282,
-        "mass_relative_error_to_refined": 0.8403395792541388,
-        "factored_relative_residual": 1.2243850524630423e-06
+      "jacobi_cr_1391360": {
+        "elimination_error_over_roundoff_bound": 0.010840384227002973,
+        "mass_relative_error_to_cholesky": 0.14295386872569738,
+        "max_abs_error_to_cholesky": 0.2513523692524029,
+        "energy_relative_difference": 0.30598065247313366
       },
-      "jacobi_cr_3337400": {
-        "elimination_error_over_roundoff_bound": 0.010207370961805224,
-        "mass_relative_error_to_cholesky": 0.00010299584979086134,
-        "max_abs_error_to_cholesky": 0.00027278564943622463,
-        "energy_relative_difference": -3.6057920349552575e-07,
-        "mass_relative_error_to_refined": 3.586904501370984e-11,
-        "factored_relative_residual": 8.437920791410622e-08
+      "jacobi_cr_13913600": {
+        "elimination_error_over_roundoff_bound": 0.008430269835509499,
+        "mass_relative_error_to_cholesky": 4.522436028427169e-05,
+        "max_abs_error_to_cholesky": 6.974647162669156e-05,
+        "energy_relative_difference": 1.9898114511640586e-07
       }
-    },
-    "refined_reference": {
-      "path": "data/dirichlet-tuned/refined_reference.npy",
-      "sha256": "2bc1b7c28fe711287b1042628bc1814d7856bc91930cc294b406c6805e44078a",
-      "method": "long-double factored energy gradient with AMD Cholesky correction solves"
-    }
-  },
-  "refinement_audit": {
-    "arithmetic": "L and M promoted before assembly; long-double factored energy gradient L.T((Lu)/mass) and updates; diagonally equilibrated float64 AMD Cholesky corrections",
-    "long_double_epsilon": 1.0842021724855044e-19,
-    "iterations": [
-      {
-        "step": 1,
-        "mass_relative_correction": 2.9750720780395135e-06
-      },
-      {
-        "step": 2,
-        "mass_relative_correction": 7.942903865526356e-12
-      },
-      {
-        "step": 3,
-        "mass_relative_correction": 6.42831104423775e-17
-      },
-      {
-        "step": 4,
-        "mass_relative_correction": 6.579906272114983e-17
-      },
-      {
-        "step": 5,
-        "mass_relative_correction": 5.863597791789259e-17
-      },
-      {
-        "step": 6,
-        "mass_relative_correction": 3.941095087488137e-17
-      }
-    ],
-    "original_cholesky_mass_relative_error": null,
-    "energy": 0.00020634215116509188,
-    "range": [
-      -1.1514028896008028,
-      1.0209006896202097
-    ],
-    "original_fields": {
-      "fsai_cg_33374": 1.2859090179030822e-09,
-      "jacobi_cr_33374": 0.8374134339560662,
-      "jacobi_cr_333740": 0.8403395792541389,
-      "jacobi_cr_3337400": 3.586904506099079e-11
     }
   },
   "render": {
@@ -295,10 +234,10 @@
     "auxiliary_palette": "blue tail, red head, gray free",
     "display_order": [
       "constraints",
-      "fsai_cg_33374",
-      "jacobi_cr_33374",
-      "jacobi_cr_333740",
-      "jacobi_cr_3337400"
+      "fsai_cg_139136",
+      "jacobi_cr_139136",
+      "jacobi_cr_1391360",
+      "jacobi_cr_13913600"
     ],
     "objects": [
       {
@@ -314,58 +253,58 @@
         "attribute_verified": true
       },
       {
-        "name": "fsai_cg_33374",
+        "name": "fsai_cg_139136",
         "location": [
           -1.9545605182647705,
           -0.7114018797874451,
           -0.0
         ],
         "label_x_fraction": 0.30952381085459524,
-        "field_sha256": "e5a0d750faef7cc6ae19db5436b845f8a61ad1fac56d64eac02c96b6d246547b",
-        "attribute_float32_max_abs_error": 5.9603449509282314e-08,
+        "field_sha256": "8fb9a21bc9360f793d5b2f32b2249e8c63fe41fbed9698ac50c9877266e71800",
+        "attribute_float32_max_abs_error": 5.960317084330313e-08,
         "attribute_verified": true
       },
       {
-        "name": "jacobi_cr_33374",
+        "name": "jacobi_cr_139136",
         "location": [
           0.0,
           0.0,
           0.0
         ],
         "label_x_fraction": 0.5,
-        "field_sha256": "c4f5d82fde53c469e5531c7f74a5813365d20f39a781c7614534d16e96c791b4",
-        "attribute_float32_max_abs_error": 5.958575255426979e-08,
+        "field_sha256": "4cc253e7a567e974c0d7d89d69612358dc247ce5787900abca8b35753216cbcb",
+        "attribute_float32_max_abs_error": 5.96030973465389e-08,
         "attribute_verified": true
       },
       {
-        "name": "jacobi_cr_333740",
+        "name": "jacobi_cr_1391360",
         "location": [
           1.9545605182647705,
           0.7114018797874451,
           0.0
         ],
         "label_x_fraction": 0.6904761891454048,
-        "field_sha256": "116a22a20b21a5996416d04c1fb8dd2bbf621bc1a1feda65bb2d2fc9fd499277",
-        "attribute_float32_max_abs_error": 5.96045264256162e-08,
+        "field_sha256": "729e94f6bef321fff9c8b8383c083b1f8c3210c1cb0d45941441c343ddb4a7d4",
+        "attribute_float32_max_abs_error": 5.960449445119309e-08,
         "attribute_verified": true
       },
       {
-        "name": "jacobi_cr_3337400",
+        "name": "jacobi_cr_13913600",
         "location": [
           3.909121036529541,
           1.4228037595748901,
           0.0
         ],
         "label_x_fraction": 0.8809523782908095,
-        "field_sha256": "53f3e37af57e7101bd51665095834f67705aa922f63fd9cea24f74d6a981c62e",
-        "attribute_float32_max_abs_error": 5.960347548850109e-08,
+        "field_sha256": "b23bf9942905a0ac5e794f23be236bc93d67dfd815e8a791f15f958b10c8502e",
+        "attribute_float32_max_abs_error": 5.9603595170543144e-08,
         "attribute_verified": true
       }
     ],
     "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
     "scalar_range": [
-      -1.151402889980055,
-      1.091876054274117
+      -1.1517439512512895,
+      1.156398613747817
     ],
     "bands": 26,
     "interpolation": "scalar interpolated on triangles, then constant color ramp per shading sample",
