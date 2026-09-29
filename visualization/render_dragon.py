@@ -39,13 +39,16 @@ def main():
     parser.add_argument("--width", type=int, default=6000)
     parser.add_argument("--height", type=int, default=1120)
     parser.add_argument("--samples", type=int, default=96)
+    parser.add_argument("--cpu", action="store_true", help="Use CPU Cycles for previews")
     parser.add_argument("--azimuth", type=float, default=-70)
     parser.add_argument("--elevation", type=float, default=19)
     args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else [])
     args.data = args.data.resolve()
     data = np.load(args.data / "fields.npz")
     meta = json.loads((args.data / "solve.json").read_text())
-    display_order = ["target", *meta["display_order"]]
+    dirichlet = meta.get("problem_type") == "dirichlet"
+    auxiliary = "constraints" if dirichlet else "target"
+    display_order = [auxiliary, *meta["display_order"]]
     scalar_range = [
         min(float(data[name].min()) for name in display_order),
         max(float(data[name].max()) for name in display_order),
@@ -61,7 +64,10 @@ def main():
     prefs.get_devices()
     for device in prefs.devices:
         device.use = device.type == "OPTIX"
-    scene.cycles.device = "GPU"
+    scene.cycles.device = "CPU" if args.cpu else "GPU"
+    if args.cpu:
+        scene.render.threads_mode = "FIXED"
+        scene.render.threads = 16
     scene.cycles.samples = args.samples
     scene.cycles.use_denoising = True
     scene.cycles.max_bounces = 6
@@ -122,6 +128,28 @@ def main():
     links.new(normalize.outputs["Result"], ramp.inputs["Fac"])
     links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
     mesh.materials.append(material)
+    if dirichlet:
+        constraint_material = material.copy()
+        constraint_material.name = "Prescribed patches: blue tail, red head, gray free vertices"
+        cnodes = constraint_material.node_tree.nodes
+        cramp = next(node for node in cnodes if node.type == "VALTORGB")
+        while len(cramp.color_ramp.elements) > 1:
+            cramp.color_ramp.elements.remove(cramp.color_ramp.elements[-1])
+        for i, (position, color) in enumerate(
+            [
+                (0.0, (0.03, 0.22, 0.75, 1)),
+                (0.001, (0.55, 0.55, 0.55, 1)),
+                (0.999, (0.75, 0.045, 0.025, 1)),
+            ]
+        ):
+            element = (
+                cramp.color_ramp.elements[0] if i == 0 else cramp.color_ramp.elements.new(position)
+            )
+            element.position = position
+            element.color = color
+        cnormalize = next(node for node in cnodes if node.type == "MAP_RANGE")
+        cnormalize.inputs["From Min"].default_value = -1
+        cnormalize.inputs["From Max"].default_value = 1
     # A shadow catcher gives contact shadows on an exactly white background.
     bpy.ops.mesh.primitive_plane_add(size=200, location=(0, 0, -0.005))
     ground = bpy.context.object
@@ -157,9 +185,13 @@ def main():
         copy = mesh.copy()
         copy.name = f"original geometry | {name}"
         u = data[name]
-        expected_hash = (
-            meta["target"]["sha256"] if name == "target" else meta["results"][name]["field_sha256"]
-        )
+        if name == auxiliary:
+            expected_hash = meta[auxiliary]["sha256"]
+        else:
+            expected_hash = meta["results"][name]["field_sha256"]
+        if dirichlet and name == "constraints":
+            copy.materials.clear()
+            copy.materials.append(constraint_material)
         assert hashlib.sha256(u.tobytes()).hexdigest() == expected_hash
         values = u.astype(np.float32)
         copy.attributes["biharmonic_u"].data.foreach_set("value", values)
@@ -187,7 +219,7 @@ def main():
     render_meta = dict(
         renderer=bpy.app.version_string,
         engine="Cycles",
-        device="OptiX",
+        device="CPU" if args.cpu else "OptiX",
         samples=args.samples,
         camera=dict(
             azimuth=args.azimuth,
@@ -195,7 +227,11 @@ def main():
             orthographic_scale=camera_data.ortho_scale,
         ),
         image_size=[args.width, args.height],
-        scene="five simultaneous dragons: raw data plus four solves; one camera, shared lights and ground",
+        scene=f"{len(display_order)} simultaneous dragons: {auxiliary} plus {len(meta['display_order'])} solves; one camera, shared lights and ground",
+        auxiliary_field=auxiliary,
+        auxiliary_palette="blue tail, red head, gray free"
+        if dirichlet
+        else "shared scalar palette",
         display_order=display_order,
         objects=objects,
         colormap="isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",

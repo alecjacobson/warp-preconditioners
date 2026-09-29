@@ -1,5 +1,8 @@
 # Nonlinear data smoothing on the dragon
 
+For interpolation without a data term, see the separate
+[head/tail Dirichlet comparison](dirichlet.md).
+
 The figure contains **five dragons in one Blender scene**, under a single
 orthographic camera with shared lighting and ground. The centers are 2.08
 scene units apart. Left to right:

@@ -31,6 +31,18 @@ also verifies field stability. This nonlinear, stronger-smoothing example
 is a different problem from the α = 1 height benchmark timings above.
 [Target formula, convergence checks, and reproduction](visualization/README.md).
 
+![Head and tail constraints, followed by FSAI-CG and Jacobi-CR biharmonic interpolation at k, 10k and 100k.](assets/dragon-dirichlet-comparison.png)
+
+A second comparison prescribes **−1 on the tail and +1 on the head**, then
+minimizes $u^TLM^{-1}Lu/2$ with **no data term**. Free vertices start at zero.
+The first dragon marks the fixed regions; the next four compare converged
+FSAI-CG with Jacobi-CR at matched iteration budgets. The reduced system is
+SPD with 320,495 unknowns; constraints are enforced exactly by elimination.
+Here **k = 139,136**: FSAI takes **43.29 s**. Jacobi's relative field error
+falls from **76.6% at k**, to **14.3% at 10k**, to **1.22e-7 at 100k**
+(2,425.32 s). A separate Cholesky solve with AMD ordering checks the result.
+[Region definitions, convergence checks, and reproduction](visualization/dirichlet.md).
+
 ```bash
 python -m pip install -e '.[test]'
 pytest -q

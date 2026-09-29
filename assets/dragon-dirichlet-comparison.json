@@ -1,0 +1,451 @@
+{
+  "problem_type": "dirichlet",
+  "problem": "minimize 0.5*u^T L M^-1 L u; u[tail]=-1, u[head]=1; no data term",
+  "initial_guess": "zero on free vertices; prescribed values on fixed vertices",
+  "mesh": "/home/horde/projects/sparse-solver-benchmark/xyzrgb_dragon-720K.ply",
+  "vertices": 360757,
+  "triangles": 721510,
+  "mesh_sha256": "f5de5c737e931acc3f32f23ec77bed532620b95ae70866681ecf81da0035e125",
+  "faces_sha256": "20064b4da979aef1f8e1294635bbb089b0173678b497f0063fb7f34d2f9d95f4",
+  "matrix_shape": [
+    320495,
+    320495
+  ],
+  "matrix_nnz": 6525939,
+  "full_matrix_nnz": 7356259,
+  "connected_components": 1,
+  "relative_symmetry_error": 9.602064244569473e-17,
+  "relative_cotmatrix_error": 1.049693409842491e-08,
+  "constraints": {
+    "tail": {
+      "selection": "largest connected component of x < -70 and z > 45",
+      "vertices": 12684,
+      "candidate_components": 1,
+      "value": -1
+    },
+    "head": {
+      "selection": "largest connected component of x > 70 and z > 55",
+      "vertices": 27578,
+      "candidate_components": 1,
+      "value": 1
+    },
+    "sha256": "ed7d161b16a7eff930c5364b7c3fce7ba7d08918fdb3cc606dfd266d59691707",
+    "fixed_index_sha256": "66fdb86faebd7106989ca096dfb60d6c824610090044d78d1388803682c91702"
+  },
+  "convergence": {
+    "fsai_rtol": 1e-12,
+    "fsai_maxiter": 500000,
+    "criterion": "Warp recursive relative residual; independently verify field stability",
+    "k": 139136,
+    "extended_solve": {
+      "solver": "warp.optim.linear.cg",
+      "preconditioner": "FSAI, max_row_size=8",
+      "setup_s": 0.02690420299768448,
+      "solve_s": 86.62812099978328,
+      "requested_iterations": 278272,
+      "actual_iterations": 278272,
+      "initial_guess": "zero",
+      "initial_relative_residual": 1.0,
+      "restarts": 0,
+      "selection": "final iterate of a single solver call; no best-checkpoint selection",
+      "tol": 0.0,
+      "atol": 0.0,
+      "recursive_relative_residual": 7.992506299083617e-21,
+      "reached_stopping_tolerance": false,
+      "backward_error": 8.570655832280731e-13,
+      "relative_residual": 1.923731383303422e-09
+    },
+    "extended_mass_relative_change": 3.350830028579651e-08
+  },
+  "results": {
+    "fsai_cg_139136": {
+      "solver": "warp.optim.linear.cg",
+      "preconditioner": "FSAI, max_row_size=8",
+      "setup_s": 0.029803749173879623,
+      "solve_s": 43.29103225469589,
+      "requested_iterations": 500000,
+      "actual_iterations": 139136,
+      "initial_guess": "zero",
+      "initial_relative_residual": 1.0,
+      "restarts": 0,
+      "selection": "final iterate of a single solver call; no best-checkpoint selection",
+      "tol": 1e-12,
+      "atol": 0.0,
+      "recursive_relative_residual": 9.892878259255314e-13,
+      "reached_stopping_tolerance": true,
+      "backward_error": 9.07087152222475e-12,
+      "relative_residual": 2.9709733926035524e-09,
+      "iteration_multiplier": 1,
+      "field_sha256": "8fb9a21bc9360f793d5b2f32b2249e8c63fe41fbed9698ac50c9877266e71800",
+      "range": [
+        -1.1517439512512895,
+        1.0209021131363973
+      ],
+      "bending_energy": 0.00020634226682454606,
+      "constraint_max_error": 0.0,
+      "mass_relative_error_to_fsai": 0.0
+    },
+    "jacobi_cr_139136": {
+      "solver": "warp.optim.linear.cr",
+      "preconditioner": "Jacobi",
+      "setup_s": 0.0003071539103984833,
+      "solve_s": 23.9416608735919,
+      "requested_iterations": 139136,
+      "actual_iterations": 139136,
+      "initial_guess": "zero",
+      "initial_relative_residual": 1.0,
+      "restarts": 0,
+      "selection": "final iterate of a single solver call; no best-checkpoint selection",
+      "tol": 0.0,
+      "atol": 0.0,
+      "recursive_relative_residual": 1.5026632912956697e-06,
+      "reached_stopping_tolerance": false,
+      "backward_error": 1.4963413634371445e-07,
+      "relative_residual": 1.5026622343973896e-06,
+      "iteration_multiplier": 1,
+      "field_sha256": "4cc253e7a567e974c0d7d89d69612358dc247ce5787900abca8b35753216cbcb",
+      "range": [
+        -1.087900765567275,
+        1.156398613747817
+      ],
+      "bending_energy": 0.010056941182916775,
+      "constraint_max_error": 0.0,
+      "mass_relative_error_to_fsai": 0.7656652982738005
+    },
+    "jacobi_cr_1391360": {
+      "solver": "warp.optim.linear.cr",
+      "preconditioner": "Jacobi",
+      "setup_s": 0.00031246989965438843,
+      "solve_s": 242.64627624303102,
+      "requested_iterations": 1391360,
+      "actual_iterations": 1391360,
+      "initial_guess": "zero",
+      "initial_relative_residual": 1.0,
+      "restarts": 0,
+      "selection": "final iterate of a single solver call; no best-checkpoint selection",
+      "tol": 0.0,
+      "atol": 0.0,
+      "recursive_relative_residual": 4.1184864895842345e-08,
+      "reached_stopping_tolerance": false,
+      "backward_error": 4.795123871428087e-11,
+      "relative_residual": 5.527112980424311e-08,
+      "iteration_multiplier": 10,
+      "field_sha256": "729e94f6bef321fff9c8b8383c083b1f8c3210c1cb0d45941441c343ddb4a7d4",
+      "range": [
+        -1.0840375701978688,
+        1.080248849081053
+      ],
+      "bending_energy": 0.0002694789543798244,
+      "constraint_max_error": 0.0,
+      "mass_relative_error_to_fsai": 0.1429939550716316
+    },
+    "jacobi_cr_13913600": {
+      "solver": "warp.optim.linear.cr",
+      "preconditioner": "Jacobi",
+      "setup_s": 0.0002921484410762787,
+      "solve_s": 2425.3156089298427,
+      "requested_iterations": 13913600,
+      "actual_iterations": 13913600,
+      "initial_guess": "zero",
+      "initial_relative_residual": 1.0,
+      "restarts": 0,
+      "selection": "final iterate of a single solver call; no best-checkpoint selection",
+      "tol": 0.0,
+      "atol": 0.0,
+      "recursive_relative_residual": 9.258334061438354e-17,
+      "reached_stopping_tolerance": false,
+      "backward_error": 1.0847016747099509e-11,
+      "relative_residual": 9.944562533213683e-08,
+      "iteration_multiplier": 100,
+      "field_sha256": "b23bf9942905a0ac5e794f23be236bc93d67dfd815e8a791f15f958b10c8502e",
+      "range": [
+        -1.1517436504490974,
+        1.0209021134553233
+      ],
+      "bending_energy": 0.00020634226662603563,
+      "constraint_max_error": 0.0,
+      "mass_relative_error_to_fsai": 1.2230932769616302e-07
+    }
+  },
+  "display_order": [
+    "fsai_cg_139136",
+    "jacobi_cr_139136",
+    "jacobi_cr_1391360",
+    "jacobi_cr_13913600"
+  ],
+  "initial_bending_energy": 28603.06559430908,
+  "scalar_range": [
+    -1.1517439512512895,
+    1.156398613747817
+  ],
+  "cholesky_audit": {
+    "method": "CHOLMOD Cholesky with AMD ordering; no diagonal shift",
+    "factor_and_solve_s": 6.543717745691538,
+    "minimum_D": 0.0019809982002151347,
+    "range": [
+      -1.1516756752437394,
+      1.0209000371037946
+    ],
+    "energy": 0.0002063422255678233,
+    "relative_residual": 6.963948567684276e-11,
+    "comparisons": {
+      "fsai_cg_139136": {
+        "elimination_error_over_roundoff_bound": 0.010320646423046871,
+        "mass_relative_error_to_cholesky": 4.529754576426458e-05,
+        "max_abs_error_to_cholesky": 6.980665099795558e-05,
+        "energy_relative_difference": 1.9994318978255876e-07
+      },
+      "jacobi_cr_139136": {
+        "elimination_error_over_roundoff_bound": 0.009968424651657919,
+        "mass_relative_error_to_cholesky": 0.7656595522691084,
+        "max_abs_error_to_cholesky": 1.2268784325124957,
+        "energy_relative_difference": 47.73913303610814
+      },
+      "jacobi_cr_1391360": {
+        "elimination_error_over_roundoff_bound": 0.010840384227002973,
+        "mass_relative_error_to_cholesky": 0.14295386872569738,
+        "max_abs_error_to_cholesky": 0.2513523692524029,
+        "energy_relative_difference": 0.30598065247313366
+      },
+      "jacobi_cr_13913600": {
+        "elimination_error_over_roundoff_bound": 0.008430269835509499,
+        "mass_relative_error_to_cholesky": 4.522436028427169e-05,
+        "max_abs_error_to_cholesky": 6.974647162669156e-05,
+        "energy_relative_difference": 1.9898114511640586e-07
+      }
+    }
+  },
+  "render": {
+    "renderer": "4.5.3 LTS",
+    "engine": "Cycles",
+    "device": "OptiX",
+    "samples": 64,
+    "camera": {
+      "azimuth": -70,
+      "elevation": 19,
+      "orthographic_scale": 10.920000076293945
+    },
+    "image_size": [
+      6000,
+      1120
+    ],
+    "scene": "5 simultaneous dragons: constraints plus 4 solves; one camera, shared lights and ground",
+    "auxiliary_field": "constraints",
+    "auxiliary_palette": "blue tail, red head, gray free",
+    "display_order": [
+      "constraints",
+      "fsai_cg_139136",
+      "jacobi_cr_139136",
+      "jacobi_cr_1391360",
+      "jacobi_cr_13913600"
+    ],
+    "objects": [
+      {
+        "name": "constraints",
+        "location": [
+          -3.909121036529541,
+          -1.4228037595748901,
+          -0.0
+        ],
+        "label_x_fraction": 0.11904762170919048,
+        "field_sha256": "ed7d161b16a7eff930c5364b7c3fce7ba7d08918fdb3cc606dfd266d59691707",
+        "attribute_float32_max_abs_error": 0.0,
+        "attribute_verified": true
+      },
+      {
+        "name": "fsai_cg_139136",
+        "location": [
+          -1.9545605182647705,
+          -0.7114018797874451,
+          -0.0
+        ],
+        "label_x_fraction": 0.30952381085459524,
+        "field_sha256": "8fb9a21bc9360f793d5b2f32b2249e8c63fe41fbed9698ac50c9877266e71800",
+        "attribute_float32_max_abs_error": 5.960317084330313e-08,
+        "attribute_verified": true
+      },
+      {
+        "name": "jacobi_cr_139136",
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "label_x_fraction": 0.5,
+        "field_sha256": "4cc253e7a567e974c0d7d89d69612358dc247ce5787900abca8b35753216cbcb",
+        "attribute_float32_max_abs_error": 5.96030973465389e-08,
+        "attribute_verified": true
+      },
+      {
+        "name": "jacobi_cr_1391360",
+        "location": [
+          1.9545605182647705,
+          0.7114018797874451,
+          0.0
+        ],
+        "label_x_fraction": 0.6904761891454048,
+        "field_sha256": "729e94f6bef321fff9c8b8383c083b1f8c3210c1cb0d45941441c343ddb4a7d4",
+        "attribute_float32_max_abs_error": 5.960449445119309e-08,
+        "attribute_verified": true
+      },
+      {
+        "name": "jacobi_cr_13913600",
+        "location": [
+          3.909121036529541,
+          1.4228037595748901,
+          0.0
+        ],
+        "label_x_fraction": 0.8809523782908095,
+        "field_sha256": "b23bf9942905a0ac5e794f23be236bc93d67dfd815e8a791f15f958b10c8502e",
+        "attribute_float32_max_abs_error": 5.9603595170543144e-08,
+        "attribute_verified": true
+      }
+    ],
+    "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
+    "scalar_range": [
+      -1.1517439512512895,
+      1.156398613747817
+    ],
+    "bands": 26,
+    "interpolation": "scalar interpolated on triangles, then constant color ramp per shading sample",
+    "geometry": "original mesh; uniform scale and translation for scene placement only",
+    "display_transform": "Standard sRGB",
+    "palette_srgb": [
+      [
+        0.5591498501792953,
+        0.6636115086857188,
+        0.9993940485718457
+      ],
+      [
+        0.409922536648003,
+        0.5889193978511272,
+        0.8974936016204962
+      ],
+      [
+        0.43247349870062796,
+        0.6998986688688721,
+        0.9881678566963495
+      ],
+      [
+        0.2635294479717083,
+        0.6233478462597191,
+        0.8714825016048129
+      ],
+      [
+        0.28870772085045343,
+        0.7331640730643494,
+        0.9461553409543545
+      ],
+      [
+        0.0,
+        0.6532394631870981,
+        0.8169861715739699
+      ],
+      [
+        0.12252464016152248,
+        0.760055885040849,
+        0.876823751586618
+      ],
+      [
+        0.0,
+        0.6754374497499179,
+        0.7384775007604176
+      ],
+      [
+        0.01088544183991462,
+        0.7776752540008811,
+        0.785788565833554
+      ],
+      [
+        0.0,
+        0.6874712769303336,
+        0.6420289586269615
+      ],
+      [
+        0.19442700487142803,
+        0.7840072167337905,
+        0.6800009658810392
+      ],
+      [
+        0.14362309892136557,
+        0.6878974545654507,
+        0.5343141093809717
+      ],
+      [
+        0.35658211107951376,
+        0.7781618275863575,
+        0.5669589212888059
+      ],
+      [
+        0.3363870998356391,
+        0.6764194131453034,
+        0.42170168668305263
+      ],
+      [
+        0.5004859799804087,
+        0.7604325158428143,
+        0.45449790036557375
+      ],
+      [
+        0.4773085739005373,
+        0.6538564380932868,
+        0.3101186490182084
+      ],
+      [
+        0.6274327453383038,
+        0.7322528667844175,
+        0.35233842059425874
+      ],
+      [
+        0.5940647125235667,
+        0.622072938412234,
+        0.2080061667945754
+      ],
+      [
+        0.7363385028085822,
+        0.6961395162562625,
+        0.2773377124177572
+      ],
+      [
+        0.6900799845439514,
+        0.5839508738067741,
+        0.14141018277352924
+      ],
+      [
+        0.8253744592719137,
+        0.6556503309008973,
+        0.25674593478637603
+      ],
+      [
+        0.765126062121843,
+        0.5433944540755442,
+        0.16105449131418645
+      ],
+      [
+        0.8926365395646133,
+        0.6152751831349027,
+        0.3011511490538727
+      ],
+      [
+        0.8181718929814286,
+        0.5052075234834885,
+        0.24531494649796853
+      ],
+      [
+        0.9365848399895731,
+        0.5800520868804823,
+        0.3866795147442834
+      ],
+      [
+        0.8483432175216958,
+        0.4745398920902925,
+        0.34863962786920777
+      ]
+    ]
+  },
+  "figure_size": [
+    6000,
+    1665
+  ],
+  "note": "One scene; labels and legend added afterward. Single RHS timings exclude setup. Region diagram uses a categorical palette."
+}
