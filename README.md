@@ -148,6 +148,25 @@ stress colors now remain visible on constrained surfaces.
 [Problem, tuning, PR comparison, verification, attribution, and reproduction](results/elasticity.md).
 The [earlier dragon elasticity results](results/archive/dragon-elasticity.md) remain archived.
 
+### Does better tetrahedral mesh quality help?
+
+We also remeshed the bracket with **fTetWild**. The original bracket uses
+SimJEB's HyperMesh tetrahedra; TetGen was used for the earlier dragon.
+The worst dihedral angle improves from **5.36° to 14.31°**, with no elements
+below 10°. The new mesh has **351,711 tetrahedra** and preserves the tagged
+bolt/pin regions, material, total pin force and reference moment.
+
+The stress concentrations persist at the same bolt holes. Maximum displacement
+changes from **0.7988 to 0.8214 mm**; the area-weighted surface stress difference
+is **7.74%**. This improves element quality but does not establish stress
+convergence. Element count and equal-weight nodal load sampling also change.
+FSAI still wins the tested settings: **0.1331 s**, versus **0.1533 s** for block
+Jacobi and **0.1693 s** for scalar Jacobi, including setup on NVIDIA L40.
+
+![Original and fTetWild converged stresses, with top, underside and all fixed/loaded boundary nodes.](assets/simjeb-mesh-comparison.png)
+
+[Mesh-quality plots, boundary-transfer checks, convergence curves and reproduction](results/simjeb-mesh-comparison.md).
+
 ## Fixed sparsity, changing values
 
 `BlockJacobi.update(A)` recomputes only diagonal inverses. FSAI can cache the

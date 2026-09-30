@@ -1,0 +1,263 @@
+{
+  "original": {
+    "vertices": 44121,
+    "tetrahedra": 215219,
+    "volume_mm3": 277422.2643926118,
+    "mean_ratio": {
+      "0": 0.2076399274787976,
+      "1": 0.3956781306376428,
+      "5": 0.6223540066275334,
+      "50": 0.8573999448051921,
+      "95": 0.9927488907395433,
+      "99": 0.9998374188569593,
+      "100": 0.9999998486559167
+    },
+    "radius_ratio": {
+      "0": 0.1086298329359681,
+      "1": 0.28357891797603924,
+      "5": 0.5382657083160959,
+      "50": 0.8150261971849332,
+      "95": 0.991011431116717,
+      "99": 0.9997998999520594,
+      "100": 0.9999998026378066
+    },
+    "min_dihedral_degrees": {
+      "0": 5.360202523461946,
+      "1": 14.121746395926781,
+      "5": 27.924574731387853,
+      "50": 49.453676237388784,
+      "95": 65.83477015129321,
+      "99": 69.82912205947429,
+      "100": 70.51663617812443
+    },
+    "fraction_dihedral_below_10": 0.004149261914607911,
+    "edge_length_mm": {
+      "0": 0.3090877902797165,
+      "1": 0.9524100648355289,
+      "5": 1.2055991491232139,
+      "50": 2.0082651252161368,
+      "95": 3.6940354751221567,
+      "99": 4.676220893730749,
+      "100": 7.657349964739755
+    }
+  },
+  "ftetwild": {
+    "vertices": 68507,
+    "tetrahedra": 351711,
+    "volume_mm3": 277423.7249163821,
+    "mean_ratio": {
+      "0": 0.43215630740189,
+      "1": 0.7178897684520955,
+      "5": 0.7753020335227547,
+      "50": 0.8995352485999129,
+      "95": 0.9704783077470683,
+      "99": 0.9853071461506674,
+      "100": 0.9996115149212115
+    },
+    "radius_ratio": {
+      "0": 0.23761299330884542,
+      "1": 0.6215785450900866,
+      "5": 0.7081297767443653,
+      "50": 0.8794175297111182,
+      "95": 0.9656971004870855,
+      "99": 0.9826789164795622,
+      "100": 0.9994851155872791
+    },
+    "min_dihedral_degrees": {
+      "0": 14.310574620578805,
+      "1": 34.992179537869816,
+      "5": 39.81008764710025,
+      "50": 51.78095383867743,
+      "95": 61.80662431089676,
+      "99": 64.73373457389107,
+      "100": 69.61474445326657
+    },
+    "fraction_dihedral_below_10": 0.0,
+    "edge_length_mm": {
+      "0": 0.449949473718995,
+      "1": 1.2179123795806996,
+      "5": 1.4457445043460717,
+      "50": 1.931864985119451,
+      "95": 2.549987419378587,
+      "99": 2.782301476083407,
+      "100": 3.9408331507043304
+    }
+  },
+  "transfer": {
+    "method": "Nearest original surface triangle to each new boundary-face centroid; transfer triangle tag, then constrain/load incident vertices",
+    "patches": [
+      {
+        "label": "B1",
+        "original_area_mm2": 253.1987382355687,
+        "new_area_mm2": 253.1716972130404,
+        "relative_area_change": -0.00010679761959608847,
+        "nodes": 106
+      },
+      {
+        "label": "B2",
+        "original_area_mm2": 262.0155843950087,
+        "new_area_mm2": 261.99875463890623,
+        "relative_area_change": -6.423188964621573e-05,
+        "nodes": 111
+      },
+      {
+        "label": "B3",
+        "original_area_mm2": 253.25638067937916,
+        "new_area_mm2": 253.2234565860262,
+        "relative_area_change": -0.0001300030161713872,
+        "nodes": 108
+      },
+      {
+        "label": "B4",
+        "original_area_mm2": 253.18966872341466,
+        "new_area_mm2": 253.1644407776268,
+        "relative_area_change": -9.964050237543098e-05,
+        "nodes": 105
+      },
+      {
+        "label": "pin",
+        "original_area_mm2": 762.2411449464679,
+        "new_area_mm2": 762.0252423910031,
+        "relative_area_change": -0.00028324704969839853,
+        "nodes": 724
+      }
+    ],
+    "max_vertex_distance_to_original_mm": 0.010719017238865165,
+    "max_original_vertex_distance_to_new_mm": 0.01453916716983772,
+    "max_centroid_distance_to_original_mm": 0.010059046456290332,
+    "load": "Same reference point, resultant and zero reference moment; equal-weight distribution over new interface nodes",
+    "caveat": "Remeshing changes discrete node positions and equal-weight RBE3 nodal sampling; surface regions and total force/moment are preserved, not individual original nodal forces."
+  },
+  "meshing": {
+    "mesher": "fTetWild via wildmeshing",
+    "version": "0.4.1",
+    "options": {
+      "stop_quality": 10,
+      "max_its": 80,
+      "max_threads": 4,
+      "epsilon": 9.155121911850056e-05,
+      "edge_length_r": 0.009155121911850056,
+      "skip_simplify": false,
+      "coarsen": false
+    },
+    "target_edge_mm": 2.0,
+    "envelope_mm": 0.02,
+    "source_sha256": "8d22720aafdee09c026341c7491cf3fcfaa87d4c2d0c18773f7dd7c5a6ef6be2",
+    "seconds": 535.4675276093185,
+    "vertices": 68507,
+    "tetrahedra": 351711,
+    "stats": "0, 0, 18190, 36400, -1, -1, -1, -1\n1, 141.507, 5446, 10912, -1, -1, -1, -1\n2, 0.035117, 5966, 34629, -1, -1, -1, -1\n3, 13.043, 12346, 68723, 1.03197e+10, 459403, 3, -1\n7, 8.00859, 7314, 42029, 315596, 48.106, -1, -1\n3, 0.098379, 7400, 42491, 2.51294e+06, 420.339, 0, -1\n6, 5.2471, 1107568, 5707522, 2.51294e+06, 63.5506, -1, -1\n7, 78.1987, 318078, 1805501, 5988.47, 3.89591, -1, -1\n8, 30.8478, 318078, 1788673, 5988.47, 3.6429, -1, -1\n9, 10.7808, 318078, 1788673, 3085.74, 3.43, -1, -1\n6, 12.2034, 443234, 2382686, 3117.64, 3.62221, -1, -1\n7, 26.968, 333891, 1873293, 328.856, 3.44166, -1, -1\n8, 37.0792, 333891, 1872370, 328.856, 3.42655, -1, -1\n9, 13.6766, 333891, 1872370, 328.856, 3.35619, -1, -1\n6, 13.0902, 394835, 2137658, 328.856, 3.44973, -1, -1\n7, 28.3079, 332212, 1864361, 328.856, 3.3599, -1, -1\n8, 19.6186, 332212, 1864229, 328.856, 3.35574, -1, -1\n9, 10.8943, 332212, 1864229, 328.856, 3.32544, -1, -1\n6, 13.3377, 379494, 2062651, 385.636, 3.40091, -1, -1\n7, 20.0772, 331358, 1860926, 7.86937, 3.32997, -1, -1\n8, 20.2506, 331358, 1860926, 7.71779, 3.32779, -1, -1\n9, 10.3127, 331358, 1860926, 6.94193, 3.31158, -1, -1\n7, 15.981, 323964, 1839456, 6.94193, 3.30837, -1, -1\n4, 377.579, 323964, 1839456, 6.94193, 3.30837, -1, -1\n5, 1.79078e+09, 68507, 351711, 6.94193, 3.39039, -1, -1\n-1, 1.79078e+09, 68507, 351711, 6.94193, 3.39039, 0, 1758\n"
+  },
+  "solutions": {
+    "original": {
+      "max_displacement_mm": 0.7988059942380153,
+      "compliance_nm": 19.506834393613875,
+      "nodal_peak_stress_mpa": 1012.5607385975001,
+      "peak_position_mm": [
+        -1.04908,
+        -143.07600000000002,
+        1.278e-12
+      ],
+      "peak_node_fixed": true,
+      "hottest_surface_0_1_percent_max_distance_to_fixed_mm": 1.7391562858167997,
+      "element_peak_stress_mpa": 1299.1541616567965,
+      "independent_reference_residual": 1.0349517011495167e-11,
+      "best_tested": {
+        "jacobi": {
+          "config": {
+            "kind": "jacobi",
+            "solver": "cg"
+          },
+          "iterations": 2035,
+          "setup_s": 0.00038836151361465454,
+          "solve_s": 0.11186689883470535,
+          "total_s": 0.11225526034832001
+        },
+        "block": {
+          "config": {
+            "kind": "block",
+            "solver": "cg",
+            "strategy": "ours"
+          },
+          "iterations": 1846,
+          "setup_s": 0.0003193765878677368,
+          "solve_s": 0.1034182459115982,
+          "total_s": 0.10383639484643936
+        },
+        "fsai": {
+          "config": {
+            "kind": "fsai",
+            "solver": "cg",
+            "width": 4,
+            "kap": 0.003,
+            "lanes": 1,
+            "storage": 32
+          },
+          "iterations": 1132,
+          "setup_s": 0.005647383630275726,
+          "solve_s": 0.07588498294353485,
+          "total_s": 0.08198096975684166
+        }
+      }
+    },
+    "ftetwild": {
+      "max_displacement_mm": 0.8213767776510693,
+      "compliance_nm": 20.039225851181197,
+      "nodal_peak_stress_mpa": 1035.0908918647115,
+      "peak_position_mm": [
+        -1.04908,
+        -143.07600000000002,
+        1.278e-12
+      ],
+      "peak_node_fixed": true,
+      "hottest_surface_0_1_percent_max_distance_to_fixed_mm": 2.5198662655550854,
+      "element_peak_stress_mpa": 1243.1029621178259,
+      "independent_reference_residual": 9.837879369696444e-12,
+      "best_tested": {
+        "jacobi": {
+          "config": {
+            "kind": "jacobi",
+            "solver": "cg"
+          },
+          "iterations": 2063,
+          "setup_s": 0.00040282681584358215,
+          "solve_s": 0.16882216930389404,
+          "total_s": 0.169290479272604
+        },
+        "block": {
+          "config": {
+            "kind": "block",
+            "solver": "cg",
+            "strategy": "ours"
+          },
+          "iterations": 1838,
+          "setup_s": 0.0004415586590766907,
+          "solve_s": 0.152756217867136,
+          "total_s": 0.15330823883414268
+        },
+        "fsai": {
+          "config": {
+            "kind": "fsai",
+            "solver": "cg",
+            "width": 4,
+            "kap": 0.003,
+            "lanes": 1,
+            "storage": 32
+          },
+          "iterations": 1186,
+          "setup_s": 0.008788086473941803,
+          "solve_s": 0.12432006001472473,
+          "total_s": 0.13310814648866653
+        }
+      }
+    }
+  },
+  "common_surface_comparison": {
+    "method": "Closest-point interpolation of new nodal displacement and recovered stress onto original surface vertices; original surface lumped-area weights",
+    "displacement_relative_l2": 0.0287481802405366,
+    "stress_relative_l2": 0.0774322276606188,
+    "stress_relative_l2_more_than_5mm_from_fixed": 0.06699928737843666,
+    "max_projection_distance_mm": 0.01453916716983772,
+    "caveat": "Two P1 discretizations of the same tagged surface, with changed node locations and equal-weight load sampling; not a converged stress ground truth."
+  }
+}

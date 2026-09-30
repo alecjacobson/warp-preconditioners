@@ -4,6 +4,7 @@ Volume-average the element stress tensors at each vertex, then evaluate
 sqrt(3/2 dev(sigma):dev(sigma)). This is visualization postprocessing only.
 """
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -101,10 +102,14 @@ def recover(vertices, tets, displacement, young, poisson, device="cuda:0"):
 
 
 def main():
-    root = Path("data/simjeb")
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--data", type=Path, default=Path("data/simjeb"))
+    parser.add_argument("--output", type=Path, default=Path("results/elasticity.json"))
+    args = parser.parse_args()
+    root = args.data
     fields = dict(np.load(root / "comparison.npz"))
     mesh = np.load(root / "mesh.npz")
-    path = Path("results/elasticity.json")
+    path = args.output
     meta = json.loads(path.read_text())
     stress = {}
     for name in ["reference", "jacobi", "block", "fsai"]:

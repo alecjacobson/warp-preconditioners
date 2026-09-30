@@ -1,5 +1,6 @@
 """Plot verified displacement and energy errors for the three tuned finalists."""
 
+import argparse
 import json
 from pathlib import Path
 
@@ -10,7 +11,13 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    data = json.loads(Path("results/elasticity.json").read_text())
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--input", type=Path, default=Path("results/elasticity.json"))
+    parser.add_argument(
+        "--output", type=Path, default=Path("assets/simjeb-elasticity-convergence.png")
+    )
+    args = parser.parse_args()
+    data = json.loads(args.input.read_text())
     colors = dict(jacobi="#D17632", block="#8056B3", fsai="#087E8B")
     labels = dict(jacobi="Scalar Jacobi", block="Block Jacobi", fsai="FSAI")
     plt.rcParams.update(
@@ -67,7 +74,7 @@ def main():
     axes[1].text(
         data["snapshot_budget_s"],
         1.02,
-        "Render budget",
+        "Snapshot budget",
         rotation=90,
         ha="right",
         va="top",
@@ -78,7 +85,9 @@ def main():
     fig.text(
         0.075,
         0.94,
-        "SimJEB #225 bracket under vertical pin load",
+        "SimJEB #225: fTetWild mesh under vertical pin load"
+        if "remeshing" in data["mesh"]
+        else "SimJEB #225 bracket under vertical pin load",
         fontsize=21,
         weight="bold",
         color="#263448",
@@ -104,7 +113,7 @@ def main():
         fontsize=10,
         color="#66758A",
     )
-    out = Path("assets/simjeb-elasticity-convergence.png")
+    out = args.output
     fig.savefig(out, dpi=190, facecolor="white")
     print(out)
 

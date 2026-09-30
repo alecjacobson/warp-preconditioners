@@ -13,6 +13,7 @@ dependencies = ["warp-lang>=1.15"]
 test = ["numpy", "scipy", "pytest"]
 visualization = ["numpy", "scipy", "libigl", "Pillow", "matplotlib"]
 elasticity = ["numpy", "scipy", "libigl", "tetgen>=0.8.4", "Pillow", "matplotlib"]
+remesh = ["numpy", "scipy", "libigl", "wildmeshing==0.4.1", "Pillow", "matplotlib"]
 
 [tool.setuptools.packages.find]
 include = ["warp_preconditioners*"]

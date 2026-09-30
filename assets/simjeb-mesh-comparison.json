@@ -1,0 +1,39 @@
+{
+  "provenance": [
+    {
+      "mesh_sha256": "8d22720aafdee09c026341c7491cf3fcfaa87d4c2d0c18773f7dd7c5a6ef6be2",
+      "stress_sha256": "20bd70b0b241ee855aa21866936872d48150cfd7a240caa5704975cc5d899208",
+      "displacement_sha256": "9274e66411226cbf93ad8e03ea035bcc2b1ba7c9e9d0dfcc9577c493ed5b63f3"
+    },
+    {
+      "mesh_sha256": "25d0aa12658c66342145769f05f52f8be4a6a737d3a2933c32a2385a4d094d2d",
+      "stress_sha256": "1867ef12bcb560691fdce8c468d878982afb13d241df83576f9622230067a5e9",
+      "displacement_sha256": "39867fbe75697f33b7b1a95ae55c1079a44868c5080677e3107b92a62e51fe20"
+    }
+  ],
+  "scalar_range_pa": [
+    0,
+    1035090891.8647114
+  ],
+  "amplification": 1,
+  "stress_recovery": "Volume-average element stress tensors, then von Mises; no additional smoothing",
+  "views": [
+    "top",
+    "underside (rigid display rotation)",
+    "undeformed transparent boundary nodes"
+  ],
+  "renderer": "4.5.3 LTS",
+  "device": "OptiX",
+  "samples": 64,
+  "boundary_nodes": [
+    {
+      "fixed": 428,
+      "loaded": 753
+    },
+    {
+      "fixed": 430,
+      "loaded": 724
+    }
+  ],
+  "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))"
+}

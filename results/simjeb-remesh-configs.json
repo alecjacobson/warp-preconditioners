@@ -1,0 +1,78 @@
+[
+  {
+    "kind": "jacobi",
+    "solver": "cg"
+  },
+  {
+    "kind": "block",
+    "solver": "cg",
+    "strategy": "ours"
+  },
+  {
+    "kind": "block",
+    "solver": "cg",
+    "strategy": "direct"
+  },
+  {
+    "kind": "fsai",
+    "solver": "cg",
+    "width": 4,
+    "kap": 0.003,
+    "lanes": 1,
+    "storage": 32
+  },
+  {
+    "kind": "fsai",
+    "solver": "cg",
+    "width": 8,
+    "kap": 0.003,
+    "lanes": 4,
+    "storage": 32
+  },
+  {
+    "kind": "fsai",
+    "solver": "cg",
+    "width": 16,
+    "kap": 0.003,
+    "lanes": 4,
+    "storage": 32
+  },
+  {
+    "kind": "jacobi",
+    "solver": "cr"
+  },
+  {
+    "kind": "block",
+    "solver": "cr",
+    "strategy": "ours"
+  },
+  {
+    "kind": "block",
+    "solver": "cr",
+    "strategy": "direct"
+  },
+  {
+    "kind": "fsai",
+    "solver": "cr",
+    "width": 4,
+    "kap": 0.003,
+    "lanes": 1,
+    "storage": 32
+  },
+  {
+    "kind": "fsai",
+    "solver": "cr",
+    "width": 8,
+    "kap": 0.003,
+    "lanes": 4,
+    "storage": 32
+  },
+  {
+    "kind": "fsai",
+    "solver": "cr",
+    "width": 16,
+    "kap": 0.003,
+    "lanes": 4,
+    "storage": 32
+  }
+]
