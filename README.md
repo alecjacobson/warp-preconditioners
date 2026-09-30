@@ -102,6 +102,39 @@ energy. Failed trials and manufactured-solution errors are reported.
 
 [Algorithms, exact matrix signs, accuracy checks, API examples, and reproduction](results/indefinite.md).
 
+## Tetrahedral linear elasticity
+
+FSAI also helps on a solid dragon under gravity, with its head and tail
+clamped: **225,770 tetrahedra and 152,058 free displacement DOFs**. All
+assembly, preconditioners, reference solves, and compared solves run in Warp
+on the L40. We tune CG/CR and preconditioner settings against the same
+**1e-4 relative displacement and energy error** target.
+
+| Best tested configuration | Iterations | Median setup + solve |
+| --- | ---: | ---: |
+| Default scalar Jacobi + CG | 6,117 | 0.393 s |
+| PR #1890 direct block Jacobi + CG | 5,026 | 0.328 s |
+| FSAI, width 8, κ = 0.003, float64 factors, four lanes + CG | 2,109 | **0.215 s** |
+
+Our block Jacobi applies the same mathematical operator as
+[Warp PR #1890](https://github.com/NVIDIA/warp/pull/1890) on these 3×3 SPD
+blocks; measured applications agree within **2.60e-16**. The PR's direct
+variant has cheaper setup here, so it is the block baseline in this table.
+FSAI is **1.52× faster than block Jacobi** and **1.83× faster than scalar
+Jacobi**, including setup, for this accuracy target.
+
+![Elasticity displacement and energy errors versus iterations and setup-plus-solve wall time.](assets/dragon-elasticity-convergence.png)
+
+The next image freezes all three methods near **0.215 s**, alongside a
+verified reference. Displacement errors at that budget are **1.05%**,
+**0.344%**, and **0.00482%**, respectively. The rendering shows **actual
+displacement with no exaggeration**, colored by recovered **von Mises stress
+in kPa**, with one shared linear scale.
+
+![Reference and actual elasticity iterates frozen at approximately the first winner's wall-clock time.](assets/dragon-elasticity-comparison.png)
+
+[Problem, PR comparison, all 36 configurations, timing protocol, verification, and reproduction](results/elasticity.md).
+
 ```bash
 python -m pip install -e '.[test]'
 pytest -q

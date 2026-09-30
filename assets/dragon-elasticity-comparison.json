@@ -1,0 +1,200 @@
+{
+  "mesh": {
+    "source": "data/dirichlet-tuned/fields.npz",
+    "source_sha256": "f35bb5bc2365892697f8d98a0fa0dd427ef4e3684aa3d3c3a1e3bf762fb76607",
+    "tetgen": "0.8.4",
+    "simplified_vertices": 30002,
+    "simplified_faces": 60000,
+    "vertices": 54720,
+    "tetrahedra": 225770,
+    "boundary_faces": 69244,
+    "fixed_vertices": 4034,
+    "free_dofs": 152058,
+    "length_metres": 1.0,
+    "max_volume": 1e-06,
+    "minratio": 1.4,
+    "mindihedral": 8,
+    "volume": 0.018814314740502693,
+    "minimum_tet_volume": 4.375302784622011e-14,
+    "mesh_sha256": "c78ef04ee3b812cf5758d561183309a6c3d9412d8a65763efb83db4187b6f032",
+    "seconds": 3.5897238217294216
+  },
+  "gpu": "NVIDIA L40",
+  "warp": "1.15.0",
+  "snapshot_budget_s": 0.2148488312959671,
+  "winner": "fsai",
+  "stress": {
+    "recovery": "Volume-average element Cauchy stress tensors at vertices, then compute von Mises invariant",
+    "units": "Pa",
+    "displacement_amplification": 1,
+    "fields": {
+      "reference": {
+        "nodal_max_pa": 100398.35461889501,
+        "element_max_pa": 182390.8923357255,
+        "nodal_sha256": "6a3bbad01bf77c7404874f43614b91137c67eb92d271b1e367fd1b661edd66a1"
+      },
+      "jacobi": {
+        "nodal_max_pa": 99614.74829441865,
+        "element_max_pa": 182651.28454416222,
+        "nodal_sha256": "5ee1e5b72b56823772877cca9db8025184a2a855a911a940f51f90203b18c52e"
+      },
+      "block": {
+        "nodal_max_pa": 99987.34405058311,
+        "element_max_pa": 182775.45482356023,
+        "nodal_sha256": "14ae5820cbbf1f00ea714c7d6b9fb9ccc87f764c61b8244e6f968301efbc491f"
+      },
+      "fsai": {
+        "nodal_max_pa": 100401.59798079394,
+        "element_max_pa": 182395.83912447214,
+        "nodal_sha256": "75c39b81236882ffd4469adc2b557561b51a2a9b7494fd05c1a8abd0057d5bee"
+      }
+    }
+  },
+  "results_source": "results/elasticity.json",
+  "render": {
+    "objects": [
+      {
+        "name": "reference",
+        "label_x_fraction": 0.14705882352941174,
+        "field_sha256": "e84f2966015981ed4aa831a984784225a8fd7311fe22e06a6e7be4eae130859f",
+        "geometry_and_attribute_verified": true
+      },
+      {
+        "name": "jacobi",
+        "label_x_fraction": 0.38235294117647056,
+        "field_sha256": "95d7b2c0bbd91b6aaf14195d5ceb598a18bb0dccbb9ecb1c4f65b9b36bb63ce9",
+        "geometry_and_attribute_verified": true
+      },
+      {
+        "name": "block",
+        "label_x_fraction": 0.6176470588235294,
+        "field_sha256": "deefe0a3a40cd0fe261f1946e6e7f27534b16407c773246a0ee95dfbe9d8454a",
+        "geometry_and_attribute_verified": true
+      },
+      {
+        "name": "fsai",
+        "label_x_fraction": 0.8529411764705883,
+        "field_sha256": "085a203ca8365ee9291078c27eea0a6a5a46e3efe16eb8cea4f0ff40b6cf85dd",
+        "geometry_and_attribute_verified": true
+      }
+    ],
+    "amplification": 1.0,
+    "scalar_range_pa": [
+      0,
+      100401.59798079394
+    ],
+    "renderer": "4.5.3 LTS",
+    "device": "OptiX",
+    "samples": 96,
+    "geometry": "TetGen boundary plus actual saved physical displacement; no exaggeration",
+    "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
+    "clamps": "Dark gray surface patches",
+    "image_size": [
+      4800,
+      1150
+    ]
+  },
+  "finalists": {
+    "jacobi": {
+      "config": {
+        "kind": "jacobi",
+        "solver": "cg"
+      },
+      "iterations": 6117,
+      "setup_s": 0.00039659440517425537,
+      "solve_s": 0.3930271714925766,
+      "total_s": 0.39342376589775085,
+      "setup_repeats_s": [
+        0.0004871189594268799,
+        0.00038985908031463623,
+        0.00039659440517425537
+      ],
+      "solve_repeats_s": [
+        0.39291973412036896,
+        0.39326975867152214,
+        0.3930271714925766
+      ],
+      "mass_error": 5.444737354401598e-05,
+      "energy_error": 9.799120229547009e-05,
+      "relative_residual": 0.001347539253521531,
+      "snapshot": {
+        "iterations": 3322,
+        "solve_s": 0.21506230160593987,
+        "total_s": 0.21545889601111412,
+        "field_sha256": "95d7b2c0bbd91b6aaf14195d5ceb598a18bb0dccbb9ecb1c4f65b9b36bb63ce9",
+        "mass_error": 0.010481736011401893,
+        "energy_error": 0.010970813865576627,
+        "relative_residual": 0.14170105779209993
+      }
+    },
+    "block": {
+      "config": {
+        "kind": "block",
+        "solver": "cg",
+        "strategy": "direct"
+      },
+      "iterations": 5026,
+      "setup_s": 0.0003786422312259674,
+      "solve_s": 0.327183585613966,
+      "total_s": 0.3275316320359707,
+      "setup_repeats_s": [
+        0.0004405081272125244,
+        0.0003480464220046997,
+        0.0003786422312259674
+      ],
+      "solve_repeats_s": [
+        0.32697074860334396,
+        0.327183585613966,
+        0.3275115452706814
+      ],
+      "mass_error": 3.8482291227831376e-05,
+      "energy_error": 7.888198856007133e-05,
+      "relative_residual": 0.0012782758304631927,
+      "snapshot": {
+        "iterations": 3277,
+        "solve_s": 0.21446656063199043,
+        "total_s": 0.2148452028632164,
+        "field_sha256": "deefe0a3a40cd0fe261f1946e6e7f27534b16407c773246a0ee95dfbe9d8454a",
+        "mass_error": 0.003439713615251865,
+        "energy_error": 0.004331280615769866,
+        "relative_residual": 0.04009693426936848
+      }
+    },
+    "fsai": {
+      "config": {
+        "kind": "fsai",
+        "solver": "cg",
+        "width": 8,
+        "kap": 0.003,
+        "lanes": 4,
+        "storage": 64
+      },
+      "iterations": 2109,
+      "setup_s": 0.03338271379470825,
+      "solve_s": 0.1808767355978489,
+      "total_s": 0.2148488312959671,
+      "setup_repeats_s": [
+        0.03338271379470825,
+        0.03026573732495308,
+        0.051048148423433304
+      ],
+      "solve_repeats_s": [
+        0.18146611750125885,
+        0.1802908033132553,
+        0.1808767355978489
+      ],
+      "mass_error": 4.8220685244029904e-05,
+      "energy_error": 9.082346110216172e-05,
+      "relative_residual": 0.001293025061336962,
+      "snapshot": {
+        "iterations": 2109,
+        "solve_s": 0.18408340960741043,
+        "total_s": 0.21746612340211868,
+        "field_sha256": "085a203ca8365ee9291078c27eea0a6a5a46e3efe16eb8cea4f0ff40b6cf85dd",
+        "mass_error": 4.8220685244029904e-05,
+        "energy_error": 9.082346110216172e-05,
+        "relative_residual": 0.001293025061336962
+      }
+    }
+  }
+}
