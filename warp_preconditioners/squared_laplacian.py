@@ -1,5 +1,6 @@
 """Factored application of a squared Laplacian with exact variable elimination."""
 
+import math
 from functools import lru_cache
 
 import warp as wp
@@ -69,6 +70,9 @@ def _kernels(dtype, lanes):
         cols: wp.array(dtype=int),
         vals: wp.array(dtype=dtype),
         free: wp.array(dtype=int),
+        mass: wp.array(dtype=dtype),
+        x: wp.array(dtype=dtype),
+        mass_weight: dtype,
         tmp: wp.array(dtype=dtype),
         y: wp.array(dtype=dtype),
         z: wp.array(dtype=dtype),
@@ -86,6 +90,8 @@ def _kernels(dtype, lanes):
             sums = wp.tile_sum(t, axis=1)
             acc = wp.tile_extract(sums, i % wp.static(rows))
         if lane == 0 and i < free.shape[0]:
+            if mass_weight != dtype(0) and alpha != dtype(0):
+                acc += mass_weight * mass[free[i]] * x[i]
             acc *= alpha
             if beta != dtype(0):
                 acc += beta * y[i]
@@ -95,13 +101,15 @@ def _kernels(dtype, lanes):
 
 
 class SquaredLaplacianOperator(LinearOperator):
-    """Apply ``(L diag(1/mass) L)[free,free]`` without multiplying sparse matrices.
+    """Apply ``(L diag(1/mass) L + mass_weight diag(mass))[free,free]``.
 
     ``L`` must be a symmetric scalar BSR matrix. ``mass`` contains positive
     lumped masses. ``free_indices`` contains distinct free scalar indices;
     any omitted indices are constrained. All arrays must be on L.device.
     The energy includes all rows of L, including constrained vertices.
     Positive definiteness depends on the constraints removing L's nullspace.
+    A positive ``mass_weight`` also makes the full smoothing system positive
+    definite. Pass all vertex indices as free for unconstrained smoothing.
 
     ``rhs(boundary_values)`` constructs the eliminated RHS with the same
     factored arithmetic. Values at free indices in that full vector are ignored.
@@ -109,7 +117,7 @@ class SquaredLaplacianOperator(LinearOperator):
     Instances own scratch and must not be used on concurrent streams.
     """
 
-    def __init__(self, L, mass, free_indices, row_lanes=1):
+    def __init__(self, L, mass, free_indices, row_lanes=1, mass_weight=0.0):
         if not isinstance(L, sp.BsrMatrix) or L.nrow != L.ncol or L.block_shape != (1, 1):
             raise ValueError("L must be a square scalar BSR matrix")
         if L.scalar_type not in (wp.float32, wp.float64):
@@ -122,6 +130,9 @@ class SquaredLaplacianOperator(LinearOperator):
             raise ValueError("free_indices must be a one-dimensional int32 array")
         if not isinstance(row_lanes, int) or row_lanes not in (1, 2, 4, 8, 16, 32):
             raise ValueError("row_lanes must be one of 1, 2, 4, 8, 16, 32")
+        if not math.isfinite(mass_weight) or mass_weight < 0:
+            raise ValueError("mass_weight must be finite and nonnegative")
+        self.mass_weight = mass_weight
         self.L = sp.bsr_copy(L)
         self.mass = mass
         self.free = wp.clone(free_indices)
@@ -170,6 +181,9 @@ class SquaredLaplacianOperator(LinearOperator):
                 L.columns,
                 L.values,
                 self.free,
+                self.mass,
+                x,
+                self.scalar_type(0.0 if boundary else self.mass_weight),
                 self._tmp,
                 y,
                 z,

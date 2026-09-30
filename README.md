@@ -22,12 +22,20 @@ reduction alone is not a measure of visible change. All methods start from the s
 function; a [separate initialization experiment](visualization/initialization.md)
 finds modest FSAI iteration savings and substantially better early Jacobi fields.
 
-FSAI-CG reaches its relative stopping tolerance of **1e-8 at k = 28,688**.
-Left to right after the raw data: **FSAI-CG at k; Jacobi-CR at k, 10k = 286,880, and
-100k = 2,868,800**. Each is one uninterrupted solve. All five share a scene,
+The Dirichlet tuning also improves this smoothing problem: three warmed
+trials reduce median FSAI solve time from **10.14 s to 2.80 s**, and total
+setup-plus-solve time from **10.17 s to 3.96 s (2.57× faster)**.
+Both configurations use the same data, initial guess, and stopping tolerance.
+[Repeated measurements](results/smoothing-tuning.json).
+
+Tuned FSAI-CG reaches its relative stopping tolerance of **1e-8 at k = 9,482**.
+Left to right after the raw data: **FSAI-CG at k; Jacobi-CR at k, 10k = 94,820, and
+100k = 948,200**. Both solvers now use the same factored operator including
+the data term. Each is one uninterrupted solve. All five share a scene,
 scalar range, and `isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))` palette.
 The figure shows independently recomputed residuals; a longer FSAI run
-also verifies field stability. This nonlinear, stronger-smoothing example
+verifies field stability, and a [higher-precision reference](results/smoothing-verification.json)
+checks field accuracy. This nonlinear, stronger-smoothing example
 is a different problem from the α = 1 height benchmark timings above.
 [Target formula, convergence checks, and reproduction](visualization/README.md).
 
@@ -157,6 +165,8 @@ mass, `SquaredLaplacianOperator(L, mass, free_indices, row_lanes=4)` applies
 the reduced squared energy through two Laplacian products; its
 `rhs(prescribed)` method eliminates fixed values while retaining all rows
 of the full energy. Both support CUDA graph capture after construction.
+For smoothing, pass every vertex as free and set `mass_weight=alpha` to
+apply `L M^-1 L + alpha M`; supply `alpha M f` as the solver RHS.
 See the [tested Dirichlet recipe](results/dirichlet-tuning/README.md#recommended-usage)
 for FSAI parameters, input conventions, and accuracy checks.
 

@@ -1,0 +1,25 @@
+{
+  "reference": "Long-double factored energy gradient, equilibrated float64 AMD Cholesky corrections",
+  "long_double_epsilon": 1.0842021724855044e-19,
+  "relative_mass_norm_corrections": [
+    9.152993029065035e-08,
+    1.4412536350151356e-13,
+    1.1286572868154145e-17,
+    1.5703175968328215e-17,
+    1.3411594508447388e-17,
+    7.199000506649187e-18
+  ],
+  "tuned_fields": {
+    "fsai_cg_9482": 1.8258529137455e-11,
+    "jacobi_cr_9482": 0.1036580677866512,
+    "jacobi_cr_94820": 0.016350519778947456,
+    "jacobi_cr_948200": 4.7434727788455906e-11
+  },
+  "original_fields": {
+    "fsai_cg_28688": 1.7600040878887775e-06,
+    "jacobi_cr_28688": 0.03930170949153355,
+    "jacobi_cr_286880": 0.010822824281969767,
+    "jacobi_cr_2868800": 1.7519756450986522e-06
+  },
+  "unchanged_inputs": "Target, vertices and triangles are bitwise identical to original smoothing figure"
+}

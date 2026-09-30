@@ -11,7 +11,8 @@ from warp_preconditioners import FSAI, SquaredLaplacianOperator
 @pytest.mark.parametrize("device", DEVICES)
 @pytest.mark.parametrize("dtype", [wp.float32, wp.float64])
 @pytest.mark.parametrize("lanes", [1, 2, 4, 8])
-def test_factored_dirichlet_operator_and_rhs(device, dtype, lanes):
+@pytest.mark.parametrize("mass_weight", [0.0, 0.15])
+def test_factored_dirichlet_operator_and_rhs(device, dtype, lanes, mass_weight):
     rng = np.random.default_rng(27)
     n = 67
     laplacian = ss.diags(
@@ -24,8 +25,9 @@ def test_factored_dirichlet_operator_and_rhs(device, dtype, lanes):
         wp.array(mass, dtype=dtype, device=device),
         wp.array(free, dtype=int, device=device),
         row_lanes=lanes,
+        mass_weight=mass_weight,
     )
-    q = laplacian @ ss.diags(1 / mass) @ laplacian
+    q = laplacian @ ss.diags(1 / mass) @ laplacian + mass_weight * ss.diags(mass)
     reduced = q[free][:, free]
     rtol, atol = (3e-5, 3e-6) if dtype == wp.float32 else (1e-12, 1e-12)
     for alias in ["none", "xz", "yz", "xyz"]:
@@ -90,6 +92,11 @@ def test_mixed_storage_spd_and_solve(device, lanes):
 def test_squared_validation_and_factor_conversion():
     L = from_scipy(ss.eye(5), "cpu")
     mass = wp.ones(5, dtype=wp.float64, device="cpu")
+    for weight in [-1, float("nan"), float("inf")]:
+        with pytest.raises(ValueError, match="mass_weight"):
+            SquaredLaplacianOperator(
+                L, mass, wp.array([1, 2], dtype=int, device="cpu"), mass_weight=weight
+            )
     for free in [[0, 0], [0, 5], [-1, 2]]:
         with pytest.raises(ValueError, match="free_indices"):
             SquaredLaplacianOperator(L, mass, wp.array(free, dtype=int, device="cpu"))
@@ -98,3 +105,32 @@ def test_squared_validation_and_factor_conversion():
         SquaredLaplacianOperator(L, mass, wp.array([1, 2], dtype=int, device="cpu"))
     with pytest.raises(ValueError, match="positive diagonal"):
         FSAI(from_scipy(ss.eye(3) * 1e100, "cpu"), factor_dtype=wp.float32)
+
+
+@pytest.mark.parametrize("device", DEVICES)
+def test_unconstrained_smoothing(device):
+    n = 23
+    laplacian = ss.diags(
+        [-np.ones(n - 1), np.r_[1.0, np.full(n - 2, 2.0), 1.0], -np.ones(n - 1)], [-1, 0, 1]
+    ).tocsr()
+    mass = np.linspace(0.5, 2.0, n)
+    target = np.sin(np.arange(n))
+    weight = 0.03
+    expected_matrix = laplacian @ ss.diags(1 / mass) @ laplacian + ss.diags(weight * mass)
+    with wp.ScopedDevice(device):
+        operator = SquaredLaplacianOperator(
+            from_scipy(laplacian, device),
+            wp.array(mass, dtype=wp.float64),
+            wp.array(np.arange(n), dtype=wp.int32),
+            row_lanes=4,
+            mass_weight=weight,
+        )
+        rhs = wp.array(weight * mass * target, dtype=wp.float64)
+        x = wp.array(target, dtype=wp.float64)
+        linear.cg(operator, rhs, x, tol=1e-12, maxiter=300)
+        np.testing.assert_allclose(
+            x.numpy(),
+            ss.linalg.spsolve(expected_matrix, weight * mass * target),
+            rtol=1e-10,
+            atol=1e-11,
+        )

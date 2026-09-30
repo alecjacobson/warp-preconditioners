@@ -6,6 +6,7 @@
   "vertices": 360757,
   "faces": 721510,
   "system": "(alpha M + K M^-1 K) u = alpha M f",
+  "tuned": true,
   "target": {
     "name": "nonlinear_xyz",
     "formula": "sin(pi*(0.9X+0.45Y-0.65Z)) + 0.65*cos(pi*(0.35X-0.8Y+0.9Z)) + 0.35*sin(2*pi*(XZ+0.2Y))",
@@ -39,19 +40,19 @@
   "smoothing_weight": 1.0,
   "display_order": [
     "target",
-    "fsai_cg_28688",
-    "jacobi_cr_28688",
-    "jacobi_cr_286880",
-    "jacobi_cr_2868800"
+    "fsai_cg_9482",
+    "jacobi_cr_9482",
+    "jacobi_cr_94820",
+    "jacobi_cr_948200"
   ],
   "convergence": {
     "criterion": "Warp recursive relative residual <= fsai_rtol",
     "fsai_rtol": 1e-08,
-    "k": 28688,
-    "extended_actual_iterations": 57376,
-    "extended_relative_residual": 0.002828210913866489,
-    "relative_mass_norm_field_change": 3.335128359820983e-11,
-    "max_abs_field_change": 1.1612205641498008e-10,
+    "k": 9482,
+    "extended_actual_iterations": 18964,
+    "extended_relative_residual": 0.00321503471791835,
+    "relative_mass_norm_field_change": 1.9544938715596522e-11,
+    "max_abs_field_change": 6.917333372769008e-11,
     "field_stability_threshold": 1e-06
   },
   "scalar_range": [
@@ -70,133 +71,145 @@
     "gpu_field": "exact downloaded float64 iterate; hash recorded per field"
   },
   "results": {
-    "fsai_cg_28688": {
+    "fsai_cg_9482": {
       "solver": "warp.optim.linear.cg",
-      "preconditioner": "FSAI, max_row_size=8",
-      "setup_s": 0.02993195131421089,
-      "solve_s": 10.035964097827673,
+      "preconditioner": "FSAI, width=48, kap_tolerance=0.003, float32 storage, float64 accumulation, apply_lanes=4",
+      "operator": "factored K M^-1 K + alpha M, row_lanes=4",
+      "setup_s": 1.1730522736907005,
+      "solve_s": 2.862425357103348,
       "requested_iterations": 100000,
-      "actual_iterations": 28688,
+      "actual_iterations": 9482,
       "initial_guess": "data function",
-      "initial_relative_residual": 21517564.44208935,
+      "initial_relative_residual": 21517564.441944182,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 1e-08,
       "atol": 0.0,
-      "recursive_relative_residual": 8.890406344485577e-09,
+      "recursive_relative_residual": 9.438745383327704e-09,
       "reached_stopping_tolerance": true,
-      "backward_error": 9.11363908638128e-13,
-      "relative_residual": 0.0012801104002837377,
+      "backward_error": 8.166411855831583e-13,
+      "backward_error_definition": "componentwise backward error against assembled matrix",
+      "relative_residual": 0.0033516931870584583,
+      "residual_definition": "CPU float64 factored energy gradient / norm(b)",
       "iteration_multiplier": 1,
       "relative_mass_norm_difference_from_fsai": 0.0,
       "range": [
-        -1.2217605554737863,
-        1.7389259547555376
+        -1.2217605446830502,
+        1.738925954746837
       ],
-      "mass_weighted_mean": 0.43423331252809955,
-      "mass_weighted_std": 0.662988101543695,
-      "data_fit_rms": 0.1365199298906113,
-      "affine_fit_rms": 0.5673348389179138,
-      "nonaffine_fraction": 0.8557240131413172,
-      "field_sha256": "575e9b1932d8ac6d751df80e06c32f51df3dc84c083ae4b2a934872e329619a3",
-      "data_energy": 0.03712292010751295,
-      "bending_energy": 0.049320222576362545
+      "mass_weighted_mean": 0.4342330146825613,
+      "mass_weighted_std": 0.6629885225402349,
+      "data_fit_rms": 0.13651987546156646,
+      "affine_fit_rms": 0.5673351540122434,
+      "nonaffine_fraction": 0.8557239450217081,
+      "field_sha256": "34290ce7ae994d9459857e515c04bc9994871a684ee34ad9c2011769833f74f1",
+      "data_energy": 0.037122890506491604,
+      "bending_energy": 0.04932025216939106
     },
-    "jacobi_cr_28688": {
+    "jacobi_cr_9482": {
       "solver": "warp.optim.linear.cr",
       "preconditioner": "Jacobi",
-      "setup_s": 0.000505249947309494,
-      "solve_s": 6.250350084155798,
-      "requested_iterations": 28688,
-      "actual_iterations": 28688,
+      "operator": "factored K M^-1 K + alpha M, row_lanes=4",
+      "setup_s": 0.0017268657684326172,
+      "solve_s": 1.2691948413848877,
+      "requested_iterations": 9482,
+      "actual_iterations": 9482,
       "initial_guess": "data function",
-      "initial_relative_residual": 21517564.44208935,
+      "initial_relative_residual": 21517564.441944182,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 2.888580928853652,
+      "recursive_relative_residual": 22.585242255726694,
       "reached_stopping_tolerance": false,
-      "backward_error": 3.8293997870573857e-07,
-      "relative_residual": 2.888243399708365,
+      "backward_error": 1.6431723552497716e-06,
+      "backward_error_definition": "componentwise backward error against assembled matrix",
+      "relative_residual": 22.585268862987217,
+      "residual_definition": "CPU float64 factored energy gradient / norm(b)",
       "iteration_multiplier": 1,
-      "relative_mass_norm_difference_from_fsai": 0.03930213184957275,
+      "relative_mass_norm_difference_from_fsai": 0.10365806778690473,
       "range": [
-        -1.2253850919668856,
-        1.753178310729396
+        -1.3804757001732861,
+        1.8150843603637619
       ],
-      "mass_weighted_mean": 0.43877881654284356,
-      "mass_weighted_std": 0.6781068420225403,
-      "data_fit_rms": 0.1285608144544959,
-      "affine_fit_rms": 0.5803801628853679,
-      "nonaffine_fraction": 0.8558830657928621,
-      "field_sha256": "f370e75420fcf38c64068c4ec6b07122eaccfa8b5af5ea69657403e6f6230711",
-      "data_energy": 0.03292056254037985,
-      "bending_energy": 0.05722390741812569
+      "mass_weighted_mean": 0.437465792295007,
+      "mass_weighted_std": 0.7003896894529134,
+      "data_fit_rms": 0.08557982779338946,
+      "affine_fit_rms": 0.6081103477763462,
+      "nonaffine_fraction": 0.8682457165401047,
+      "field_sha256": "0aebccff4b867db5b5640b19aae0aea4609320bd2a969537ecad57fc633f5b9c",
+      "data_energy": 0.01458790189745339,
+      "bending_energy": 0.10892561323367736
     },
-    "jacobi_cr_286880": {
+    "jacobi_cr_94820": {
       "solver": "warp.optim.linear.cr",
       "preconditioner": "Jacobi",
-      "setup_s": 0.0003691278398036957,
-      "solve_s": 66.3431143797934,
-      "requested_iterations": 286880,
-      "actual_iterations": 286880,
+      "operator": "factored K M^-1 K + alpha M, row_lanes=4",
+      "setup_s": 0.0019295811653137207,
+      "solve_s": 12.64321543648839,
+      "requested_iterations": 94820,
+      "actual_iterations": 94820,
       "initial_guess": "data function",
-      "initial_relative_residual": 21517564.44208935,
+      "initial_relative_residual": 21517564.441944182,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 0.7716550168734243,
+      "recursive_relative_residual": 1.1081165896724983,
       "reached_stopping_tolerance": false,
-      "backward_error": 5.36153533952885e-10,
-      "relative_residual": 0.7700041075159151,
+      "backward_error": 1.8165402318452505e-08,
+      "backward_error_definition": "componentwise backward error against assembled matrix",
+      "relative_residual": 1.1116134685450634,
+      "residual_definition": "CPU float64 factored energy gradient / norm(b)",
       "iteration_multiplier": 10,
-      "relative_mass_norm_difference_from_fsai": 0.010824456185819245,
+      "relative_mass_norm_difference_from_fsai": 0.01635051977904999,
       "range": [
-        -1.2217614135456702,
-        1.7389372282820785
+        -1.2218793934700096,
+        1.7395496145537335
       ],
-      "mass_weighted_mean": 0.4319271189956043,
-      "mass_weighted_std": 0.6658796800383584,
-      "data_fit_rms": 0.13614367679914588,
-      "affine_fit_rms": 0.5693436343140053,
-      "nonaffine_fraction": 0.8550247910871944,
-      "field_sha256": "9baab26409f2ab588413a9deae109b0e7a49dec8f8ee4e16d274468f2ea159ac",
-      "data_energy": 0.03691857828164969,
-      "bending_energy": 0.049826715820521714
+      "mass_weighted_mean": 0.43131009264757175,
+      "mass_weighted_std": 0.6673778509026618,
+      "data_fit_rms": 0.13529525563700306,
+      "affine_fit_rms": 0.5706629332008708,
+      "nonaffine_fraction": 0.8550822183100935,
+      "field_sha256": "25e49bff0d548e8232c93d16582986ab4da8d5891c829bddc346fa36d3ca8b62",
+      "data_energy": 0.03645987309720887,
+      "bending_energy": 0.05061742167415125
     },
-    "jacobi_cr_2868800": {
+    "jacobi_cr_948200": {
       "solver": "warp.optim.linear.cr",
       "preconditioner": "Jacobi",
-      "setup_s": 0.000403381884098053,
-      "solve_s": 673.4727999605238,
-      "requested_iterations": 2868800,
-      "actual_iterations": 2868800,
+      "operator": "factored K M^-1 K + alpha M, row_lanes=4",
+      "setup_s": 0.001134488731622696,
+      "solve_s": 127.540741071105,
+      "requested_iterations": 948200,
+      "actual_iterations": 948200,
       "initial_guess": "data function",
-      "initial_relative_residual": 21517564.44208935,
+      "initial_relative_residual": 21517564.441944182,
       "restarts": 0,
       "selection": "final iterate of a single solver call; no best-checkpoint selection",
       "tol": 0.0,
       "atol": 0.0,
-      "recursive_relative_residual": 4.951429426455797e-10,
+      "recursive_relative_residual": 9.392283960522081e-10,
       "reached_stopping_tolerance": false,
-      "backward_error": 2.7980829293665126e-12,
-      "relative_residual": 0.011280873728811487,
+      "backward_error": 6.284414803678895e-12,
+      "backward_error_definition": "componentwise backward error against assembled matrix",
+      "relative_residual": 0.12208814018647644,
+      "residual_definition": "CPU float64 factored energy gradient / norm(b)",
       "iteration_multiplier": 100,
-      "relative_mass_norm_difference_from_fsai": 8.1155566007844e-09,
+      "relative_mass_norm_difference_from_fsai": 5.2061868018434274e-11,
       "range": [
-        -1.2217605554624378,
-        1.7389259547259768
+        -1.2217605446597808,
+        1.7389259547319345
       ],
-      "mass_weighted_mean": 0.43423331137540555,
-      "mass_weighted_std": 0.6629881033258772,
-      "data_fit_rms": 0.13651992974787144,
-      "affine_fit_rms": 0.5673348402936264,
-      "nonaffine_fraction": 0.8557240129160589,
-      "field_sha256": "32cf41fb4c3f35b15901990414fb2c67acec37cb3b2a63ac6d5fb18e61dcdc8f",
-      "data_energy": 0.03712292002988443,
-      "bending_energy": 0.0493202226539205
+      "mass_weighted_mean": 0.43423301467131753,
+      "mass_weighted_std": 0.6629885225535668,
+      "data_fit_rms": 0.13651987545909733,
+      "affine_fit_rms": 0.5673351540231992,
+      "nonaffine_fraction": 0.8557239450210254,
+      "field_sha256": "f1898fc085d61b41881c9c9d4bedf311f3af301f4fe2cddf78622e3535b91e56",
+      "data_energy": 0.03712289050514876,
+      "bending_energy": 0.04932025217073254
     }
   },
   "render": {
@@ -213,13 +226,15 @@
       6000,
       1120
     ],
-    "scene": "five simultaneous dragons: raw data plus four solves; one camera, shared lights and ground",
+    "scene": "5 simultaneous dragons: target plus 4 solves; one camera, shared lights and ground",
+    "auxiliary_field": "target",
+    "auxiliary_palette": "shared scalar palette",
     "display_order": [
       "target",
-      "fsai_cg_28688",
-      "jacobi_cr_28688",
-      "jacobi_cr_286880",
-      "jacobi_cr_2868800"
+      "fsai_cg_9482",
+      "jacobi_cr_9482",
+      "jacobi_cr_94820",
+      "jacobi_cr_948200"
     ],
     "objects": [
       {
@@ -235,51 +250,51 @@
         "attribute_verified": true
       },
       {
-        "name": "fsai_cg_28688",
+        "name": "fsai_cg_9482",
         "location": [
           -1.9545605182647705,
           -0.7114018797874451,
           -0.0
         ],
         "label_x_fraction": 0.30952381085459524,
-        "field_sha256": "575e9b1932d8ac6d751df80e06c32f51df3dc84c083ae4b2a934872e329619a3",
-        "attribute_float32_max_abs_error": 5.9604575719518493e-08,
+        "field_sha256": "34290ce7ae994d9459857e515c04bc9994871a684ee34ad9c2011769833f74f1",
+        "attribute_float32_max_abs_error": 5.9603803892471774e-08,
         "attribute_verified": true
       },
       {
-        "name": "jacobi_cr_28688",
+        "name": "jacobi_cr_9482",
         "location": [
           0.0,
           0.0,
           0.0
         ],
         "label_x_fraction": 0.5,
-        "field_sha256": "f370e75420fcf38c64068c4ec6b07122eaccfa8b5af5ea69657403e6f6230711",
-        "attribute_float32_max_abs_error": 5.9604478019892326e-08,
+        "field_sha256": "0aebccff4b867db5b5640b19aae0aea4609320bd2a969537ecad57fc633f5b9c",
+        "attribute_float32_max_abs_error": 5.960423465900533e-08,
         "attribute_verified": true
       },
       {
-        "name": "jacobi_cr_286880",
+        "name": "jacobi_cr_94820",
         "location": [
           1.9545605182647705,
           0.7114018797874451,
           0.0
         ],
         "label_x_fraction": 0.6904761891454048,
-        "field_sha256": "9baab26409f2ab588413a9deae109b0e7a49dec8f8ee4e16d274468f2ea159ac",
-        "attribute_float32_max_abs_error": 5.9603400881513835e-08,
+        "field_sha256": "25e49bff0d548e8232c93d16582986ab4da8d5891c829bddc346fa36d3ca8b62",
+        "attribute_float32_max_abs_error": 5.960414917183243e-08,
         "attribute_verified": true
       },
       {
-        "name": "jacobi_cr_2868800",
+        "name": "jacobi_cr_948200",
         "location": [
           3.909121036529541,
           1.4228037595748901,
           0.0
         ],
         "label_x_fraction": 0.8809523782908095,
-        "field_sha256": "32cf41fb4c3f35b15901990414fb2c67acec37cb3b2a63ac6d5fb18e61dcdc8f",
-        "attribute_float32_max_abs_error": 5.960450577546794e-08,
+        "field_sha256": "f1898fc085d61b41881c9c9d4bedf311f3af301f4fe2cddf78622e3535b91e56",
+        "attribute_float32_max_abs_error": 5.9604166047222407e-08,
         "attribute_verified": true
       }
     ],
@@ -426,24 +441,24 @@
     ]
   },
   "solver_display_order": [
-    "fsai_cg_28688",
-    "jacobi_cr_28688",
-    "jacobi_cr_286880",
-    "jacobi_cr_2868800"
+    "fsai_cg_9482",
+    "jacobi_cr_9482",
+    "jacobi_cr_94820",
+    "jacobi_cr_948200"
   ],
   "solver_scalar_range": [
-    -1.2253850919668856,
-    1.753178310729396
+    -1.3804757001732861,
+    1.8150843603637619
   ],
   "raw_data_comparison": {
-    "reference_field": "fsai_cg_28688",
-    "mass_weighted_rms_change": 0.1365199298906113,
-    "rms_change_over_data_std": 0.19159597147263896,
-    "max_abs_change": 0.7150701303525814,
+    "reference_field": "fsai_cg_9482",
+    "mass_weighted_rms_change": 0.13651987546156646,
+    "rms_change_over_data_std": 0.19159589508536182,
+    "max_abs_change": 0.715070131579829,
     "data_std": 0.7125407117973102,
-    "smoothed_std": 0.662988101543695,
-    "std_reduction_fraction": 0.06954354948873565,
-    "bending_reduction_fraction": 0.9988823038287898
+    "smoothed_std": 0.6629885225402349,
+    "std_reduction_fraction": 0.06954295865015914,
+    "bending_reduction_fraction": 0.9988823031581519
   },
   "figure_size": [
     6000,

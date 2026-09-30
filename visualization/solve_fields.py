@@ -9,6 +9,7 @@ import hashlib
 import json
 import sys
 import time
+from functools import partial
 from pathlib import Path
 
 import igl
@@ -21,7 +22,7 @@ from warp.optim import linear
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "benchmarks"))
 from dragon import berr, norm, upload
 
-from warp_preconditioners import FSAI
+from warp_preconditioners import FSAI, SquaredLaplacianOperator
 
 
 def data_function(vertices):
@@ -65,22 +66,51 @@ def field_statistics(u, vertices, mass, target=None):
     )
 
 
-def run(a, b_np, method, budget, rtol=0.0, initial=None):
+def run(
+    a,
+    b_np,
+    method,
+    budget,
+    rtol=0.0,
+    initial=None,
+    *,
+    tuned=False,
+    laplacian=None,
+    mass=None,
+    data_weight=0.0001,
+):
     A = upload(a, "cuda:0")
     b = wp.array(b_np, dtype=wp.float64, device="cuda:0")
     solver = linear.cg if method == "fsai_cg" else linear.cr
+    if tuned:
+        L = upload(laplacian, "cuda:0")
+        mw = wp.array(mass, dtype=wp.float64, device="cuda:0")
+        free = wp.array(np.arange(len(mass), dtype=np.int32), dtype=wp.int32, device="cuda:0")
+
+    def make_operator():
+        return (
+            SquaredLaplacianOperator(L, mw, free, row_lanes=4, mass_weight=data_weight)
+            if tuned
+            else A
+        )
 
     def make():
+        if tuned and method == "fsai_cg":
+            return FSAI(
+                A, max_row_size=48, kap_tolerance=0.003, apply_lanes=4, factor_dtype=wp.float32
+            )
         return FSAI(A, max_row_size=8) if method == "fsai_cg" else linear.preconditioner(A, "diag")
 
+    operator = make_operator()
     pre = make()
     x = wp.zeros_like(b)
     initial_gpu = None if initial is None else wp.array(initial, dtype=wp.float64, device="cuda:0")
     if initial_gpu is not None:
         wp.copy(x, initial_gpu)
-    solver(A, b, x, M=pre, tol=0.0, atol=0.0, maxiter=10, check_every=0)
+    solver(operator, b, x, M=pre, tol=0.0, atol=0.0, maxiter=10, check_every=0)
     wp.synchronize()
     start = time.perf_counter()
+    operator = make_operator()
     pre = make()
     wp.synchronize()
     setup_s = time.perf_counter() - start
@@ -90,23 +120,42 @@ def run(a, b_np, method, budget, rtol=0.0, initial=None):
         wp.copy(x, initial_gpu)
     wp.synchronize()
     start = time.perf_counter()
-    nit, recursive_sq, _ = solver(A, b, x, M=pre, tol=rtol, atol=0.0, maxiter=budget, check_every=0)
+    nit, recursive_sq, _ = solver(
+        operator, b, x, M=pre, tol=rtol, atol=0.0, maxiter=budget, check_every=0
+    )
     wp.synchronize()
     elapsed = time.perf_counter() - start
     actual = int(nit.numpy()[0]) if isinstance(nit, wp.array) else int(nit)
     sol = x.numpy()
     recursive_relative = float(np.sqrt(recursive_sq.numpy()[0])) / norm(b_np)
     assert np.isfinite(sol).all()
+
+    def residual(u):
+        return (
+            b_np - (laplacian.T @ ((laplacian @ u) / mass) + data_weight * mass * u)
+            if tuned
+            else b_np - a @ u
+        )
+
     return sol, dict(
         solver="warp.optim.linear." + solver.__name__,
-        preconditioner="FSAI, max_row_size=8" if method == "fsai_cg" else "Jacobi",
+        preconditioner=(
+            (
+                "FSAI, width=48, kap_tolerance=0.003, float32 storage, float64 accumulation, apply_lanes=4"
+                if tuned
+                else "FSAI, max_row_size=8"
+            )
+            if method == "fsai_cg"
+            else "Jacobi"
+        ),
+        operator="factored K M^-1 K + alpha M, row_lanes=4" if tuned else "assembled sparse matrix",
         setup_s=setup_s,
         solve_s=elapsed,
         requested_iterations=budget,
         actual_iterations=actual,
         initial_guess="zero" if initial is None else "data function",
         initial_relative_residual=(
-            1.0 if initial is None else norm(b_np - a @ initial) / norm(b_np)
+            1.0 if initial is None else norm(residual(initial)) / norm(b_np)
         ),
         restarts=0,
         selection="final iterate of a single solver call; no best-checkpoint selection",
@@ -115,7 +164,11 @@ def run(a, b_np, method, budget, rtol=0.0, initial=None):
         recursive_relative_residual=recursive_relative,
         reached_stopping_tolerance=bool(rtol > 0 and recursive_relative <= rtol),
         backward_error=berr(a, abs(a), b_np, sol),
-        relative_residual=norm(b_np - a @ sol) / norm(b_np),
+        backward_error_definition="componentwise backward error against assembled matrix",
+        relative_residual=norm(residual(sol)) / norm(b_np),
+        residual_definition="CPU float64 factored energy gradient / norm(b)"
+        if tuned
+        else "CPU float64 assembled residual / norm(b)",
     )
 
 
@@ -130,6 +183,9 @@ def main():
     parser.add_argument("--fsai-maxiter", type=int, default=100000)
     parser.add_argument("--audit-weights", type=float, nargs="+")
     parser.add_argument("--audit-initial-guess", action="store_true")
+    parser.add_argument(
+        "--tuned", action="store_true", help="Tuned FSAI and factored operator for all methods"
+    )
     args = parser.parse_args()
     if args.data_weight <= 0 or (args.audit_weights and min(args.audit_weights) <= 0):
         parser.error("data weights must be positive")
@@ -159,6 +215,7 @@ def main():
     del mixed, expected
     target, target_spec = data_function(vertices)
     initial = target if args.initial_guess == "data" else None
+    solve = partial(run, tuned=args.tuned, laplacian=K, mass=mass, data_weight=args.data_weight)
 
     def equation(weight):
         return original_q + ss.diags((weight - 1) * mass), weight * mass * target
@@ -168,7 +225,7 @@ def main():
         for weight in args.audit_weights:
             a, b_np = equation(weight)
             for budget in [500, 5000]:
-                u, record = run(a, b_np, "fsai_cg", budget, initial=initial)
+                u, record = solve(a, b_np, "fsai_cg", budget, initial=initial, data_weight=weight)
                 record.update(data_weight=weight, **field_statistics(u, vertices, mass, target))
                 sweep.append(record)
                 print(json.dumps(record), flush=True)
@@ -183,7 +240,7 @@ def main():
         # equation, preconditioner, tolerance and paired budgets identical.
         trials, audit_fields = [], {}
         for guess in ["data", "zero"]:
-            u, record = run(
+            u, record = solve(
                 a,
                 b_np,
                 "fsai_cg",
@@ -200,7 +257,7 @@ def main():
         k = trials[0]["actual_iterations"]
         for budget in [1000, k]:
             for guess in ["data", "zero"]:
-                u, record = run(
+                u, record = solve(
                     a, b_np, "jacobi_cr", budget, initial=target if guess == "data" else None
                 )
                 assert record["actual_iterations"] == budget
@@ -248,7 +305,7 @@ def main():
         return
 
     fields, records = {}, {}
-    u_fsai, fsai_record = run(
+    u_fsai, fsai_record = solve(
         a, b_np, "fsai_cg", args.fsai_maxiter, rtol=args.fsai_rtol, initial=initial
     )
     assert fsai_record["reached_stopping_tolerance"], fsai_record
@@ -256,7 +313,7 @@ def main():
     print("FSAI CONVERGED", k, json.dumps(fsai_record), flush=True)
     # Check forward stability, rather than treating the recursive residual as
     # an independently verified residual of the ill-conditioned matrix.
-    extended, check_record = run(a, b_np, "fsai_cg", 2 * k, initial=initial)
+    extended, check_record = solve(a, b_np, "fsai_cg", 2 * k, initial=initial)
     change = float(np.sqrt(np.sum(mass * (extended - u_fsai) ** 2) / np.sum(mass * u_fsai**2)))
     assert change < 1e-6, ("FSAI field has not stabilized", change)
     convergence_check = dict(
@@ -277,7 +334,7 @@ def main():
             u, record = u_fsai, fsai_record
         else:
             print("START", name, flush=True)
-            u, record = run(a, b_np, method, int(budget), initial=initial)
+            u, record = solve(a, b_np, method, int(budget), initial=initial)
         assert record["actual_iterations"] == int(budget), record
         record["iteration_multiplier"] = [1, 1, 10, 100][i]
         record["relative_mass_norm_difference_from_fsai"] = float(
@@ -302,6 +359,7 @@ def main():
         vertices=n,
         faces=len(faces),
         system="(alpha M + K M^-1 K) u = alpha M f",
+        tuned=args.tuned,
         target=target_spec,
         target_statistics=field_statistics(target, vertices, mass, target),
         target_bending_energy=float(0.5 * np.sum((K @ target) ** 2 / mass)),

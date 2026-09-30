@@ -79,6 +79,8 @@ def main():
             continue
         r = meta["results"][name]
         label = "Warp CG + FSAI" if name.startswith("fsai") else "Warp CR + Jacobi"
+        if name.startswith("fsai") and meta.get("tuned"):
+            label = "Warp CG + tuned FSAI"
         text(cx, 185, label, 44, True)
         multiplier = r["iteration_multiplier"]
         budget_label = "k" if multiplier == 1 else f"{multiplier}k"
@@ -86,7 +88,7 @@ def main():
         text(cx, 239, f"{budget_label} = {r['actual_iterations']:,}{status}", 37)
         text(cx, y, f"{r['solve_s']:.2f} s solve", 36, True)
         text(cx, y + 49, f"Relative residual  {r['relative_residual']:.2e}", 29, color="#657083")
-        text(cx, y + 88, f"Backward error  {r['backward_error']:.2e}", 27, color="#657083")
+        text(cx, y + 88, f"Setup  {r['setup_s']:.3f} s", 27, color="#657083")
     _, palette = striped_okloop()
     legend_w = 2200
     legend_x = (width - legend_w) // 2

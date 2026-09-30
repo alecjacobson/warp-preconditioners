@@ -8,13 +8,13 @@ orthographic camera with shared lighting and ground. The centers are 2.08
 scene units apart. Left to right:
 
 1. **Raw data $f$**, before any solve or smoothing.
-2. Warp CG + adaptive FSAI (width 8), **converged at $k=28{,}688$ iterations**.
-3. Warp CR + Jacobi, **$k=28{,}688$ iterations**.
-4. Warp CR + Jacobi, **$10k=286{,}880$ iterations**.
-5. Warp CR + Jacobi, **$100k=2{,}868{,}800$ iterations**.
+2. Warp CG + tuned adaptive FSAI (width 48), **converged at $k=9{,}482$ iterations**.
+3. Warp CR + Jacobi, **$k=9{,}482$ iterations**.
+4. Warp CR + Jacobi, **$10k=94{,}820$ iterations**.
+5. Warp CR + Jacobi, **$100k=948{,}200$ iterations**.
 
 **All four solvers start from the same data function, $u_0=f$.** A separate
-[initialization experiment](initialization.md) compares this with zero:
+[initialization experiment](initialization.md), using the original width-8 setup, compares this with zero:
 FSAI uses about 2.7% fewer iterations, while the early Jacobi fields are
 substantially closer to the converged solution. This is evidence for the
 choice in this example, not a claim that data initialization always wins.
@@ -68,9 +68,9 @@ diagnostic and is never rendered or subtracted from the field.
 The first dragon shows the stored raw input `target` directly. It is next to
 the converged FSAI result, and **all five dragons use one scalar range**, now
 including the raw data extrema. No separate normalization or clipping hides
-the input's larger range. The smoothing problem and all four previously
-computed solver fields are unchanged; adding the raw-data view requires no
-new solves.
+the input's larger range. The target, geometry, smoothing weight, and data weight match the previous
+figure. All four solver fields have been regenerated using the factored
+operator and budgets derived from the tuned FSAI solve.
 
 | Measure | Raw data | Converged FSAI result |
 | --- | ---: | ---: |
@@ -101,26 +101,58 @@ budgets; actual counts are verified. Setup and kernels are warmed before
 timing. Setup time is recorded separately. Solve times refer to one scalar
 right-hand side and exclude initialization copies and diagnostic checks.
 
-The FSAI label means **the solver reached its stated stopping tolerance**.
-Its recursive relative residual is about $8.89\times10^{-9}$; independently
-computing $\|b-Au\|_2/\|b\|_2$ gives about $1.28\times10^{-3}$, and its
-componentwise backward error is about $9.11\times10^{-13}$. The figure shows
-the independent residual, not the smaller internal estimate. This
-ill-conditioned system amplifies floating-point errors in residual evaluation.
+The FSAI label means **the solver reached its stated recursive stopping
+tolerance**. The recursive relative residual is 9.44e-9; independently
+recomputing the factored energy gradient in CPU float64 gives 3.35e-3.
+The figure shows the latter. The initial data field has relative residual
+2.15e7, and the small right-hand side makes this normalization particularly
+sensitive to roundoff. The stopping tolerance is not a claim of an independently
+verified 1e-8 residual; field accuracy is checked separately.
 
-An additional, unrendered FSAI run with budget $2k$ checks field stability.
-Its mass-weighted relative difference from the displayed FSAI field must be
-below $10^{-6}$; the recorded change is only **$3.34\times10^{-11}$**, with
-maximum absolute change $1.16\times10^{-10}$. This run is separate from the
-displayed timing. Jacobi's field differences from FSAI are also recorded,
-without treating the FSAI field as an exact-arithmetic solution.
+An additional unrendered run for $2k$ checks stability: its relative mass-norm
+change is **1.95e-11**, with maximum absolute change 6.92e-11. This run is
+excluded from displayed solve times.
 
-| Method | Iterations | Solve time (s) | Relative mass-norm difference from FSAI |
-| --- | ---: | ---: | ---: |
-| FSAI-CG | 28,688 | 10.04 | 0 |
-| Jacobi-CR, k | 28,688 | 6.25 | 3.93e-2 |
-| Jacobi-CR, 10k | 286,880 | 66.34 | 1.08e-2 |
-| Jacobi-CR, 100k | 2,868,800 | 673.47 | 8.12e-9 |
+An independent reference uses long-double evaluation of the factored energy
+gradient with six equilibrated Cholesky correction solves. The tuned FSAI
+field's relative mass-norm error is **1.83e-11**, versus **1.76e-6** for the
+original assembled-operator FSAI field. The tuned Jacobi field at $100k$
+has error **4.74e-11**. Target values, vertices, and triangles are bitwise
+identical between old and new inputs. This checks field accuracy independently
+of the drifting recursive residual.
+[Reference verification](../results/smoothing-verification.json).
+
+| Method | Iterations | Solve time (s) | Setup (s) | Relative mass-norm difference from FSAI |
+| --- | ---: | ---: | ---: | ---: |
+| Tuned FSAI-CG | 9,482 | 2.86 | 1.173 | 0 |
+| Jacobi-CR, k | 9,482 | 1.27 | 0.002 | 0.104 |
+| Jacobi-CR, 10k | 94,820 | 12.64 | 0.002 | 0.0164 |
+| Jacobi-CR, 100k | 948,200 | 127.54 | 0.001 | 5.21e-11 |
+
+## Transfer of the Dirichlet tuning
+
+The transferred settings are width 48, `kap_tolerance=0.003`, float32 factor
+storage with float64 arithmetic, and four cooperating CUDA lanes per sparse
+row. Both FSAI and Jacobi use `SquaredLaplacianOperator` with all vertices free
+and `mass_weight=0.0001`. The diagonal mass term is fused into the final
+Laplacian product. The explicitly assembled matrix is used to build the
+preconditioners; solver products use the factored energy.
+
+Three warmed trials, alternating configuration order, measure:
+
+| Configuration | Iterations | Median solve (s) | Median setup (s) | Median total (s) |
+| --- | ---: | ---: | ---: | ---: |
+| Original width-8 FSAI, assembled operator | 28,688 | 10.14 | 0.029 | 10.17 |
+| Tuned width-48 FSAI, factored operator | 9,482 | 2.80 | 1.144 | 3.96 |
+
+This is **3.62× faster for the solve and 2.57× including setup**, at the
+same recursive tolerance and initial guess. It measures the combined tuning
+and operator change. Setup includes the operator and preconditioner;
+both configurations exclude CPU assembly and matrix upload.
+[Full repeated measurements](../results/smoothing-tuning.json).
+The figure labels use its own fresh run, so they differ slightly from these
+medians. The old width-8 image and its metadata remain in
+[the previous revision](https://github.com/alecjacobson/warp-preconditioners/tree/3ecbebcd1435382e67806a6514c46be8acd8b7af/assets).
 
 ## Checking what is visualized
 
@@ -170,19 +202,31 @@ Generate the C++ benchmark dumps using the main README instructions, then:
 python -m pip install -e '.[visualization]'
 OPENBLAS_NUM_THREADS=1 python visualization/solve_fields.py \
   --dir /tmp/dump --mesh /path/to/xyzrgb_dragon-720K.ply \
+  --output data/visualization-tuned --tuned \
   --data-weight 0.0001 --initial-guess data --fsai-rtol 1e-8
 blender -b --factory-startup --python visualization/render_dragon.py -- \
-  --width 6000 --height 1120 --samples 64
-python visualization/compose.py
+  --data data/visualization-tuned --width 6000 --height 1120 --samples 64
+python visualization/compose.py --data data/visualization-tuned
 ```
 
-Use `--audit-initial-guess` for the [separate initialization test](initialization.md).
+To repeat the original/tuned measurements and reference checks, retain the
+original width-8 inputs in `data/visualization/` and run:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/compare_smoothing.py
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/verify_smoothing.py
+```
+
+The reference check additionally requires scikit-sparse and SuiteSparse;
+these are verification dependencies, not dependencies of the Warp solvers.
+
+Omit `--tuned` and use `--audit-initial-guess` to reproduce the [separate initialization test](initialization.md).
 The optional `--audit-weights` mode tests its specified positive coefficients
 on the **new nonlinear target**, independently of the displayed fields.
 
 Solving uses `cuda:0`; rendering uses an OptiX GPU and Blender 4.5.3. The
-editable scene is `data/visualization/five_dragons.blend`. Intermediate
+editable scene is `data/visualization-tuned/five_dragons.blend`. Intermediate
 fields (including the input `target`) and renders are also in ignored
-`data/visualization/`. Published PNGs use Git LFS. The numerical solver
+`data/visualization-tuned/`. Published PNGs use Git LFS. The numerical solver
 library still depends only on Warp; Matplotlib is an optional dependency
 for the separate initialization plot.
