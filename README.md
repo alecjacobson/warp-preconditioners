@@ -104,36 +104,69 @@ energy. Failed trials and manufactured-solution errors are reported.
 
 ## Tetrahedral linear elasticity
 
-FSAI also helps on a solid dragon under gravity, with its head and tail
-clamped: **225,770 tetrahedra and 152,058 free displacement DOFs**. All
-assembly, preconditioners, reference solves, and compared solves run in Warp
-on the L40. We tune CG/CR and preconditioner settings against the same
-**1e-4 relative displacement and energy error** target.
+The current example is [SimJEB #225](https://simjeb.github.io/), Michael
+Jenkins's GE bracket: **215,219 original tetrahedra and 131,079 free DOFs**.
+It uses the supplied titanium material, fixed bolt holes, and **35.6 kN
+vertical pin load**. All assembly, preconditioners, references, and compared
+solves run in Warp on NVIDIA L40. Both relative displacement and energy
+errors must reach **1e-4**.
 
 | Best tested configuration | Iterations | Median setup + solve |
 | --- | ---: | ---: |
-| Default scalar Jacobi + CG | 6,117 | 0.393 s |
-| PR #1890 direct block Jacobi + CG | 5,026 | 0.328 s |
-| FSAI, width 8, κ = 0.003, float64 factors, four lanes + CG | 2,109 | **0.215 s** |
+| Default scalar Jacobi + CG | 2,035 | 0.1123 s |
+| Block Jacobi + CG | 1,846 | 0.1038 s |
+| FSAI, width 4, κ=.003, float32 factors, one lane + CG | 1,132 | **0.0820 s** |
 
-Our block Jacobi applies the same mathematical operator as
-[Warp PR #1890](https://github.com/NVIDIA/warp/pull/1890) on these 3×3 SPD
-blocks; measured applications agree within **2.60e-16**. The PR's direct
-variant has cheaper setup here, so it is the block baseline in this table.
-FSAI is **1.52× faster than block Jacobi** and **1.83× faster than scalar
-Jacobi**, including setup, for this accuracy target.
+FSAI is **1.27× faster than block Jacobi**, including setup. Our streamlined
+block Jacobi and the actual [Warp PR #1890](https://github.com/NVIDIA/warp/pull/1890)
+direct implementation apply the same inverse to within **2.39e-16** and have
+practically tied total times. CG wins over CR for these finalists.
 
-![Elasticity displacement and energy errors versus iterations and setup-plus-solve wall time.](assets/dragon-elasticity-convergence.png)
+![Bracket displacement and energy errors versus iterations and setup-plus-solve wall time.](assets/simjeb-elasticity-convergence.png)
 
-The next image freezes all three methods near **0.215 s**, alongside a
-verified reference. Displacement errors at that budget are **1.05%**,
-**0.344%**, and **0.00482%**, respectively. The rendering shows **actual
-displacement with no exaggeration**, colored by recovered **von Mises stress
-in kPa**, with one shared linear scale.
+The rendering freezes all three methods near **0.0820 s**, alongside the
+verified reference. It shows **actual displacement**, colored by recovered
+**von Mises stress in MPa**, with a shared linear scale and crisp intervals.
+Maximum reference displacement is **0.798806 mm**, matching the published
+SimJEB metadata to its reported precision.
 
-![Reference and actual elasticity iterates frozen at approximately the first winner's wall-clock time.](assets/dragon-elasticity-comparison.png)
+![Reference and actual bracket iterates frozen near the first winner's wall-clock time.](assets/simjeb-elasticity-comparison.png)
 
-[Problem, PR comparison, all 36 configurations, timing protocol, verification, and reproduction](results/elasticity.md).
+[Problem, tuning, PR comparison, verification, attribution, and reproduction](results/elasticity.md).
+The [earlier dragon elasticity results](results/archive/dragon-elasticity.md) remain archived.
+
+## Fixed sparsity, changing values
+
+`BlockJacobi.update(A)` recomputes only diagonal inverses. FSAI can cache the
+selected factor supports, source-value mapping, and transpose permutation:
+
+```python
+P = FSAI(A, max_row_size=8, reuse_pattern=True)
+# Update A.values in place, or supply another matrix with identical topology.
+P.update(A)
+cg(A, b, x, M=P, tol=1e-8)
+```
+
+Refits run entirely in Warp and keep factor buffers stable for captured
+applications. Invalid topology or local pivots raise before replacing the
+previous factors. FSAI reuse currently requires compact BSR storage; use
+`warp.sparse.bsr_copy` to canonicalize padded matrices first. Setup and updates
+synchronize for validation; application is graph-capturable.
+
+A refit keeps the original supports—it does not repeat adaptive pattern
+selection. Monitor convergence and rebuild if that pattern stops working
+well. Optional `P.quality(A)` estimates the normalized Frobenius defect of
+`G A G.T`; it is a diagnostic heuristic, not a condition-number bound.
+
+On ten spatially varying stiffness fields of the bracket, width-eight FSAI
+refits take **1.0 ms versus 25.5 ms** for fresh setup. Including the initial
+plan and all solves, refitting takes **0.950 s**, versus **1.168 s** for fresh
+builds and **1.460 s** for updated block Jacobi. The final material contrast
+is 263×; fresh and refitted width-eight factors both need 1,321 iterations.
+
+![FSAI numerical refits versus fresh builds, stale factors, and updated block Jacobi.](assets/simjeb-numerical-updates.png)
+
+[Changing-material benchmarks, measured update costs, and API details](results/numerical-updates.md).
 
 ```bash
 python -m pip install -e '.[test]'

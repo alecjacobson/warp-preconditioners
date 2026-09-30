@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def main():
-    root = Path("data/elasticity")
+    root = Path("data/simjeb")
     meta = json.loads(Path("results/elasticity.json").read_text())
     render = json.loads((root / "render.json").read_text())
     scene = Image.open(root / "elasticity-render.png").convert("RGBA")
@@ -25,7 +25,7 @@ def main():
         )
         draw.text((x, y), label, font=font, fill=color, anchor="mt")
 
-    text(width / 2, 20, "Linear elasticity: head and tail clamped, gravity ↓", 60, True)
+    text(width / 2, 20, "SimJEB #225: fixed bolt holes, vertical pin load ↑", 60, True)
     text(
         width / 2,
         104,
@@ -77,18 +77,18 @@ def main():
         text(
             lx + t * lw,
             ly + 38,
-            f"{t * render['scalar_range_pa'][1] / 1000:.2f}",
+            f"{t * render['scalar_range_pa'][1] / 1e6:.1f}",
             24,
             color="#657083",
         )
     text(
         width / 2,
         canvas.height - 36,
-        "Von Mises stress (kPa), shared linear scale  ·  225,770 tetrahedra  ·  152,058 free DOFs  ·  Target: relative displacement and energy errors ≤ 10⁻⁴",
+        f"Von Mises stress (MPa), shared scale  ·  {meta['mesh']['tetrahedra']:,} tetrahedra  ·  {meta['mesh']['free_dofs']:,} free DOFs  ·  Relative displacement and energy errors ≤ 10⁻⁴",
         25,
         color="#657083",
     )
-    out = Path("assets/dragon-elasticity-comparison.png")
+    out = Path("assets/simjeb-elasticity-comparison.png")
     canvas.save(out, optimize=True)
     figure_meta = {
         k: meta[k] for k in ["mesh", "gpu", "warp", "snapshot_budget_s", "winner", "stress"]

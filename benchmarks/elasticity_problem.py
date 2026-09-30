@@ -19,6 +19,7 @@ def element_blocks(
     free_index: wp.array(dtype=int),
     lame: wp.float64,
     mu: wp.float64,
+    material_scale: wp.array(dtype=wp.float64),
     rows: wp.array(dtype=int),
     cols: wp.array(dtype=int),
     values: wp.array(dtype=wp.mat33d),
@@ -49,10 +50,14 @@ def element_blocks(
             block = wp.mat33d(wp.float64(0))
             if ri >= 0 and cj >= 0:
                 gj = gradients[j]
-                block = volume * (
-                    lame * wp.outer(gi, gj)
-                    + mu * wp.outer(gj, gi)
-                    + mu * wp.dot(gi, gj) * wp.identity(n=3, dtype=wp.float64)
+                block = (
+                    volume
+                    * material_scale[e]
+                    * (
+                        lame * wp.outer(gi, gj)
+                        + mu * wp.outer(gj, gi)
+                        + mu * wp.dot(gi, gj) * wp.identity(n=3, dtype=wp.float64)
+                    )
                 )
             values[out] = block
 
@@ -69,7 +74,25 @@ def gravity_load(
     rhs[i] = density * volume[free[i]] * gravity
 
 
-def assemble(vertices, tets, fixed, young=1e7, poisson=0.35, density=1000.0, device="cuda:0"):
+def assemble(
+    vertices,
+    tets,
+    fixed,
+    young=1e7,
+    poisson=0.35,
+    density=1000.0,
+    device="cuda:0",
+    material_scale=None,
+):
+    if material_scale is None:
+        material_scale = np.ones(len(tets))
+    material_scale = np.asarray(material_scale, dtype=np.float64)
+    if (
+        material_scale.shape != (len(tets),)
+        or not np.all(np.isfinite(material_scale))
+        or np.any(material_scale <= 0)
+    ):
+        raise ValueError("material_scale must contain one finite positive multiplier per tet")
     if not young > 0 or not -1 < poisson < 0.5 or not density > 0:
         raise ValueError("Expected positive Young's modulus/density and -1 < Poisson ratio < 0.5")
     free = np.flatnonzero(~fixed).astype(np.int32)
@@ -89,6 +112,7 @@ def assemble(vertices, tets, fixed, young=1e7, poisson=0.35, density=1000.0, dev
                 wp.array(index, dtype=int),
                 young * poisson / ((1 + poisson) * (1 - 2 * poisson)),
                 young / (2 * (1 + poisson)),
+                wp.array(material_scale, dtype=wp.float64),
                 rows,
                 cols,
                 values,

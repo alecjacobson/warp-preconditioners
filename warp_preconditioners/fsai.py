@@ -62,7 +62,6 @@ def _kernels(dtype, width):
         scale: wp.array(dtype=dtype),
         tolerance: dtype,
         pivot_floor: dtype,
-        rows_out: wp.array(dtype=int),
         cols_out: wp.array(dtype=int),
         vals_out: wp.array(dtype=dtype),
         status: wp.array(dtype=int),
@@ -144,7 +143,6 @@ def _kernels(dtype, width):
         norm = wp.sqrt(z[0])
         for p in range(wp.static(width)):
             e = i * wp.static(width) + p
-            rows_out[e] = i
             cols_out[e] = -1
             vals_out[e] = dtype(0)
             if p < size:
@@ -188,7 +186,9 @@ class FSAI(LinearOperator):
     Matrix symmetry/positive definiteness are caller preconditions.
 
     Instances own scratch storage; do not apply one instance concurrently on
-    independent streams. Rebuild after changing the source matrix.
+    independent streams. With ``reuse_pattern=True``, ``update(A)`` refits the
+    original supports for new values on identical compact BSR topology; otherwise
+    rebuild after changing the source. Updates must not overlap application.
     """
 
     def __init__(
@@ -199,6 +199,7 @@ class FSAI(LinearOperator):
         pivot_floor=None,
         apply_lanes=1,
         factor_dtype=None,
+        reuse_pattern=False,
     ):
         if (
             not isinstance(A, sp.BsrMatrix)
@@ -222,11 +223,26 @@ class FSAI(LinearOperator):
             factor_dtype = A.scalar_type
         if factor_dtype not in (A.scalar_type, wp.float32):
             raise ValueError("factor_dtype must be the matrix scalar type or wp.float32")
+        if reuse_pattern and A.row_counts is not None:
+            raise ValueError(
+                "reuse_pattern requires compact BSR storage; canonicalize with bsr_copy"
+            )
+        self.max_row_size = max_row_size
         self.factor_dtype = factor_dtype
         self.apply_lanes = apply_lanes
         self.source = A
+        # Settle the source count before scalarization: nnz can otherwise be a
+        # very loose assembly upper bound, causing oversized temporary buffers.
+        A.nnz_sync()
         # Also canonicalizes padded storage. No host matrix staging.
-        scalar = sp.bsr_copy(A, block_shape=(1, 1))
+        from .fsai_pack import scalarize_compact
+
+        if A.row_counts is not None:
+            scalar = sp.bsr_copy(A, block_shape=(1, 1))
+        elif A.dtype == A.scalar_type and not reuse_pattern:
+            scalar = A
+        else:
+            scalar = scalarize_compact(A)
         n = scalar.nrow
         dtype, device = scalar.scalar_type, scalar.device
         scale = wp.empty(n, dtype=dtype, device=device)
@@ -238,8 +254,7 @@ class FSAI(LinearOperator):
             [scalar.offsets, scalar.columns, scalar.values, scale, status],
             device=device,
         )
-        rows = wp.empty(n * max_row_size, dtype=int, device=device)
-        cols = wp.empty_like(rows)
+        cols = wp.empty(n * max_row_size, dtype=int, device=device)
         vals = wp.empty(n * max_row_size, dtype=dtype, device=device)
         wp.launch(
             build,
@@ -251,7 +266,6 @@ class FSAI(LinearOperator):
                 scale,
                 dtype(kap_tolerance),
                 dtype(pivot_floor),
-                rows,
                 cols,
                 vals,
                 status,
@@ -264,7 +278,9 @@ class FSAI(LinearOperator):
                 f"FSAI requires finite positive diagonals ({diagnostics[0]} invalid rows)"
             )
         self.truncated_rows = int(diagnostics[1])
-        self.G = sp.bsr_from_triplets(n, n, rows, cols, vals)
+        from .fsai_pack import pack_factor
+
+        self.G = pack_factor(n, max_row_size, cols, vals)
         if factor_dtype != dtype:
             self.G = sp.bsr_copy(self.G, scalar_type=factor_dtype)
             status.zero_()
@@ -281,6 +297,37 @@ class FSAI(LinearOperator):
         self.GT = sp.bsr_transposed(self.G)
         self._tmp = wp.empty(n, dtype=dtype, device=device)
         super().__init__(A.shape, A.dtype, device, self._apply)
+        self._refit = None
+        if reuse_pattern:
+            from .fsai_reuse import RefitPlan
+
+            self._refit = RefitPlan(self, A, scalar, max_row_size, pivot_floor)
+
+    def update(self, A=None):
+        """Refit on the original factor supports, preserving captured apply buffers.
+
+        Requires ``reuse_pattern=True`` and identical compact BSR topology/storage.
+        This is not a new adaptive pattern search. Rebuild when convergence worsens.
+        Failed validation leaves the previous factors intact. Updates synchronize.
+        """
+        if self._refit is None:
+            raise ValueError("Construct FSAI with reuse_pattern=True before updating")
+        A = self.source if A is None else A
+        if not isinstance(A, sp.BsrMatrix):
+            raise ValueError("update requires a Warp BSR matrix")
+        self._refit.update(self, A, _kernels(self.scalar_type, self.max_row_size)[0])
+        self.source = A
+        return self
+
+    def quality(self, A=None, probes=4, seed=17):
+        """Estimate normalized Frobenius defect of G A G.T using fixed random probes.
+
+        A diagnostic heuristic, not a bound on conditioning or solve iterations.
+        Includes GPU products, allocations and host synchronization; not capturable.
+        """
+        from .fsai_reuse import quality
+
+        return quality(self, self.source if A is None else A, probes, seed)
 
     def _apply(self, x, y, z, alpha, beta):
         x = x.view(self.scalar_type).flatten()

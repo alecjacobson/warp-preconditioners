@@ -60,7 +60,7 @@ def timed_solve(operator, b, pre, solver, iterations, tol=0.0):
 
 def main():
     p = argparse.ArgumentParser(__doc__)
-    p.add_argument("--data", type=Path, default=Path("data/elasticity"))
+    p.add_argument("--data", type=Path, default=Path("data/simjeb"))
     p.add_argument("--output", type=Path, default=Path("results/elasticity.json"))
     p.add_argument("--stage", choices=["reference", "sweep", "final"], required=True)
     p.add_argument("--configs", type=Path)
@@ -72,8 +72,13 @@ def main():
     mesh = np.load(args.data / "mesh.npz")
     vertices, tets, fixed = mesh["vertices"], mesh["tets"], mesh["fixed"]
     mesh_meta = json.loads((args.data / "mesh.json").read_text())
-    young, poisson, density = 1e7, 0.35, 1000.0
+    young, poisson, density = (
+        mesh_meta.get(k, v)
+        for k, v in [("young_pa", 1e7), ("poisson", 0.35), ("density_kg_m3", 1000.0)]
+    )
     A, b, volume, free = assemble(vertices, tets, fixed, young, poisson, density)
+    if "forces" in mesh:
+        b = wp.array(mesh["forces"][free], dtype=wp.vec3d, device=A.device)
     cpu = cpu_matrix(A)
     mass = volume.numpy()[free]
     b_np = b.numpy().ravel()
@@ -86,7 +91,7 @@ def main():
         young_pa=young,
         poisson=poisson,
         density_kg_m3=density,
-        gravity_m_s2=[0, 0, -9.81],
+        gravity_m_s2=None if "forces" in mesh else [0, 0, -9.81],
         pr1890_commit=PR_SHA,
         target=args.target,
         target_definition="Both relative lumped-mass displacement error and relative energy error <= target",

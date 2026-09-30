@@ -19,7 +19,7 @@ from render_dragon import area, look_at
 
 
 def main():
-    root = Path("data/elasticity").resolve()
+    root = Path("data/simjeb").resolve()
     fields = np.load(root / "comparison.npz")
     meta = json.loads(Path("results/elasticity.json").read_text())
     order = ["reference", "jacobi", "block", "fsai"]
@@ -27,7 +27,9 @@ def main():
     v, f = fields["vertices"], fields["faces"]
     center = (v.min(0) + v.max(0)) / 2
     center[2] = v[:, 2].min()
-    scale = 2 / np.ptp(v[:, 0])
+    az, elevation = math.radians(-130), math.radians(32)
+    right = Vector((-math.sin(az), math.cos(az), 0))
+    scale = 1.90 / np.ptp(v @ np.array(right))
     scalar_max = max(float(fields["von_mises_" + name].max()) for name in order)
     palette, _ = striped_okloop()
     bpy.ops.object.select_all(action="SELECT")
@@ -77,7 +79,7 @@ def main():
     links.new(attr.outputs["Fac"], normalize.inputs["Value"])
     links.new(normalize.outputs["Result"], ramp.inputs["Fac"])
     links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
-    clamp = bpy.data.materials.new("Clamped head and tail")
+    clamp = bpy.data.materials.new("Fixed bolt-hole surfaces")
     clamp.use_nodes = True
     clamp.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
         0.12,
@@ -86,8 +88,6 @@ def main():
         1,
     )
     clamp.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.8
-    az, el = math.radians(-70), math.radians(19)
-    right = Vector((-math.sin(az), math.cos(az), 0))
     objects = []
     ground_z = (
         min(float(((v + amplification * fields[n] - center) * scale)[:, 2].min()) for n in order)
@@ -151,7 +151,7 @@ def main():
     camera = bpy.data.objects.new("camera", camera_data)
     bpy.context.collection.objects.link(camera)
     target = Vector((0, 0, 0.36))
-    direction = Vector((math.cos(az) * math.cos(el), math.sin(az) * math.cos(el), math.sin(el)))
+    direction = Vector((math.cos(az) * math.cos(elevation), math.sin(az) * math.cos(elevation), math.sin(elevation)))
     camera.location = target + 5 * direction
     look_at(camera, target)
     camera_data.type = "ORTHO"
@@ -169,7 +169,7 @@ def main():
                 renderer=bpy.app.version_string,
                 device="OptiX",
                 samples=96,
-                geometry="TetGen boundary plus actual saved physical displacement; no exaggeration",
+                geometry="Original SimJEB tet boundary plus actual saved physical displacement; no exaggeration",
                 colormap="isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
                 clamps="Dark gray surface patches",
                 image_size=[4800, 1150],

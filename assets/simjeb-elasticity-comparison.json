@@ -1,0 +1,210 @@
+{
+  "mesh": {
+    "name": "SimJEB #225 \u2014 Michael Jenkins",
+    "source": "https://raw.githubusercontent.com/nora-alshareef/jeb-dataset-forge/e571104fc20c7cd34dc9be5b7f038b56fbef4981/data/raw/225.fem",
+    "source_sha256": "1dc777d4e6d7a8f10aac7bf3994df849b8b38f7853cf3374ea46189e586c1b33",
+    "dataset": "https://simjeb.github.io/",
+    "design": "https://grabcad.com/library/improved-ge-bracket-1",
+    "vertices": 44121,
+    "tetrahedra": 215219,
+    "fixed_vertices": 428,
+    "free_dofs": 131079,
+    "mesh_sha256": "8d22720aafdee09c026341c7491cf3fcfaa87d4c2d0c18773f7dd7c5a6ef6be2",
+    "young_pa": 113800000000.0,
+    "poisson": 0.342,
+    "density_kg_m3": 4430.0,
+    "load_force_n": [
+      0.0,
+      0.0,
+      35585.77
+    ],
+    "load_reference_m": [
+      -0.021027999999999998,
+      -0.0749383,
+      0.04462994
+    ],
+    "loaded_vertices": 753,
+    "boundary": "All translations fixed on four RBE2 bolt-hole surfaces",
+    "load": "Original vertical FORCE; equal-weight rigid-motion least-squares distribution over RBE3 nodes, preserving force and moment",
+    "units": "m, N, Pa; original deck in mm, N, MPa",
+    "disclaimer": "Reproduction with linear tetrahedra, not a validation of OptiStruct RBE3 internal implementation"
+  },
+  "gpu": "NVIDIA L40",
+  "warp": "1.15.0",
+  "snapshot_budget_s": 0.08198096975684166,
+  "winner": "fsai",
+  "stress": {
+    "recovery": "Volume-average element Cauchy stress tensors at vertices, then compute von Mises invariant",
+    "units": "Pa",
+    "displacement_amplification": 1,
+    "fields": {
+      "reference": {
+        "nodal_max_pa": 1012560738.5975001,
+        "element_max_pa": 1299154161.6567965,
+        "nodal_sha256": "20bd70b0b241ee855aa21866936872d48150cfd7a240caa5704975cc5d899208"
+      },
+      "jacobi": {
+        "nodal_max_pa": 1013337554.0876918,
+        "element_max_pa": 1300244355.8173866,
+        "nodal_sha256": "7b7cf529e0d4486199d5a414ff71dacdd1e6c9672a05eb01a471095bcde5042e"
+      },
+      "block": {
+        "nodal_max_pa": 1012847248.4767054,
+        "element_max_pa": 1299489549.6147926,
+        "nodal_sha256": "dc96e4c5158f0da2be585a51b29df25eafd4180ad637a6a0ea68322e0c3ce7cb"
+      },
+      "fsai": {
+        "nodal_max_pa": 1012613715.1726002,
+        "element_max_pa": 1299225362.3782227,
+        "nodal_sha256": "702642e963f73d265a58149455b7f91469d46ccac0b709cac57f6fd9f90f9dcd"
+      }
+    }
+  },
+  "results_source": "results/elasticity.json",
+  "render": {
+    "objects": [
+      {
+        "name": "reference",
+        "label_x_fraction": 0.14705882352941174,
+        "field_sha256": "9274e66411226cbf93ad8e03ea035bcc2b1ba7c9e9d0dfcc9577c493ed5b63f3",
+        "geometry_and_attribute_verified": true
+      },
+      {
+        "name": "jacobi",
+        "label_x_fraction": 0.38235294117647056,
+        "field_sha256": "4ad87f8ecdedf2f2d5c2413575727112c5c2e428a61b0f49db4f5cd3109b124c",
+        "geometry_and_attribute_verified": true
+      },
+      {
+        "name": "block",
+        "label_x_fraction": 0.6176470588235294,
+        "field_sha256": "c37235821e2344a70cd68e2061165adbabbb2950bab34461dfa3b7e7ae131876",
+        "geometry_and_attribute_verified": true
+      },
+      {
+        "name": "fsai",
+        "label_x_fraction": 0.8529411764705883,
+        "field_sha256": "0ac30483548a8ac28cb9451b72fe500387a4d7d11b009cdb38894fb412313163",
+        "geometry_and_attribute_verified": true
+      }
+    ],
+    "amplification": 1.0,
+    "scalar_range_pa": [
+      0,
+      1013337554.0876918
+    ],
+    "renderer": "4.5.3 LTS",
+    "device": "OptiX",
+    "samples": 96,
+    "geometry": "Original SimJEB tet boundary plus actual saved physical displacement; no exaggeration",
+    "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
+    "clamps": "Dark gray surface patches",
+    "image_size": [
+      4800,
+      1150
+    ]
+  },
+  "finalists": {
+    "jacobi": {
+      "config": {
+        "kind": "jacobi",
+        "solver": "cg"
+      },
+      "iterations": 2035,
+      "setup_s": 0.00038836151361465454,
+      "solve_s": 0.11186689883470535,
+      "total_s": 0.11225526034832001,
+      "setup_repeats_s": [
+        0.0005349963903427124,
+        0.00037425756454467773,
+        0.00038836151361465454
+      ],
+      "solve_repeats_s": [
+        0.11214518919587135,
+        0.11138167232275009,
+        0.11186689883470535
+      ],
+      "mass_error": 1.693985685161694e-05,
+      "energy_error": 8.084599822073096e-05,
+      "relative_residual": 0.0008812918928587012,
+      "snapshot": {
+        "iterations": 1475,
+        "solve_s": 0.0825410820543766,
+        "total_s": 0.08292944356799126,
+        "field_sha256": "4ad87f8ecdedf2f2d5c2413575727112c5c2e428a61b0f49db4f5cd3109b124c",
+        "mass_error": 0.0007849193026304355,
+        "energy_error": 0.0032788293537179226,
+        "relative_residual": 0.03483410931677765
+      }
+    },
+    "block": {
+      "config": {
+        "kind": "block",
+        "solver": "cg",
+        "strategy": "ours"
+      },
+      "iterations": 1846,
+      "setup_s": 0.0003193765878677368,
+      "solve_s": 0.1034182459115982,
+      "total_s": 0.10383639484643936,
+      "setup_repeats_s": [
+        0.0005228184163570404,
+        0.00030295178294181824,
+        0.0003193765878677368
+      ],
+      "solve_repeats_s": [
+        0.1034182459115982,
+        0.10305427387356758,
+        0.10351701825857162
+      ],
+      "mass_error": 1.8518334706084474e-05,
+      "energy_error": 9.224883693325659e-05,
+      "relative_residual": 0.0011140135367457206,
+      "snapshot": {
+        "iterations": 1443,
+        "solve_s": 0.08109835907816887,
+        "total_s": 0.0814177356660366,
+        "field_sha256": "c37235821e2344a70cd68e2061165adbabbb2950bab34461dfa3b7e7ae131876",
+        "mass_error": 0.0004791060917428783,
+        "energy_error": 0.001449498149640296,
+        "relative_residual": 0.012483245909104388
+      }
+    },
+    "fsai": {
+      "config": {
+        "kind": "fsai",
+        "solver": "cg",
+        "width": 4,
+        "kap": 0.003,
+        "lanes": 1,
+        "storage": 32
+      },
+      "iterations": 1132,
+      "setup_s": 0.005647383630275726,
+      "solve_s": 0.07588498294353485,
+      "total_s": 0.08198096975684166,
+      "setup_repeats_s": [
+        0.006404899060726166,
+        0.005622103810310364,
+        0.005647383630275726
+      ],
+      "solve_repeats_s": [
+        0.0755760706961155,
+        0.07588498294353485,
+        0.07634919136762619
+      ],
+      "mass_error": 1.762913009046389e-05,
+      "energy_error": 8.654910900295075e-05,
+      "relative_residual": 0.0010494127835147078,
+      "snapshot": {
+        "iterations": 1132,
+        "solve_s": 0.07595132291316986,
+        "total_s": 0.08159870654344559,
+        "field_sha256": "0ac30483548a8ac28cb9451b72fe500387a4d7d11b009cdb38894fb412313163",
+        "mass_error": 1.762913009046389e-05,
+        "energy_error": 8.654910900295075e-05,
+        "relative_residual": 0.0010494127835147078
+      }
+    }
+  }
+}

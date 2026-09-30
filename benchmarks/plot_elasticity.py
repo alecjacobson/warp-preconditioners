@@ -78,7 +78,7 @@ def main():
     fig.text(
         0.075,
         0.94,
-        "Dragon volume elasticity under gravity",
+        "SimJEB #225 bracket under vertical pin load",
         fontsize=21,
         weight="bold",
         color="#263448",
@@ -86,7 +86,7 @@ def main():
     fig.text(
         0.075,
         0.875,
-        f"{data['mesh']['tetrahedra']:,} tetrahedra · {data['mesh']['free_dofs']:,} free DOFs · Head and tail clamped · NVIDIA L40",
+        f"{data['mesh']['tetrahedra']:,} tetrahedra · {data['mesh']['free_dofs']:,} free DOFs · Four bolt holes fixed · NVIDIA L40",
         fontsize=11,
         color="#66758A",
     )
@@ -104,7 +104,7 @@ def main():
         fontsize=10,
         color="#66758A",
     )
-    out = Path("assets/dragon-elasticity-convergence.png")
+    out = Path("assets/simjeb-elasticity-convergence.png")
     fig.savefig(out, dpi=190, facecolor="white")
     print(out)
 

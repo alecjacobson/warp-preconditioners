@@ -101,7 +101,7 @@ def recover(vertices, tets, displacement, young, poisson, device="cuda:0"):
 
 
 def main():
-    root = Path("data/elasticity")
+    root = Path("data/simjeb")
     fields = dict(np.load(root / "comparison.npz"))
     mesh = np.load(root / "mesh.npz")
     path = Path("results/elasticity.json")

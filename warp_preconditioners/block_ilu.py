@@ -73,6 +73,37 @@ def _kernels(dtype, size):
             inverse[i] = safe_inverse(values[diagonal[i]], tolerance, bad)
 
     @wp.kernel(enable_backward=False)
+    def diagonal_only(
+        offsets: wp.array(dtype=int),
+        columns: wp.array(dtype=int),
+        counts: wp.array(dtype=int),
+        padded: bool,
+        values: wp.array(dtype=mat),
+        inverse: wp.array(dtype=mat),
+        tolerance: dtype,
+        bad: wp.array(dtype=int),
+    ):
+        i = wp.tid()
+        lo = offsets[i]
+        end = offsets[i + 1]
+        if padded:
+            end = lo + counts[i]
+        hi = end
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if columns[mid] < i:
+                lo = mid + 1
+            else:
+                hi = mid
+        if lo < end:
+            if columns[lo] == i:
+                inverse[i] = safe_inverse(values[lo], tolerance, bad)
+            else:
+                wp.atomic_add(bad, 0, 1)
+        else:
+            wp.atomic_add(bad, 0, 1)
+
+    @wp.kernel(enable_backward=False)
     def initialize(
         rows: wp.array(dtype=int),
         columns: wp.array(dtype=int),
@@ -187,6 +218,7 @@ def _kernels(dtype, size):
         combine,
         diagonal_apply,
         validate_factors,
+        diagonal_only,
     )
 
 
@@ -214,6 +246,18 @@ class BlockJacobi(LinearOperator):
         )
         if not math.isfinite(tolerance) or tolerance < 0:
             raise ValueError("pivot_tolerance must be finite and nonnegative")
+        if type(self) is BlockJacobi:
+            self.A = A
+            self.vector_type = wp.types.vector(length=size, dtype=A.scalar_type)
+            self._value_type = wp.types.matrix(shape=(size, size), dtype=A.scalar_type)
+            self._kernels = _kernels(A.scalar_type, size)
+            self.inverse_diagonal = wp.empty(A.nrow, dtype=self._value_type, device=A.device)
+            self._candidate = wp.empty_like(self.inverse_diagonal)
+            self._bad = wp.zeros(1, dtype=int, device=A.device)
+            self.pivot_tolerance = tolerance
+            super().__init__(A.shape, A.dtype, A.device, self._apply)
+            self.update(A)
+            return
         self.A = sp.bsr_copy(A)
         self.A.nnz_sync()
         self.vector_type = wp.types.vector(length=size, dtype=A.scalar_type)
@@ -234,6 +278,43 @@ class BlockJacobi(LinearOperator):
         self._invert(self._values)
         self._check()
         super().__init__(A.shape, A.dtype, A.device, self._apply)
+
+    def update(self, A=None):
+        """Recompute diagonal inverses in existing buffers; failed updates are atomic.
+
+        Accepts any canonical topology with the same shape/type/device. Off-diagonal
+        values are never copied or inspected. Setup/update synchronize; apply does not.
+        """
+        if type(self) is not BlockJacobi:
+            raise NotImplementedError("Rebuild BlockILU0 to update its factors")
+        if A is None:
+            A = self.A
+        if not isinstance(A, sp.BsrMatrix) or (A.shape, A.dtype, A.device) != (
+            self.shape,
+            self.dtype,
+            self.device,
+        ):
+            raise ValueError("update requires the same shape, dtype, and device")
+        self._bad.zero_()
+        wp.launch(
+            self._kernels[8],
+            A.nrow,
+            [
+                A.offsets,
+                A.columns,
+                A.row_counts if A.row_counts is not None else A.offsets,
+                A.row_counts is not None,
+                A.values.view(self._value_type),
+                self._candidate,
+                A.scalar_type(self.pivot_tolerance),
+                self._bad,
+            ],
+            device=A.device,
+        )
+        self._check()
+        wp.copy(self.inverse_diagonal, self._candidate)
+        self.A = A
+        return self
 
     def _invert(self, values):
         wp.launch(
