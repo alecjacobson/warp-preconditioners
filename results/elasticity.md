@@ -38,6 +38,36 @@ with SHA-256 verification. Attribution and provenance are preserved in
 `mesh.json` and the results. SimJEB uses ODC-By; the original design remains
 subject to GrabCAD's terms. The geometry is not relicensed as project code.
 
+## Visualizing the input conditions
+
+![Exact source-deck boundary conditions and applied loads](../assets/simjeb-boundary-conditions.png)
+
+This figure uses the **undeformed input mesh**, without loading a displacement
+or stress solution. Orange identifies the 428 solid nodes prescribed to
+`u_x=u_y=u_z=0`; blue identifies the 753 pin-interface nodes carrying the
+load, whose displacements remain unknown. B1–B4 correspond to RBE2 centers
+44122–44125. The entire base is not clamped. All other exposed surfaces have
+zero prescribed traction; this case has no gravity or contact model.
+
+The blue resultant arrow is `(0,0,35585.77)` N at GRID 44126. In the
+see-through panel, the smaller arrows use the actual nodal force vectors at
+a shared scale: approximately 47.259 N per node. They have a separate display
+scale from the resultant arrow. All selected nodes are drawn; coupling spokes
+and small force arrows are subsampled for legibility. Axes account for the
+underside display rotation.
+
+[`export_simjeb_boundary.py`](../benchmarks/export_simjeb_boundary.py) extracts
+the sets and master coordinates from `225.fem`, checks the masks exactly
+against the solver's input arrays, and verifies the resultant. The renderer
+consumes that checked export. Counts, source cards, positions, and rendering
+provenance are in [the figure metadata](../assets/simjeb-boundary-conditions.json).
+
+```bash
+python benchmarks/export_simjeb_boundary.py
+blender -b --factory-startup --python visualization/render_simjeb_boundary.py
+python visualization/compose_simjeb_boundary.py
+```
+
 ## Best tested settings
 
 All assembly, preconditioners, reference solves, and compared solves execute

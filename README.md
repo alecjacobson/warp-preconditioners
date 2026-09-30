@@ -111,6 +111,13 @@ vertical pin load**. All assembly, preconditioners, references, and compared
 solves run in Warp on NVIDIA L40. Both relative displacement and energy
 errors must reach **1e-4**.
 
+The input boundary conditions are shown explicitly below: **orange nodes have
+u_x=u_y=u_z=0**; **blue nodes receive the distributed pin load and remain free
+to move**. The see-through view exposes all selected nodes and the coupling
+centers. The gray base plate is free outside the four bolt-hole regions.
+
+![Exact fixed node sets and applied pin load, with top, underside, and see-through views.](assets/simjeb-boundary-conditions.png)
+
 | Best tested configuration | Iterations | Median setup + solve |
 | --- | ---: | ---: |
 | Default scalar Jacobi + CG | 2,035 | 0.1123 s |

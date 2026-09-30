@@ -1,0 +1,243 @@
+{
+  "panels": [
+    {
+      "index": 0,
+      "anchors": {
+        "B1": [
+          0.145588681101799,
+          0.5606124997138977
+        ],
+        "B2": [
+          0.0878220796585083,
+          0.4835675060749054
+        ],
+        "B3": [
+          0.2300751507282257,
+          0.229683518409729
+        ],
+        "B4": [
+          0.2724571228027344,
+          0.2862248122692108
+        ],
+        "pin": [
+          0.13559874892234802,
+          0.4703831374645233
+        ],
+        "force_tip": [
+          0.1355987787246704,
+          0.7071415781974792
+        ]
+      },
+      "axes": {
+        "X": [
+          0.11496729403734207,
+          0.27678313851356506
+        ],
+        "Y": [
+          0.083308145403862,
+          0.28092747926712036
+        ],
+        "Z": [
+          0.09775280207395554,
+          0.3089791238307953
+        ]
+      },
+      "view": "top / pin side",
+      "all_fixed_nodes_drawn": 428,
+      "all_loaded_nodes_drawn": 753,
+      "sampled_force_arrows": 0
+    },
+    {
+      "index": 1,
+      "anchors": {
+        "B1": [
+          0.6152353882789612,
+          0.49976974725723267
+        ],
+        "B2": [
+          0.5544958114624023,
+          0.4280305802822113
+        ],
+        "B3": [
+          0.412022203207016,
+          0.6816376447677612
+        ],
+        "B4": [
+          0.4566386342048645,
+          0.7343226075172424
+        ],
+        "pin": [
+          0.45823830366134644,
+          0.38034743070602417
+        ]
+      },
+      "axes": {
+        "X": [
+          0.4408099949359894,
+          0.2767830491065979
+        ],
+        "Y": [
+          0.438040167093277,
+          0.22941328585147858
+        ],
+        "Z": [
+          0.42359548807144165,
+          0.20136161148548126
+        ]
+      },
+      "view": "underside",
+      "all_fixed_nodes_drawn": 428,
+      "all_loaded_nodes_drawn": 753,
+      "sampled_force_arrows": 0
+    },
+    {
+      "index": 2,
+      "anchors": {
+        "B1": [
+          0.7972740530967712,
+          0.5606123805046082
+        ],
+        "B2": [
+          0.7395074963569641,
+          0.48356738686561584
+        ],
+        "B3": [
+          0.8817605376243591,
+          0.22968342900276184
+        ],
+        "B4": [
+          0.9241425395011902,
+          0.2862246632575989
+        ],
+        "pin": [
+          0.7872841358184814,
+          0.47038301825523376
+        ],
+        "force_tip": [
+          0.7872841954231262,
+          0.7071414589881897
+        ]
+      },
+      "axes": {
+        "X": [
+          0.7666527032852173,
+          0.2767829895019531
+        ],
+        "Y": [
+          0.7349935173988342,
+          0.2809273302555084
+        ],
+        "Z": [
+          0.7494381666183472,
+          0.30897900462150574
+        ]
+      },
+      "view": "see-through coupling",
+      "all_fixed_nodes_drawn": 428,
+      "all_loaded_nodes_drawn": 753,
+      "sampled_force_arrows": 48
+    }
+  ],
+  "source": {
+    "source": "225.fem",
+    "source_sha256": "1dc777d4e6d7a8f10aac7bf3994df849b8b38f7853cf3374ea46189e586c1b33",
+    "subcase": 1,
+    "spc": 1,
+    "load": 2,
+    "geometry": "Undeformed original tetrahedral boundary; no solution fields loaded",
+    "boundary_npz_sha256": "6fe8ced24cad6d90d263f83bb025087aa79d739396add898112c122245ee4d72",
+    "exact_fixed_mask_match": true,
+    "exact_loaded_mask_match": true,
+    "fixed_nodes": 428,
+    "loaded_nodes": 753,
+    "bolts": [
+      {
+        "label": "B1",
+        "rbe2": 251620,
+        "center_grid": 44122,
+        "physical_nodes": 106,
+        "center_mm": [
+          51.90106,
+          1.576064,
+          3.925375
+        ],
+        "prescribed_center_dofs": "ux=uy=uz=rx=ry=rz=0",
+        "prescribed_solid_node_dofs": "ux=uy=uz=0"
+      },
+      {
+        "label": "B2",
+        "rbe2": 251621,
+        "center_grid": 44123,
+        "physical_nodes": 109,
+        "center_mm": [
+          0.1452728,
+          0.028675,
+          3.924747
+        ],
+        "prescribed_center_dofs": "ux=uy=uz=rx=ry=rz=0",
+        "prescribed_solid_node_dofs": "ux=uy=uz=0"
+      },
+      {
+        "label": "B3",
+        "rbe2": 251622,
+        "center_grid": 44124,
+        "physical_nodes": 108,
+        "center_mm": [
+          0.048955,
+          -148.166,
+          3.955508
+        ],
+        "prescribed_center_dofs": "ux=uy=uz=rx=ry=rz=0",
+        "prescribed_solid_node_dofs": "ux=uy=uz=0"
+      },
+      {
+        "label": "B4",
+        "rbe2": 251623,
+        "center_grid": 44125,
+        "physical_nodes": 105,
+        "center_mm": [
+          38.04421,
+          -147.003,
+          3.9376129999999994
+        ],
+        "prescribed_center_dofs": "ux=uy=uz=rx=ry=rz=0",
+        "prescribed_solid_node_dofs": "ux=uy=uz=0"
+      }
+    ],
+    "load_interface": {
+      "rbe3": 251624,
+      "center_grid": 44126,
+      "center_mm": [
+        -21.028,
+        -74.9383,
+        44.62994
+      ],
+      "resultant_n": [
+        0.0,
+        0.0,
+        35585.77
+      ],
+      "distribution": "Equal-weight RBE3-style force/moment-preserving distribution",
+      "nodal_force_magnitude_range_n": [
+        47.25852661584938,
+        47.2587896313543
+      ]
+    },
+    "other_conditions": "Remaining displacements are unknown. Other exposed surfaces have no prescribed traction. No gravity, pressure, contact, or whole-base clamp.",
+    "source_cards": [
+      "SPC 1 44122 123456 0.0",
+      "SPC 1 44123 123456 0.0",
+      "SPC 1 44124 123456 0.0",
+      "SPC 1 44125 123456 0.0",
+      "FORCE 2 44126 0 1.0 0.0 0.0 35585.77"
+    ]
+  },
+  "dimensions": [
+    4800,
+    1700
+  ],
+  "fixed_surface_faces": 712,
+  "loaded_surface_faces": 1286,
+  "line_sampling": "Every eighth fixed node for RBE2 spokes; every sixteenth loaded node for RBE3 spokes and nodal force glyphs. All nodes are marked.",
+  "arrow_scales": "Large arrows depict total load direction; small arrows in panel 3 are actual nodal forces at one common scale, separate from the resultant arrow scale."
+}
