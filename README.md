@@ -47,6 +47,16 @@ Cholesky corrections independently checks the result; the
 [original width-eight figure](visualization/dirichlet-original.md) is archived.
 [Region definitions, convergence checks, and reproduction](visualization/dirichlet.md).
 
+![Log-log residual convergence for the tuned dragon Dirichlet problem: FSAI-CG and Jacobi-CR, with independently recomputed and recursive residuals.](assets/dragon-dirichlet-residuals.png)
+
+The log–log plot measures relative residual norm, $\|r_k\|_2/\|b\|_2$.
+Solid curves independently recompute the full biharmonic energy gradient;
+dashed curves show Warp's recursive residual. They can diverge near
+convergence on this ill-conditioned system. Samples preserve each solver's
+Krylov state, with no restarts or smoothing. The zero-iteration residual is
+1 and is omitted from the logarithmic axis.
+[Convergence data and reproduction](visualization/dirichlet.md#residual-history).
+
 The [FSAI tuning study](results/dirichlet-tuning/README.md) reduces
 this unregularized solve to about **10 seconds including setup**, using
 wider adaptive factors and a factored squared-Laplacian operator. A sparser

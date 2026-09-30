@@ -123,6 +123,55 @@ is read back and compared exactly with the float32 conversion of the saved
 float64 field. Colors are assigned after scalar interpolation on each
 triangle, yielding crisp isointervals rather than interpolated vertex colors.
 
+## Residual history
+
+![Measured log-log residual histories.](../assets/dragon-dirichlet-residuals.png)
+
+The plot uses the same tuned FSAI-CG and Jacobi-CR configurations, full
+factored operator, prescribed values, and zero free initial guess as the
+figure. Its vertical quantity is a **relative Euclidean residual norm**,
+not squared residual loss, bending energy, or forward field error:
+
+$$
+\rho_k=\frac{\|(L^T M^{-1} L u_k)_f\|_2}{\|b\|_2}.
+$$
+
+Solid curves recompute this quantity independently in CPU float64 at each
+sample. Dashed curves show the residual maintained by Warp's iterative
+recurrence. The horizontal tolerance applies to the recursive FSAI residual;
+it is not a guarantee that the independently recomputed residual reaches
+that value. Residual drift and finite precision explain the visible gap
+near convergence. Field accuracy is checked separately as described above.
+
+Each curve comes from a single live Krylov recurrence. The sampling driver
+pauses the native GPU iteration loop at logarithmically spaced checkpoints
+and at the figure's $k$, $10k$, and $100k$. It preserves all search
+directions and reduction buffers; it never calls a fresh solve at a
+checkpoint. Iteration zero is saved with relative residual 1, but omitted
+from the log axis. Lines connect actual samples, without smoothing or
+cumulative-minimum filtering; unsampled intermediate oscillations are not
+shown. FSAI stops at its original tolerance, while Jacobi runs through
+$100k$ with tolerance zero, matching the figure's budget.
+
+[`results/dirichlet-residuals.json`](../results/dirichlet-residuals.json)
+contains the sample values, configuration, input hash, and endpoint check
+against the saved figure fields. Instrumented wall times include graph
+captures, downloads, and CPU verification; they are **not solver benchmark
+timings**. The diagnostic adapter uses Warp 1.15's private loop driver in
+a temporary, process-local context and restores it afterward; the library
+and its public solver API are unchanged. CPU/CUDA tests compare sampled
+and native endpoints exactly for both CG and CR.
+
+After preparing `data/dirichlet-tuned/` below, collect and plot with:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/trace_dirichlet.py
+python benchmarks/plot_dirichlet_residuals.py
+```
+
+Only the plot command is needed to regenerate the image from the committed
+JSON. The PNG is tracked with Git LFS.
+
 ## Reproduction
 
 Generate the benchmark dumps in `/tmp/dump` as in the main README, then:
