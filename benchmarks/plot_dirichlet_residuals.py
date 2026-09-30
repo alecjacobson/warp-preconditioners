@@ -22,12 +22,13 @@ def main():
     args = parser.parse_args()
     data = json.loads(args.input.read_text())
     methods = data.get("methods", list(data["results"]))
-    assert len(methods) == 2 and sum(name.startswith("fsai_") for name in methods) == 1
+    assert len(methods) == 3 and sum(name.startswith("fsai_") for name in methods) == 1
     assert set(methods) == set(data["results"]), (
-        "Exactly the two selected trajectories are required"
+        "The selected FSAI trajectory and both Jacobi trajectories are required"
     )
     fsai_name = next(name for name in methods if name.startswith("fsai_"))
-    jacobi_name = next(name for name in methods if name.startswith("jacobi_"))
+    jacobi_names = ["jacobi_cg", "jacobi_cr"]
+    assert set(jacobi_names).issubset(methods)
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
@@ -54,7 +55,7 @@ def main():
         "jacobi_cr": "Jacobi-CR",
         "jacobi_cg": "Jacobi-CG",
     }
-    for name in [jacobi_name, fsai_name]:
+    for name in [*jacobi_names, fsai_name]:
         samples = [s for s in data["results"][name]["samples"] if s["iteration"] > 0]
         iteration = np.array([s["iteration"] for s in samples])
         recomputed = np.array([s["relative_residual"] for s in samples])
@@ -78,7 +79,6 @@ def main():
             color="#738094",
         )
     fsai = data["results"][fsai_name]["samples"][-1]
-    jacobi = data["results"][jacobi_name]["samples"][-1]
     ax.annotate(
         f"{labels[fsai_name]}: {fsai['relative_residual']:.2e}\nat {k:,} iterations",
         xy=(k, fsai["relative_residual"]),
@@ -89,15 +89,17 @@ def main():
         va="top",
         arrowprops={"arrowstyle": "-", "color": colors[fsai_name], "lw": 0.9},
     )
-    ax.annotate(
-        f"{labels[jacobi_name]}: {jacobi['relative_residual']:.2e}",
-        xy=(100 * k, jacobi["relative_residual"]),
-        xytext=(100 * k / 1.3, 1e-5),
-        fontsize=10,
-        color=colors[jacobi_name],
-        ha="right",
-        arrowprops={"arrowstyle": "-", "color": colors[jacobi_name], "lw": 0.9},
-    )
+    for jacobi_name, label_y in zip(jacobi_names, [1e-5, 3e-9]):
+        jacobi = data["results"][jacobi_name]["samples"][-1]
+        ax.annotate(
+            f"{labels[jacobi_name]}: {jacobi['relative_residual']:.2e}",
+            xy=(100 * k, jacobi["relative_residual"]),
+            xytext=(100 * k * (1 / 1.3 if jacobi_name == "jacobi_cg" else 1.3), label_y),
+            fontsize=10,
+            color=colors[jacobi_name],
+            ha="right",
+            arrowprops={"arrowstyle": "-", "color": colors[jacobi_name], "lw": 0.9},
+        )
     ax.set_xlim(1, 100 * k * 1.5)
     ax.set_ylim(1e-17, 1.3)
     ax.set_xlabel("Iterations (log scale)", labelpad=12)

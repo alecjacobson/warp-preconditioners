@@ -59,15 +59,16 @@ independently recomputed residual. Jacobi timings are single warm runs.
 [problem, accuracy checks and reproduction](visualization/dirichlet.md).
 The [original width-eight figure](visualization/dirichlet-original.md) is archived.
 
-![Fresh log-log residual trajectories for selected FSAI-CG and Jacobi-CG only.](assets/dragon-dirichlet-residuals.png)
+![Fresh log-log residual trajectories for selected FSAI-CG, Jacobi-CG and Jacobi-CR.](assets/dragon-dirichlet-residuals.png)
 
-The residual plot contains **only those two methods**. Solid curves recompute
+The residual plot compares **FSAI-CG, Jacobi-CG and Jacobi-CR**. The dragon
+rendering above retains Jacobi-CG as its single baseline. Solid curves recompute
 $\|r_k\|_2/\|b\|_2$ from the full biharmonic energy gradient; dashed curves
 show Warp's recursive residual. They can diverge on this ill-conditioned
 system. Samples preserve Krylov state without restarts or smoothing, and
-both initial residuals are 1. Iteration zero is omitted from the log axis.
+all initial residuals are 1. Iteration zero is omitted from the log axis.
 The selected FSAI endpoint is based on verified **field accuracy**, not a
-recursive residual threshold. Jacobi runs through **3,312,500 iterations**.
+recursive residual threshold. Both Jacobi methods run through **3,312,500 iterations**.
 
 The [earlier FSAI tuning study](results/dirichlet-tuning/README.md) explains
 why wider factors and a factored squared-Laplacian operator help this

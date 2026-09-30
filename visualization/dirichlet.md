@@ -2,10 +2,11 @@
 
 ![Prescribed regions, FSAI-CG, and Jacobi-CG at k, 10k, and 100k with refreshed timings](../assets/dragon-dirichlet-comparison.png)
 
-The current comparison uses **one FSAI method, CG**, and **Jacobi-CG**.
+The dragon rendering uses **one FSAI method, CG**, and **Jacobi-CG**.
 It was rerun after the FSAI setup/packing changes. FSAI-CG and FSAI-CR were
 compared at the same independently checked field-accuracy target, then the
 faster qualifying method was retained in the rendering and residual plot.
+The residual plot also includes **Jacobi-CR** alongside Jacobi-CG.
 The former four-method residual plot and Jacobi-CR rendering remain in
 [the repository history](https://github.com/alecjacobson/warp-preconditioners/tree/f01f138).
 The [original width-eight experiment](dirichlet-original.md) is also archived.
@@ -93,28 +94,37 @@ used as proof of field accuracy on this ill-conditioned problem.
 
 ## Residual history
 
-![Fresh trajectories for selected FSAI-CG and Jacobi-CG only](../assets/dragon-dirichlet-residuals.png)
+![Fresh trajectories for selected FSAI-CG, Jacobi-CG and Jacobi-CR](../assets/dragon-dirichlet-residuals.png)
 
-The plot contains **only FSAI-CG and Jacobi-CG**. Solid curves independently
+The plot contains **FSAI-CG, Jacobi-CG and Jacobi-CR**. Solid curves independently
 recompute the relative residual; dashed curves show Warp's internal
-recursive residual. Both start with true relative residual 1 at iteration
+recursive residual. All start with true relative residual 1 at iteration
 zero, which is omitted from the logarithmic axis. FSAI runs to its selected
-field-accuracy stop k; Jacobi runs to 100k. The FSAI stopping target is a
-field error, not a horizontal residual threshold.
+field-accuracy stop k; both Jacobi methods run to the same 100k budget.
+The FSAI stopping target is a field error, not a horizontal residual threshold.
 
 Samples retain each solver's live Krylov state, without restarts or smoothing.
-The diagnostic sampler's endpoints are checked against the separately timed
-rendered fields. Its wall time includes transfers, graph captures and CPU
-checks and is excluded from benchmark solve timings. The temporary sampler
+The FSAI-CG and Jacobi-CG sampler endpoints are checked against their
+separately timed rendered fields. Jacobi-CR appears only in the plot and has
+no corresponding rendered field. Sampling wall times include transfers, graph
+captures and CPU checks and are excluded from benchmark solve timings. The temporary sampler
 uses Warp 1.15's private loop driver; CPU/CUDA regression tests check its
 endpoints against native CG and CR.
 
-Both sampled final fields match the separately timed figure fields **exactly**
+The sampled FSAI-CG and Jacobi-CG final fields match the separately timed
+figure fields **exactly**
 (zero relative L2 difference). The true residual and reference-field error
 also agree at every rendered k, 10k and 100k checkpoint. FSAI ends at true
-relative residual **1.16e-9**, versus recursive **1.47e-10**. Jacobi ends at
+relative residual **1.16e-9**, versus recursive **1.47e-10**. Jacobi-CG ends at
 true residual **3.31e-7**, versus recursive **3.18e-30**, while its field error
 is **8.95e-12**. The large residual gap is reported directly.
+
+The restored Jacobi-CR trace uses the same current operator and **3,312,500**
+iteration budget. It ends at true residual **8.44e-08**,
+recursive residual **8.84e-17**, and relative
+field error **3.59e-11**. Its smaller final
+recomputed residual than Jacobi-CG does not imply smaller field error.
+The existing FSAI-CG and Jacobi-CG records are unchanged by this addition.
 
 [Raw trajectories and endpoint checks](../results/dirichlet-residuals.json).
 The independent reference is the unchanged long-double energy-gradient

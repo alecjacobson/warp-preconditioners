@@ -5,7 +5,8 @@
   "k": 33125,
   "methods": [
     "fsai_cg",
-    "jacobi_cg"
+    "jacobi_cg",
+    "jacobi_cr"
   ],
   "field_target": 1e-08,
   "b_norm": 7918.930805032345,
@@ -2152,6 +2153,1300 @@
       "preconditioner": "Jacobi",
       "relative_l2_difference_from_figure_field": 0.0,
       "instrumented_wall_seconds": 386.55113111808896,
+      "timing_note": "Includes transfers, graph captures and CPU verification; not benchmark solve time"
+    },
+    "jacobi_cr": {
+      "actual_iterations": 3312500,
+      "tol": 0.0,
+      "samples": [
+        {
+          "iteration": 0,
+          "relative_residual": 1.0,
+          "recursive_relative_residual": 1.0,
+          "mass_relative_error_to_refined": 0.918050484486681
+        },
+        {
+          "iteration": 1,
+          "relative_residual": 0.35961517415916866,
+          "recursive_relative_residual": 0.3596151741591686,
+          "mass_relative_error_to_refined": 0.9178332258508246
+        },
+        {
+          "iteration": 2,
+          "relative_residual": 0.19984279236235064,
+          "recursive_relative_residual": 0.19984279236235067,
+          "mass_relative_error_to_refined": 0.9176869717148621
+        },
+        {
+          "iteration": 3,
+          "relative_residual": 0.14024686815800083,
+          "recursive_relative_residual": 0.14024686815800083,
+          "mass_relative_error_to_refined": 0.9175522408877439
+        },
+        {
+          "iteration": 4,
+          "relative_residual": 0.11361378693353925,
+          "recursive_relative_residual": 0.11361378693353925,
+          "mass_relative_error_to_refined": 0.9174298046993961
+        },
+        {
+          "iteration": 5,
+          "relative_residual": 0.09703777970622429,
+          "recursive_relative_residual": 0.09703777970622428,
+          "mass_relative_error_to_refined": 0.91732459447134
+        },
+        {
+          "iteration": 6,
+          "relative_residual": 0.08213429897191085,
+          "recursive_relative_residual": 0.08213429897191084,
+          "mass_relative_error_to_refined": 0.9172289641506901
+        },
+        {
+          "iteration": 7,
+          "relative_residual": 0.07299760379104993,
+          "recursive_relative_residual": 0.0729976037910499,
+          "mass_relative_error_to_refined": 0.9171257897313984
+        },
+        {
+          "iteration": 8,
+          "relative_residual": 0.0678791320818959,
+          "recursive_relative_residual": 0.06787913208189586,
+          "mass_relative_error_to_refined": 0.9170289851519499
+        },
+        {
+          "iteration": 9,
+          "relative_residual": 0.060730776749952406,
+          "recursive_relative_residual": 0.06073077674995235,
+          "mass_relative_error_to_refined": 0.9169491304320534
+        },
+        {
+          "iteration": 10,
+          "relative_residual": 0.05652058625168829,
+          "recursive_relative_residual": 0.05652058625168827,
+          "mass_relative_error_to_refined": 0.9168666271680327
+        },
+        {
+          "iteration": 11,
+          "relative_residual": 0.05163469420497767,
+          "recursive_relative_residual": 0.05163469420497764,
+          "mass_relative_error_to_refined": 0.9167836938975015
+        },
+        {
+          "iteration": 12,
+          "relative_residual": 0.04659173707205786,
+          "recursive_relative_residual": 0.04659173707205784,
+          "mass_relative_error_to_refined": 0.9167078843024546
+        },
+        {
+          "iteration": 13,
+          "relative_residual": 0.043122741733012004,
+          "recursive_relative_residual": 0.043122741733012004,
+          "mass_relative_error_to_refined": 0.9166370950518477
+        },
+        {
+          "iteration": 14,
+          "relative_residual": 0.03982747980345912,
+          "recursive_relative_residual": 0.039827479803459104,
+          "mass_relative_error_to_refined": 0.9165728079592644
+        },
+        {
+          "iteration": 15,
+          "relative_residual": 0.03911093734604851,
+          "recursive_relative_residual": 0.03911093734604846,
+          "mass_relative_error_to_refined": 0.9165133521051433
+        },
+        {
+          "iteration": 16,
+          "relative_residual": 0.0345433743782112,
+          "recursive_relative_residual": 0.03454337437821112,
+          "mass_relative_error_to_refined": 0.9164578930544711
+        },
+        {
+          "iteration": 17,
+          "relative_residual": 0.030734770075656958,
+          "recursive_relative_residual": 0.03073477007565696,
+          "mass_relative_error_to_refined": 0.9164001868486652
+        },
+        {
+          "iteration": 18,
+          "relative_residual": 0.028138051214680982,
+          "recursive_relative_residual": 0.028138051214680788,
+          "mass_relative_error_to_refined": 0.9163428984682205
+        },
+        {
+          "iteration": 19,
+          "relative_residual": 0.025688939036988385,
+          "recursive_relative_residual": 0.025688939036988243,
+          "mass_relative_error_to_refined": 0.9162882420327839
+        },
+        {
+          "iteration": 20,
+          "relative_residual": 0.02378131779426856,
+          "recursive_relative_residual": 0.023781317794268245,
+          "mass_relative_error_to_refined": 0.9162351992907357
+        },
+        {
+          "iteration": 22,
+          "relative_residual": 0.020472923727321648,
+          "recursive_relative_residual": 0.020472923727321513,
+          "mass_relative_error_to_refined": 0.9161298905641635
+        },
+        {
+          "iteration": 23,
+          "relative_residual": 0.019587099479948755,
+          "recursive_relative_residual": 0.01958709947994859,
+          "mass_relative_error_to_refined": 0.9160800227177552
+        },
+        {
+          "iteration": 25,
+          "relative_residual": 0.017025678578537356,
+          "recursive_relative_residual": 0.017025678578537224,
+          "mass_relative_error_to_refined": 0.9159831230949906
+        },
+        {
+          "iteration": 26,
+          "relative_residual": 0.016314576853250797,
+          "recursive_relative_residual": 0.016314576853250634,
+          "mass_relative_error_to_refined": 0.9159333539617962
+        },
+        {
+          "iteration": 28,
+          "relative_residual": 0.014441931879747566,
+          "recursive_relative_residual": 0.014441931879747436,
+          "mass_relative_error_to_refined": 0.9158364672307735
+        },
+        {
+          "iteration": 30,
+          "relative_residual": 0.01293358622593183,
+          "recursive_relative_residual": 0.01293358622593183,
+          "mass_relative_error_to_refined": 0.9157469272932688
+        },
+        {
+          "iteration": 32,
+          "relative_residual": 0.01172423458719405,
+          "recursive_relative_residual": 0.011724234587194144,
+          "mass_relative_error_to_refined": 0.9156585646508458
+        },
+        {
+          "iteration": 34,
+          "relative_residual": 0.010406371456265068,
+          "recursive_relative_residual": 0.01040637145626523,
+          "mass_relative_error_to_refined": 0.9155710876240477
+        },
+        {
+          "iteration": 36,
+          "relative_residual": 0.009449054339180968,
+          "recursive_relative_residual": 0.009449054339181013,
+          "mass_relative_error_to_refined": 0.9154834049201304
+        },
+        {
+          "iteration": 38,
+          "relative_residual": 0.00865313191999469,
+          "recursive_relative_residual": 0.008653131919994922,
+          "mass_relative_error_to_refined": 0.915392630560932
+        },
+        {
+          "iteration": 41,
+          "relative_residual": 0.007483124694315726,
+          "recursive_relative_residual": 0.007483124694316086,
+          "mass_relative_error_to_refined": 0.9152596202711631
+        },
+        {
+          "iteration": 43,
+          "relative_residual": 0.0070754954601812015,
+          "recursive_relative_residual": 0.007075495460181347,
+          "mass_relative_error_to_refined": 0.9151778751460414
+        },
+        {
+          "iteration": 46,
+          "relative_residual": 0.006578952723317772,
+          "recursive_relative_residual": 0.006578952723318071,
+          "mass_relative_error_to_refined": 0.9150662547610404
+        },
+        {
+          "iteration": 49,
+          "relative_residual": 0.006073650727790138,
+          "recursive_relative_residual": 0.0060736507277904545,
+          "mass_relative_error_to_refined": 0.9149584457007809
+        },
+        {
+          "iteration": 52,
+          "relative_residual": 0.005649898526599494,
+          "recursive_relative_residual": 0.005649898526599648,
+          "mass_relative_error_to_refined": 0.9148602385784868
+        },
+        {
+          "iteration": 56,
+          "relative_residual": 0.005248720596044799,
+          "recursive_relative_residual": 0.005248720596044843,
+          "mass_relative_error_to_refined": 0.91473484752666
+        },
+        {
+          "iteration": 59,
+          "relative_residual": 0.0050181307549373695,
+          "recursive_relative_residual": 0.005018130754937211,
+          "mass_relative_error_to_refined": 0.9146297477542101
+        },
+        {
+          "iteration": 63,
+          "relative_residual": 0.0048368586182870295,
+          "recursive_relative_residual": 0.004836858618286983,
+          "mass_relative_error_to_refined": 0.9144999679684203
+        },
+        {
+          "iteration": 67,
+          "relative_residual": 0.004716420354265884,
+          "recursive_relative_residual": 0.004716420354265871,
+          "mass_relative_error_to_refined": 0.9143786745007881
+        },
+        {
+          "iteration": 72,
+          "relative_residual": 0.004240605953130103,
+          "recursive_relative_residual": 0.0042406059531299115,
+          "mass_relative_error_to_refined": 0.914229595388608
+        },
+        {
+          "iteration": 76,
+          "relative_residual": 0.003458204619920007,
+          "recursive_relative_residual": 0.0034582046199199724,
+          "mass_relative_error_to_refined": 0.9141056783088696
+        },
+        {
+          "iteration": 81,
+          "relative_residual": 0.0034281487644410745,
+          "recursive_relative_residual": 0.0034281487644409895,
+          "mass_relative_error_to_refined": 0.9139447947144783
+        },
+        {
+          "iteration": 86,
+          "relative_residual": 0.0033611385246134426,
+          "recursive_relative_residual": 0.003361138524613478,
+          "mass_relative_error_to_refined": 0.9137892197152526
+        },
+        {
+          "iteration": 92,
+          "relative_residual": 0.003708359219639587,
+          "recursive_relative_residual": 0.003708359219639692,
+          "mass_relative_error_to_refined": 0.9136061249559287
+        },
+        {
+          "iteration": 98,
+          "relative_residual": 0.0027987246831977673,
+          "recursive_relative_residual": 0.002798724683197874,
+          "mass_relative_error_to_refined": 0.913424472590807
+        },
+        {
+          "iteration": 104,
+          "relative_residual": 0.002474801918888183,
+          "recursive_relative_residual": 0.002474801918888212,
+          "mass_relative_error_to_refined": 0.9132503190237733
+        },
+        {
+          "iteration": 111,
+          "relative_residual": 0.0022373857093396037,
+          "recursive_relative_residual": 0.0022373857093396688,
+          "mass_relative_error_to_refined": 0.9130413998448482
+        },
+        {
+          "iteration": 118,
+          "relative_residual": 0.0020621539075204058,
+          "recursive_relative_residual": 0.0020621539075204205,
+          "mass_relative_error_to_refined": 0.9128470848695387
+        },
+        {
+          "iteration": 126,
+          "relative_residual": 0.0019761247771628637,
+          "recursive_relative_residual": 0.0019761247771629058,
+          "mass_relative_error_to_refined": 0.912623604756315
+        },
+        {
+          "iteration": 134,
+          "relative_residual": 0.0018192971636094566,
+          "recursive_relative_residual": 0.0018192971636096808,
+          "mass_relative_error_to_refined": 0.9124146218558832
+        },
+        {
+          "iteration": 143,
+          "relative_residual": 0.0017501701666377163,
+          "recursive_relative_residual": 0.0017501701666377734,
+          "mass_relative_error_to_refined": 0.9121939220238134
+        },
+        {
+          "iteration": 152,
+          "relative_residual": 0.0016551650125234188,
+          "recursive_relative_residual": 0.001655165012523585,
+          "mass_relative_error_to_refined": 0.9119978547759113
+        },
+        {
+          "iteration": 162,
+          "relative_residual": 0.0015912545548126132,
+          "recursive_relative_residual": 0.001591254554812512,
+          "mass_relative_error_to_refined": 0.9118103384273084
+        },
+        {
+          "iteration": 173,
+          "relative_residual": 0.0015396373071576161,
+          "recursive_relative_residual": 0.001539637307157762,
+          "mass_relative_error_to_refined": 0.9116086144343128
+        },
+        {
+          "iteration": 184,
+          "relative_residual": 0.0014480122175499096,
+          "recursive_relative_residual": 0.0014480122175498282,
+          "mass_relative_error_to_refined": 0.9114168791986169
+        },
+        {
+          "iteration": 196,
+          "relative_residual": 0.001406970143484117,
+          "recursive_relative_residual": 0.001406970143483903,
+          "mass_relative_error_to_refined": 0.9112273434547499
+        },
+        {
+          "iteration": 208,
+          "relative_residual": 0.0013684728162925955,
+          "recursive_relative_residual": 0.0013684728162923067,
+          "mass_relative_error_to_refined": 0.9110558216566362
+        },
+        {
+          "iteration": 222,
+          "relative_residual": 0.0013252437669757425,
+          "recursive_relative_residual": 0.0013252437669768258,
+          "mass_relative_error_to_refined": 0.910873984527066
+        },
+        {
+          "iteration": 236,
+          "relative_residual": 0.0013306258516206947,
+          "recursive_relative_residual": 0.0013306258516212408,
+          "mass_relative_error_to_refined": 0.9106971894470777
+        },
+        {
+          "iteration": 252,
+          "relative_residual": 0.001308169541536596,
+          "recursive_relative_residual": 0.0013081695415362983,
+          "mass_relative_error_to_refined": 0.9104907623509126
+        },
+        {
+          "iteration": 268,
+          "relative_residual": 0.001278153281999144,
+          "recursive_relative_residual": 0.0012781532819984487,
+          "mass_relative_error_to_refined": 0.9102961287808969
+        },
+        {
+          "iteration": 285,
+          "relative_residual": 0.0012502745143735765,
+          "recursive_relative_residual": 0.001250274514376398,
+          "mass_relative_error_to_refined": 0.9100971065180218
+        },
+        {
+          "iteration": 304,
+          "relative_residual": 0.0012149067455040474,
+          "recursive_relative_residual": 0.0012149067455069643,
+          "mass_relative_error_to_refined": 0.9098690552549068
+        },
+        {
+          "iteration": 323,
+          "relative_residual": 0.0011776527914149758,
+          "recursive_relative_residual": 0.0011776527914197932,
+          "mass_relative_error_to_refined": 0.9096519762789748
+        },
+        {
+          "iteration": 344,
+          "relative_residual": 0.0011431512156600786,
+          "recursive_relative_residual": 0.001143151215660183,
+          "mass_relative_error_to_refined": 0.9093999099520791
+        },
+        {
+          "iteration": 367,
+          "relative_residual": 0.0010996836906438186,
+          "recursive_relative_residual": 0.0010996836906431615,
+          "mass_relative_error_to_refined": 0.9091406562080483
+        },
+        {
+          "iteration": 391,
+          "relative_residual": 0.0010402695935962016,
+          "recursive_relative_residual": 0.0010402695935932719,
+          "mass_relative_error_to_refined": 0.908873025248139
+        },
+        {
+          "iteration": 416,
+          "relative_residual": 0.0009713587070148716,
+          "recursive_relative_residual": 0.0009713587070066673,
+          "mass_relative_error_to_refined": 0.9085969721213452
+        },
+        {
+          "iteration": 443,
+          "relative_residual": 0.0008953276780172781,
+          "recursive_relative_residual": 0.0008953276780055775,
+          "mass_relative_error_to_refined": 0.9083106101515905
+        },
+        {
+          "iteration": 472,
+          "relative_residual": 0.0008309990284499945,
+          "recursive_relative_residual": 0.0008309990284347668,
+          "mass_relative_error_to_refined": 0.9079955454362504
+        },
+        {
+          "iteration": 502,
+          "relative_residual": 0.0007761299430714864,
+          "recursive_relative_residual": 0.0007761299430643637,
+          "mass_relative_error_to_refined": 0.9076401299057228
+        },
+        {
+          "iteration": 535,
+          "relative_residual": 0.0007232701915841395,
+          "recursive_relative_residual": 0.0007232701915811423,
+          "mass_relative_error_to_refined": 0.9072550373750723
+        },
+        {
+          "iteration": 569,
+          "relative_residual": 0.000665042042182847,
+          "recursive_relative_residual": 0.0006650420421806061,
+          "mass_relative_error_to_refined": 0.906812564306651
+        },
+        {
+          "iteration": 606,
+          "relative_residual": 0.0006123185554432212,
+          "recursive_relative_residual": 0.0006123185554277519,
+          "mass_relative_error_to_refined": 0.9063514413183617
+        },
+        {
+          "iteration": 646,
+          "relative_residual": 0.0005670742984834056,
+          "recursive_relative_residual": 0.0005670742984681093,
+          "mass_relative_error_to_refined": 0.9058539522906158
+        },
+        {
+          "iteration": 687,
+          "relative_residual": 0.0005295115923020597,
+          "recursive_relative_residual": 0.0005295115923010712,
+          "mass_relative_error_to_refined": 0.9053251681724767
+        },
+        {
+          "iteration": 732,
+          "relative_residual": 0.0005050516169634388,
+          "recursive_relative_residual": 0.0005050516169716016,
+          "mass_relative_error_to_refined": 0.904790414754429
+        },
+        {
+          "iteration": 779,
+          "relative_residual": 0.0004925408652412724,
+          "recursive_relative_residual": 0.0004925408652478341,
+          "mass_relative_error_to_refined": 0.9043393999545981
+        },
+        {
+          "iteration": 830,
+          "relative_residual": 0.0004770075915000429,
+          "recursive_relative_residual": 0.0004770075915152987,
+          "mass_relative_error_to_refined": 0.9038427587289701
+        },
+        {
+          "iteration": 884,
+          "relative_residual": 0.0004607598218699477,
+          "recursive_relative_residual": 0.0004607598218820463,
+          "mass_relative_error_to_refined": 0.9033355016209786
+        },
+        {
+          "iteration": 941,
+          "relative_residual": 0.00044309079928662835,
+          "recursive_relative_residual": 0.0004430907992946173,
+          "mass_relative_error_to_refined": 0.9028422595141545
+        },
+        {
+          "iteration": 1002,
+          "relative_residual": 0.0004226864292782541,
+          "recursive_relative_residual": 0.00042268642931464777,
+          "mass_relative_error_to_refined": 0.9022887504171379
+        },
+        {
+          "iteration": 1067,
+          "relative_residual": 0.00039691666068307095,
+          "recursive_relative_residual": 0.0003969166607190658,
+          "mass_relative_error_to_refined": 0.9016620337240372
+        },
+        {
+          "iteration": 1136,
+          "relative_residual": 0.00037077846032084204,
+          "recursive_relative_residual": 0.0003707784603411763,
+          "mass_relative_error_to_refined": 0.9009906718058516
+        },
+        {
+          "iteration": 1210,
+          "relative_residual": 0.00034515741889351977,
+          "recursive_relative_residual": 0.00034515741889259467,
+          "mass_relative_error_to_refined": 0.9003147576186942
+        },
+        {
+          "iteration": 1288,
+          "relative_residual": 0.0003216340242106103,
+          "recursive_relative_residual": 0.0003216340242134226,
+          "mass_relative_error_to_refined": 0.8997010290407866
+        },
+        {
+          "iteration": 1372,
+          "relative_residual": 0.00029820061034587436,
+          "recursive_relative_residual": 0.0002982006103138374,
+          "mass_relative_error_to_refined": 0.899018905566574
+        },
+        {
+          "iteration": 1461,
+          "relative_residual": 0.00027661791939408435,
+          "recursive_relative_residual": 0.0002766179193446365,
+          "mass_relative_error_to_refined": 0.8983638436927857
+        },
+        {
+          "iteration": 1556,
+          "relative_residual": 0.00025635074167783614,
+          "recursive_relative_residual": 0.00025635074160635057,
+          "mass_relative_error_to_refined": 0.8977251860643952
+        },
+        {
+          "iteration": 1656,
+          "relative_residual": 0.00024115833244092724,
+          "recursive_relative_residual": 0.00024115833234109485,
+          "mass_relative_error_to_refined": 0.8971671309965292
+        },
+        {
+          "iteration": 1764,
+          "relative_residual": 0.00022685294754657749,
+          "recursive_relative_residual": 0.0002268529474208264,
+          "mass_relative_error_to_refined": 0.8966006884042323
+        },
+        {
+          "iteration": 1878,
+          "relative_residual": 0.0002180612236543376,
+          "recursive_relative_residual": 0.00021806122355286928,
+          "mass_relative_error_to_refined": 0.896093511436005
+        },
+        {
+          "iteration": 2000,
+          "relative_residual": 0.00021392336223204338,
+          "recursive_relative_residual": 0.00021392336218489544,
+          "mass_relative_error_to_refined": 0.8956158463194048
+        },
+        {
+          "iteration": 2130,
+          "relative_residual": 0.0002109535275123283,
+          "recursive_relative_residual": 0.0002109535275419413,
+          "mass_relative_error_to_refined": 0.8950800857129478
+        },
+        {
+          "iteration": 2268,
+          "relative_residual": 0.0002090014679703107,
+          "recursive_relative_residual": 0.0002090014680160768,
+          "mass_relative_error_to_refined": 0.8946110588466187
+        },
+        {
+          "iteration": 2415,
+          "relative_residual": 0.00020903753657065038,
+          "recursive_relative_residual": 0.00020903753672712861,
+          "mass_relative_error_to_refined": 0.894153621973912
+        },
+        {
+          "iteration": 2571,
+          "relative_residual": 0.00020819225452463423,
+          "recursive_relative_residual": 0.0002081922546402794,
+          "mass_relative_error_to_refined": 0.8937421094118254
+        },
+        {
+          "iteration": 2738,
+          "relative_residual": 0.0002048847401875597,
+          "recursive_relative_residual": 0.00020488474038023315,
+          "mass_relative_error_to_refined": 0.8933028834994694
+        },
+        {
+          "iteration": 2915,
+          "relative_residual": 0.00019908493906053854,
+          "recursive_relative_residual": 0.0001990849392524116,
+          "mass_relative_error_to_refined": 0.892826589352392
+        },
+        {
+          "iteration": 3104,
+          "relative_residual": 0.00019394239952670448,
+          "recursive_relative_residual": 0.00019394239956193395,
+          "mass_relative_error_to_refined": 0.8923194665184611
+        },
+        {
+          "iteration": 3306,
+          "relative_residual": 0.00018956764493032125,
+          "recursive_relative_residual": 0.00018956764497588682,
+          "mass_relative_error_to_refined": 0.8918388884345483
+        },
+        {
+          "iteration": 3520,
+          "relative_residual": 0.0001838894894067682,
+          "recursive_relative_residual": 0.00018388948946207237,
+          "mass_relative_error_to_refined": 0.8912729889651083
+        },
+        {
+          "iteration": 3748,
+          "relative_residual": 0.00017688447213294427,
+          "recursive_relative_residual": 0.00017688447211091342,
+          "mass_relative_error_to_refined": 0.8907031411745502
+        },
+        {
+          "iteration": 3991,
+          "relative_residual": 0.0001703688181802337,
+          "recursive_relative_residual": 0.00017036881810299592,
+          "mass_relative_error_to_refined": 0.8902238945378191
+        },
+        {
+          "iteration": 4250,
+          "relative_residual": 0.00016199472657144127,
+          "recursive_relative_residual": 0.0001619947265685643,
+          "mass_relative_error_to_refined": 0.8896300918348924
+        },
+        {
+          "iteration": 4525,
+          "relative_residual": 0.00015130849316689383,
+          "recursive_relative_residual": 0.00015130849319184886,
+          "mass_relative_error_to_refined": 0.8889355201457875
+        },
+        {
+          "iteration": 4819,
+          "relative_residual": 0.00013919054221321522,
+          "recursive_relative_residual": 0.00013919054252130146,
+          "mass_relative_error_to_refined": 0.8881742345683213
+        },
+        {
+          "iteration": 5131,
+          "relative_residual": 0.00013037099438254157,
+          "recursive_relative_residual": 0.00013037099524234133,
+          "mass_relative_error_to_refined": 0.887588945125545
+        },
+        {
+          "iteration": 5464,
+          "relative_residual": 0.00012334311403539415,
+          "recursive_relative_residual": 0.00012334311504548148,
+          "mass_relative_error_to_refined": 0.8871254809792629
+        },
+        {
+          "iteration": 5818,
+          "relative_residual": 0.00011691515809573545,
+          "recursive_relative_residual": 0.00011691515957214022,
+          "mass_relative_error_to_refined": 0.8866965782732812
+        },
+        {
+          "iteration": 6195,
+          "relative_residual": 0.00011075611744871581,
+          "recursive_relative_residual": 0.00011075611900647077,
+          "mass_relative_error_to_refined": 0.8862417738517453
+        },
+        {
+          "iteration": 6597,
+          "relative_residual": 0.00010393391769305074,
+          "recursive_relative_residual": 0.0001039339189574701,
+          "mass_relative_error_to_refined": 0.8857604807400531
+        },
+        {
+          "iteration": 7025,
+          "relative_residual": 9.760885719033804e-05,
+          "recursive_relative_residual": 9.76088579258712e-05,
+          "mass_relative_error_to_refined": 0.8853240630032834
+        },
+        {
+          "iteration": 7480,
+          "relative_residual": 9.192712578396559e-05,
+          "recursive_relative_residual": 9.192712709261874e-05,
+          "mass_relative_error_to_refined": 0.8849102076238682
+        },
+        {
+          "iteration": 7965,
+          "relative_residual": 8.364515095699617e-05,
+          "recursive_relative_residual": 8.364515268242373e-05,
+          "mass_relative_error_to_refined": 0.8842695556038963
+        },
+        {
+          "iteration": 8481,
+          "relative_residual": 7.160871721207036e-05,
+          "recursive_relative_residual": 7.160871949048715e-05,
+          "mass_relative_error_to_refined": 0.8833236302608658
+        },
+        {
+          "iteration": 9031,
+          "relative_residual": 5.8414560570114755e-05,
+          "recursive_relative_residual": 5.8414562763786614e-05,
+          "mass_relative_error_to_refined": 0.8823004247571149
+        },
+        {
+          "iteration": 9617,
+          "relative_residual": 4.453369792139072e-05,
+          "recursive_relative_residual": 4.453369892445504e-05,
+          "mass_relative_error_to_refined": 0.881252476678916
+        },
+        {
+          "iteration": 10240,
+          "relative_residual": 3.138710731497671e-05,
+          "recursive_relative_residual": 3.138710865045464e-05,
+          "mass_relative_error_to_refined": 0.8801541120402914
+        },
+        {
+          "iteration": 10904,
+          "relative_residual": 2.0749255448766795e-05,
+          "recursive_relative_residual": 2.0749255700360283e-05,
+          "mass_relative_error_to_refined": 0.8790263297289582
+        },
+        {
+          "iteration": 11611,
+          "relative_residual": 1.5196546584948983e-05,
+          "recursive_relative_residual": 1.5196548020697784e-05,
+          "mass_relative_error_to_refined": 0.8780400768651765
+        },
+        {
+          "iteration": 12364,
+          "relative_residual": 1.2672678461172944e-05,
+          "recursive_relative_residual": 1.2672678378920033e-05,
+          "mass_relative_error_to_refined": 0.8768954496222021
+        },
+        {
+          "iteration": 13165,
+          "relative_residual": 1.1944859494710858e-05,
+          "recursive_relative_residual": 1.1944859127881845e-05,
+          "mass_relative_error_to_refined": 0.8757635884443711
+        },
+        {
+          "iteration": 14019,
+          "relative_residual": 1.1478934344382969e-05,
+          "recursive_relative_residual": 1.1478933765395639e-05,
+          "mass_relative_error_to_refined": 0.874351461473953
+        },
+        {
+          "iteration": 14928,
+          "relative_residual": 1.0870782948426549e-05,
+          "recursive_relative_residual": 1.0870782738788012e-05,
+          "mass_relative_error_to_refined": 0.8724902270669508
+        },
+        {
+          "iteration": 15895,
+          "relative_residual": 1.0177146716931946e-05,
+          "recursive_relative_residual": 1.0177147027076961e-05,
+          "mass_relative_error_to_refined": 0.8699426655117725
+        },
+        {
+          "iteration": 16926,
+          "relative_residual": 9.506252148038828e-06,
+          "recursive_relative_residual": 9.506251594836541e-06,
+          "mass_relative_error_to_refined": 0.867683033311948
+        },
+        {
+          "iteration": 18023,
+          "relative_residual": 8.550819304167922e-06,
+          "recursive_relative_residual": 8.55081916720736e-06,
+          "mass_relative_error_to_refined": 0.865214776661702
+        },
+        {
+          "iteration": 19192,
+          "relative_residual": 7.167673379913976e-06,
+          "recursive_relative_residual": 7.16767334012821e-06,
+          "mass_relative_error_to_refined": 0.8625717119120618
+        },
+        {
+          "iteration": 20436,
+          "relative_residual": 5.969502707359921e-06,
+          "recursive_relative_residual": 5.969502552090436e-06,
+          "mass_relative_error_to_refined": 0.859825203365783
+        },
+        {
+          "iteration": 21761,
+          "relative_residual": 5.379530887606248e-06,
+          "recursive_relative_residual": 5.379530595219316e-06,
+          "mass_relative_error_to_refined": 0.857468461612066
+        },
+        {
+          "iteration": 23172,
+          "relative_residual": 5.492849714768425e-06,
+          "recursive_relative_residual": 5.492849743436146e-06,
+          "mass_relative_error_to_refined": 0.8548945646652353
+        },
+        {
+          "iteration": 24674,
+          "relative_residual": 6.425035174791634e-06,
+          "recursive_relative_residual": 6.425034929734123e-06,
+          "mass_relative_error_to_refined": 0.8516753083494042
+        },
+        {
+          "iteration": 26274,
+          "relative_residual": 7.125173713713008e-06,
+          "recursive_relative_residual": 7.125173564064444e-06,
+          "mass_relative_error_to_refined": 0.8487476167282203
+        },
+        {
+          "iteration": 27977,
+          "relative_residual": 7.236473743221898e-06,
+          "recursive_relative_residual": 7.236473383788879e-06,
+          "mass_relative_error_to_refined": 0.8463881813556264
+        },
+        {
+          "iteration": 29791,
+          "relative_residual": 6.661440071468837e-06,
+          "recursive_relative_residual": 6.661439989504504e-06,
+          "mass_relative_error_to_refined": 0.8430723857413865
+        },
+        {
+          "iteration": 31722,
+          "relative_residual": 5.729834149310412e-06,
+          "recursive_relative_residual": 5.729834041675631e-06,
+          "mass_relative_error_to_refined": 0.8400328342258382
+        },
+        {
+          "iteration": 33125,
+          "relative_residual": 5.0465661004715114e-06,
+          "recursive_relative_residual": 5.0465659159133855e-06,
+          "mass_relative_error_to_refined": 0.8378546306583878
+        },
+        {
+          "iteration": 33779,
+          "relative_residual": 4.5894098538472215e-06,
+          "recursive_relative_residual": 4.589409632974073e-06,
+          "mass_relative_error_to_refined": 0.836670799232483
+        },
+        {
+          "iteration": 35969,
+          "relative_residual": 3.1377491311393764e-06,
+          "recursive_relative_residual": 3.137748755125328e-06,
+          "mass_relative_error_to_refined": 0.8323931325388072
+        },
+        {
+          "iteration": 38301,
+          "relative_residual": 2.2201183063267996e-06,
+          "recursive_relative_residual": 2.220117469032944e-06,
+          "mass_relative_error_to_refined": 0.8279783898468356
+        },
+        {
+          "iteration": 40784,
+          "relative_residual": 2.036581059425165e-06,
+          "recursive_relative_residual": 2.036579711612861e-06,
+          "mass_relative_error_to_refined": 0.822963835423243
+        },
+        {
+          "iteration": 43428,
+          "relative_residual": 2.1370968529555504e-06,
+          "recursive_relative_residual": 2.137096438070507e-06,
+          "mass_relative_error_to_refined": 0.8198946576473334
+        },
+        {
+          "iteration": 46243,
+          "relative_residual": 2.191987062251109e-06,
+          "recursive_relative_residual": 2.191987760048903e-06,
+          "mass_relative_error_to_refined": 0.8159573088509398
+        },
+        {
+          "iteration": 49241,
+          "relative_residual": 2.171220248195039e-06,
+          "recursive_relative_residual": 2.171220185287782e-06,
+          "mass_relative_error_to_refined": 0.8127034470245902
+        },
+        {
+          "iteration": 52434,
+          "relative_residual": 2.1588572036247707e-06,
+          "recursive_relative_residual": 2.1588587186824605e-06,
+          "mass_relative_error_to_refined": 0.8097387037100211
+        },
+        {
+          "iteration": 55833,
+          "relative_residual": 2.1824159409231934e-06,
+          "recursive_relative_residual": 2.182415942599567e-06,
+          "mass_relative_error_to_refined": 0.8061370699607999
+        },
+        {
+          "iteration": 59453,
+          "relative_residual": 2.203175729833089e-06,
+          "recursive_relative_residual": 2.203175451761407e-06,
+          "mass_relative_error_to_refined": 0.80199793004167
+        },
+        {
+          "iteration": 63307,
+          "relative_residual": 2.1625162220906357e-06,
+          "recursive_relative_residual": 2.1625155477068615e-06,
+          "mass_relative_error_to_refined": 0.7985198947382146
+        },
+        {
+          "iteration": 67412,
+          "relative_residual": 2.0407975810284743e-06,
+          "recursive_relative_residual": 2.040796157159119e-06,
+          "mass_relative_error_to_refined": 0.7937762578638985
+        },
+        {
+          "iteration": 71782,
+          "relative_residual": 2.0551278298273878e-06,
+          "recursive_relative_residual": 2.055128704452291e-06,
+          "mass_relative_error_to_refined": 0.7897827580022411
+        },
+        {
+          "iteration": 76436,
+          "relative_residual": 1.9681725359741146e-06,
+          "recursive_relative_residual": 1.9681743421842626e-06,
+          "mass_relative_error_to_refined": 0.7853851180029816
+        },
+        {
+          "iteration": 81391,
+          "relative_residual": 1.8352022908444566e-06,
+          "recursive_relative_residual": 1.8352031548806278e-06,
+          "mass_relative_error_to_refined": 0.7808925757642485
+        },
+        {
+          "iteration": 86668,
+          "relative_residual": 1.7586523668020722e-06,
+          "recursive_relative_residual": 1.7586532175365234e-06,
+          "mass_relative_error_to_refined": 0.7767865065185305
+        },
+        {
+          "iteration": 92287,
+          "relative_residual": 1.7658666689529586e-06,
+          "recursive_relative_residual": 1.7658677229651747e-06,
+          "mass_relative_error_to_refined": 0.7742635956007465
+        },
+        {
+          "iteration": 98270,
+          "relative_residual": 1.7226340184903213e-06,
+          "recursive_relative_residual": 1.7226280842819447e-06,
+          "mass_relative_error_to_refined": 0.771755776542075
+        },
+        {
+          "iteration": 104641,
+          "relative_residual": 1.6504628865634848e-06,
+          "recursive_relative_residual": 1.6504606953149406e-06,
+          "mass_relative_error_to_refined": 0.7702846851418909
+        },
+        {
+          "iteration": 111425,
+          "relative_residual": 1.5927821651836624e-06,
+          "recursive_relative_residual": 1.5927760901219993e-06,
+          "mass_relative_error_to_refined": 0.7687606316677215
+        },
+        {
+          "iteration": 118649,
+          "relative_residual": 1.5844261233495165e-06,
+          "recursive_relative_residual": 1.5844114156574765e-06,
+          "mass_relative_error_to_refined": 0.7678117711819717
+        },
+        {
+          "iteration": 126341,
+          "relative_residual": 1.5659406320755097e-06,
+          "recursive_relative_residual": 1.5659335449702352e-06,
+          "mass_relative_error_to_refined": 0.7667587331161038
+        },
+        {
+          "iteration": 134532,
+          "relative_residual": 1.5203260184140695e-06,
+          "recursive_relative_residual": 1.5203061854938615e-06,
+          "mass_relative_error_to_refined": 0.7658322388151254
+        },
+        {
+          "iteration": 143254,
+          "relative_residual": 1.4849020142622167e-06,
+          "recursive_relative_residual": 1.4848802126915022e-06,
+          "mass_relative_error_to_refined": 0.7655005834976847
+        },
+        {
+          "iteration": 152541,
+          "relative_residual": 1.465771578425206e-06,
+          "recursive_relative_residual": 1.465747591353631e-06,
+          "mass_relative_error_to_refined": 0.765732152080462
+        },
+        {
+          "iteration": 162431,
+          "relative_residual": 1.4622585145921572e-06,
+          "recursive_relative_residual": 1.4622548324890012e-06,
+          "mass_relative_error_to_refined": 0.7668884366077905
+        },
+        {
+          "iteration": 172962,
+          "relative_residual": 1.4681377520213955e-06,
+          "recursive_relative_residual": 1.4681349448187923e-06,
+          "mass_relative_error_to_refined": 0.7682018817939472
+        },
+        {
+          "iteration": 184175,
+          "relative_residual": 1.4508490491708466e-06,
+          "recursive_relative_residual": 1.4508479493470484e-06,
+          "mass_relative_error_to_refined": 0.7695245455765521
+        },
+        {
+          "iteration": 196115,
+          "relative_residual": 1.4273660188814122e-06,
+          "recursive_relative_residual": 1.4273711132832012e-06,
+          "mass_relative_error_to_refined": 0.7715246043672924
+        },
+        {
+          "iteration": 208830,
+          "relative_residual": 1.4031978575964826e-06,
+          "recursive_relative_residual": 1.4031764814878165e-06,
+          "mass_relative_error_to_refined": 0.7761032083889109
+        },
+        {
+          "iteration": 222369,
+          "relative_residual": 1.3634846815308823e-06,
+          "recursive_relative_residual": 1.3635223271671977e-06,
+          "mass_relative_error_to_refined": 0.7834480980484001
+        },
+        {
+          "iteration": 236785,
+          "relative_residual": 1.3418003142727847e-06,
+          "recursive_relative_residual": 1.3418754572506165e-06,
+          "mass_relative_error_to_refined": 0.7903274249042093
+        },
+        {
+          "iteration": 252136,
+          "relative_residual": 1.3244457352088838e-06,
+          "recursive_relative_residual": 1.3245301095483277e-06,
+          "mass_relative_error_to_refined": 0.7962696255399893
+        },
+        {
+          "iteration": 268483,
+          "relative_residual": 1.31155593504497e-06,
+          "recursive_relative_residual": 1.3117291975733365e-06,
+          "mass_relative_error_to_refined": 0.7998584639244012
+        },
+        {
+          "iteration": 285889,
+          "relative_residual": 1.2972852074392595e-06,
+          "recursive_relative_residual": 1.2974658260707812e-06,
+          "mass_relative_error_to_refined": 0.8061831087528998
+        },
+        {
+          "iteration": 304424,
+          "relative_residual": 1.2694058414397306e-06,
+          "recursive_relative_residual": 1.2695775185053253e-06,
+          "mass_relative_error_to_refined": 0.8188373641305968
+        },
+        {
+          "iteration": 324160,
+          "relative_residual": 1.2343175758306042e-06,
+          "recursive_relative_residual": 1.2343140533664966e-06,
+          "mass_relative_error_to_refined": 0.8353819960715716
+        },
+        {
+          "iteration": 331250,
+          "relative_residual": 1.2265362716784895e-06,
+          "recursive_relative_residual": 1.2264938519505855e-06,
+          "mass_relative_error_to_refined": 0.8391550177124504
+        },
+        {
+          "iteration": 345176,
+          "relative_residual": 1.2156616523460611e-06,
+          "recursive_relative_residual": 1.2156117358082608e-06,
+          "mass_relative_error_to_refined": 0.8442827755120763
+        },
+        {
+          "iteration": 367554,
+          "relative_residual": 1.1853508657869216e-06,
+          "recursive_relative_residual": 1.185282618389545e-06,
+          "mass_relative_error_to_refined": 0.8576895075100385
+        },
+        {
+          "iteration": 391383,
+          "relative_residual": 1.1673318253109834e-06,
+          "recursive_relative_residual": 1.1673280032451083e-06,
+          "mass_relative_error_to_refined": 0.8671714289096445
+        },
+        {
+          "iteration": 416757,
+          "relative_residual": 1.1471606338421437e-06,
+          "recursive_relative_residual": 1.147319377973649e-06,
+          "mass_relative_error_to_refined": 0.875591445224721
+        },
+        {
+          "iteration": 443777,
+          "relative_residual": 1.0964234855534627e-06,
+          "recursive_relative_residual": 1.0967063571789652e-06,
+          "mass_relative_error_to_refined": 0.8914413295834288
+        },
+        {
+          "iteration": 472547,
+          "relative_residual": 1.008864849951605e-06,
+          "recursive_relative_residual": 1.0092126527276328e-06,
+          "mass_relative_error_to_refined": 0.9201330208473621
+        },
+        {
+          "iteration": 503183,
+          "relative_residual": 9.794472038389755e-07,
+          "recursive_relative_residual": 9.797764208521149e-07,
+          "mass_relative_error_to_refined": 0.9320134799884912
+        },
+        {
+          "iteration": 535806,
+          "relative_residual": 9.55787610183369e-07,
+          "recursive_relative_residual": 9.558194528838508e-07,
+          "mass_relative_error_to_refined": 0.9408278471508935
+        },
+        {
+          "iteration": 570543,
+          "relative_residual": 9.441089183765267e-07,
+          "recursive_relative_residual": 9.446935219333157e-07,
+          "mass_relative_error_to_refined": 0.9431244291357009
+        },
+        {
+          "iteration": 607532,
+          "relative_residual": 9.354352992356843e-07,
+          "recursive_relative_residual": 9.362421261686744e-07,
+          "mass_relative_error_to_refined": 0.9420649134788409
+        },
+        {
+          "iteration": 646919,
+          "relative_residual": 9.273744492281046e-07,
+          "recursive_relative_residual": 9.282359512447314e-07,
+          "mass_relative_error_to_refined": 0.9367310413369884
+        },
+        {
+          "iteration": 688860,
+          "relative_residual": 9.178421887922985e-07,
+          "recursive_relative_residual": 9.180730561627862e-07,
+          "mass_relative_error_to_refined": 0.9195278243870257
+        },
+        {
+          "iteration": 733520,
+          "relative_residual": 8.838307250892283e-07,
+          "recursive_relative_residual": 8.837235746003055e-07,
+          "mass_relative_error_to_refined": 0.8573489278207878
+        },
+        {
+          "iteration": 781076,
+          "relative_residual": 8.259144329369598e-07,
+          "recursive_relative_residual": 8.240157179442084e-07,
+          "mass_relative_error_to_refined": 0.7522184447916679
+        },
+        {
+          "iteration": 831714,
+          "relative_residual": 6.924371794062063e-07,
+          "recursive_relative_residual": 6.906103131785333e-07,
+          "mass_relative_error_to_refined": 0.5981823804987796
+        },
+        {
+          "iteration": 885636,
+          "relative_residual": 3.001814296813631e-07,
+          "recursive_relative_residual": 2.9957910635485733e-07,
+          "mass_relative_error_to_refined": 0.37265287311281714
+        },
+        {
+          "iteration": 943053,
+          "relative_residual": 5.1439644147883815e-08,
+          "recursive_relative_residual": 4.9006549816709117e-08,
+          "mass_relative_error_to_refined": 0.16368160603479628
+        },
+        {
+          "iteration": 1004193,
+          "relative_residual": 4.735484380987536e-08,
+          "recursive_relative_residual": 4.492804987847287e-08,
+          "mass_relative_error_to_refined": 0.15564088931054237
+        },
+        {
+          "iteration": 1069296,
+          "relative_residual": 4.9469616787464345e-08,
+          "recursive_relative_residual": 4.371469581530947e-08,
+          "mass_relative_error_to_refined": 0.15249265585459387
+        },
+        {
+          "iteration": 1138621,
+          "relative_residual": 4.919928701154073e-08,
+          "recursive_relative_residual": 4.3193015196217766e-08,
+          "mass_relative_error_to_refined": 0.15072159460783655
+        },
+        {
+          "iteration": 1212440,
+          "relative_residual": 2.1437883955311864e-08,
+          "recursive_relative_residual": 3.9466368606457497e-10,
+          "mass_relative_error_to_refined": 0.0011854790046155598
+        },
+        {
+          "iteration": 1291044,
+          "relative_residual": 2.0921526764041934e-08,
+          "recursive_relative_residual": 5.072485233319636e-12,
+          "mass_relative_error_to_refined": 1.2583888255693856e-06
+        },
+        {
+          "iteration": 1374745,
+          "relative_residual": 1.4298998439102739e-08,
+          "recursive_relative_residual": 8.614163968954124e-13,
+          "mass_relative_error_to_refined": 7.742821404547623e-08
+        },
+        {
+          "iteration": 1463872,
+          "relative_residual": 3.049433999615679e-08,
+          "recursive_relative_residual": 4.944740985378659e-14,
+          "mass_relative_error_to_refined": 1.1294244421848821e-08
+        },
+        {
+          "iteration": 1558777,
+          "relative_residual": 3.740769535785964e-08,
+          "recursive_relative_residual": 3.6744218537784614e-15,
+          "mass_relative_error_to_refined": 8.508249583248492e-10
+        },
+        {
+          "iteration": 1659835,
+          "relative_residual": 4.2832272216542666e-08,
+          "recursive_relative_residual": 8.673745673428976e-16,
+          "mass_relative_error_to_refined": 1.8470976188066912e-10
+        },
+        {
+          "iteration": 1767445,
+          "relative_residual": 6.79332388175825e-08,
+          "recursive_relative_residual": 1.0562443695351421e-16,
+          "mass_relative_error_to_refined": 3.59329394638319e-11
+        },
+        {
+          "iteration": 1882032,
+          "relative_residual": 8.451074391794608e-08,
+          "recursive_relative_residual": 8.847448527185165e-17,
+          "mass_relative_error_to_refined": 3.5945749359116396e-11
+        },
+        {
+          "iteration": 2004047,
+          "relative_residual": 8.451074022368985e-08,
+          "recursive_relative_residual": 8.845268096167204e-17,
+          "mass_relative_error_to_refined": 3.5943060047033363e-11
+        },
+        {
+          "iteration": 2133973,
+          "relative_residual": 8.432610232223143e-08,
+          "recursive_relative_residual": 8.842073077639421e-17,
+          "mass_relative_error_to_refined": 3.5859139192319396e-11
+        },
+        {
+          "iteration": 2272322,
+          "relative_residual": 8.437957408741237e-08,
+          "recursive_relative_residual": 8.841043670303694e-17,
+          "mass_relative_error_to_refined": 3.584884311600086e-11
+        },
+        {
+          "iteration": 2419641,
+          "relative_residual": 8.437957408769235e-08,
+          "recursive_relative_residual": 8.841039226416443e-17,
+          "mass_relative_error_to_refined": 3.584945670157023e-11
+        },
+        {
+          "iteration": 2576511,
+          "relative_residual": 8.437920791404618e-08,
+          "recursive_relative_residual": 8.84103344484796e-17,
+          "mass_relative_error_to_refined": 3.586893029163363e-11
+        },
+        {
+          "iteration": 2743550,
+          "relative_residual": 8.437920791409384e-08,
+          "recursive_relative_residual": 8.841033237367747e-17,
+          "mass_relative_error_to_refined": 3.586903597185499e-11
+        },
+        {
+          "iteration": 2921419,
+          "relative_residual": 8.437920791410661e-08,
+          "recursive_relative_residual": 8.84103321992293e-17,
+          "mass_relative_error_to_refined": 3.586904501370984e-11
+        },
+        {
+          "iteration": 3110820,
+          "relative_residual": 8.437920791410661e-08,
+          "recursive_relative_residual": 8.841033219847252e-17,
+          "mass_relative_error_to_refined": 3.586904501370984e-11
+        },
+        {
+          "iteration": 3312500,
+          "relative_residual": 8.437920791410661e-08,
+          "recursive_relative_residual": 8.84103321984725e-17,
+          "mass_relative_error_to_refined": 3.586904501370984e-11
+        }
+      ],
+      "preconditioner": "Jacobi",
+      "relative_l2_difference_from_figure_field": null,
+      "instrumented_wall_seconds": 403.5279620401561,
       "timing_note": "Includes transfers, graph captures and CPU verification; not benchmark solve time"
     }
   }

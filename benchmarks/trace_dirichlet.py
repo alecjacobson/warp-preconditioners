@@ -36,7 +36,8 @@ def main():
     k = int(reference_meta["convergence"]["k"])
     methods = args.methods or [
         reference_meta.get("selected_fsai", "fsai_cg"),
-        reference_meta.get("jacobi_method", "jacobi_cg"),
+        "jacobi_cg",
+        "jacobi_cr",
     ]
     L = load_laplacian(args.data)
     mass, free, prescribed = data["mass"], data["free"], data["constraints"]
@@ -83,7 +84,6 @@ def main():
             "gpu",
             "operator",
             "initial_guess",
-            "methods",
             "field_target",
         ):
             if previous[key] != records[key]:
@@ -91,6 +91,10 @@ def main():
         records["results"] = {
             name: row for name, row in previous["results"].items() if name in methods
         }
+        for name, row in records["results"].items():
+            expected = k if name.startswith("fsai_") else 100 * k
+            if row["actual_iterations"] != expected or row["tol"] != 0.0:
+                raise ValueError(f"Cannot resume: {name} stopping rule differs")
     refined_path = args.data / "refined_reference.npy"
     refined = np.load(refined_path) if refined_path.exists() else None
     args.output.parent.mkdir(parents=True, exist_ok=True)
