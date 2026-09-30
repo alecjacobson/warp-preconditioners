@@ -1,0 +1,181 @@
+{
+  "warp": "1.15.0",
+  "gpu": "NVIDIA L40",
+  "vertices": 360757,
+  "protocol": "Zero initial guesses; native right GMRES with fixed restart; no extra Krylov restarts; same matrix and RHS per case",
+  "precision": "float64; FSAI factors stored in float32",
+  "preconditioner_parameters": {
+    "fsai_kap": 0.003,
+    "fsai_apply_lanes": 4,
+    "block_ilu_factor_sweeps": 16,
+    "block_ilu_relaxation": 0.8,
+    "shifted_ilu_factor_sweeps": 20,
+    "shifted_ilu_relaxation": 1.0
+  },
+  "timing": "Warmed operator construction + preconditioner setup + native GMRES; uploads and independent CPU verification excluded",
+  "validation": "Original-system relative residual < 1e-8 AND componentwise backward error < 1e-8; manufactured forward error additionally < 1e-6",
+  "maxiter": 12400,
+  "restart": 31,
+  "rtol": 1e-10,
+  "rhs": "nonlinear",
+  "equilibrate": true,
+  "repeats": 3,
+  "results": [
+    {
+      "trial": 0,
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift8",
+      "setup_s": 0.0109921395778656,
+      "operator_setup_s": 0.014252342283725739,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 5952,
+          "solve_s": 5.033865641802549,
+          "solver_relative_residual": 9.36579511752812e-11,
+          "relative_residual": 5.916841382502061e-09,
+          "backward_error": 5.841584748875792e-11,
+          "block_relative_residuals": [
+            7.259039764540902e-11,
+            5.916396080373473e-09
+          ],
+          "validated": true,
+          "u_mass_relative_error_to_smoothing_reference": 7.355011652611372e-11
+        }
+      ],
+      "total_s": 5.059110123664141,
+      "validated": true
+    },
+    {
+      "trial": 0,
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift48",
+      "setup_s": 0.23544081300497055,
+      "operator_setup_s": 0.014252342283725739,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 2139,
+          "solve_s": 1.9965337589383125,
+          "solver_relative_residual": 7.876881868372365e-11,
+          "relative_residual": 4.248250741353734e-09,
+          "backward_error": 4.681194331071339e-11,
+          "block_relative_residuals": [
+            6.634677970320218e-11,
+            4.247732626500351e-09
+          ],
+          "validated": true,
+          "u_mass_relative_error_to_smoothing_reference": 6.16928153883615e-11
+        }
+      ],
+      "total_s": 2.246226914227009,
+      "validated": true
+    },
+    {
+      "trial": 1,
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift48",
+      "setup_s": 0.24114111438393593,
+      "operator_setup_s": 0.014252342283725739,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 2139,
+          "solve_s": 1.9945679306983948,
+          "solver_relative_residual": 7.876881868372365e-11,
+          "relative_residual": 4.248250741353734e-09,
+          "backward_error": 4.681194331071339e-11,
+          "block_relative_residuals": [
+            6.634677970320218e-11,
+            4.247732626500351e-09
+          ],
+          "validated": true,
+          "u_mass_relative_error_to_smoothing_reference": 6.16928153883615e-11
+        }
+      ],
+      "total_s": 2.2499613873660564,
+      "validated": true
+    },
+    {
+      "trial": 1,
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift8",
+      "setup_s": 0.012421298772096634,
+      "operator_setup_s": 0.014252342283725739,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 5952,
+          "solve_s": 5.02345921471715,
+          "solver_relative_residual": 9.36579511752812e-11,
+          "relative_residual": 5.916841382502061e-09,
+          "backward_error": 5.841584748875792e-11,
+          "block_relative_residuals": [
+            7.259039764540902e-11,
+            5.916396080373473e-09
+          ],
+          "validated": true,
+          "u_mass_relative_error_to_smoothing_reference": 7.355011652611372e-11
+        }
+      ],
+      "total_s": 5.050132855772972,
+      "validated": true
+    },
+    {
+      "trial": 2,
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift8",
+      "setup_s": 0.012636572122573853,
+      "operator_setup_s": 0.014252342283725739,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 5952,
+          "solve_s": 5.021838061511517,
+          "solver_relative_residual": 9.36579511752812e-11,
+          "relative_residual": 5.916841382502061e-09,
+          "backward_error": 5.841584748875792e-11,
+          "block_relative_residuals": [
+            7.259039764540902e-11,
+            5.916396080373473e-09
+          ],
+          "validated": true,
+          "u_mass_relative_error_to_smoothing_reference": 7.355011652611372e-11
+        }
+      ],
+      "total_s": 5.048726975917816,
+      "validated": true
+    },
+    {
+      "trial": 2,
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift48",
+      "setup_s": 0.2427007146179676,
+      "operator_setup_s": 0.014252342283725739,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 2139,
+          "solve_s": 2.002557035535574,
+          "solver_relative_residual": 7.876881868372365e-11,
+          "relative_residual": 4.248250741353734e-09,
+          "backward_error": 4.681194331071339e-11,
+          "block_relative_residuals": [
+            6.634677970320218e-11,
+            4.247732626500351e-09
+          ],
+          "validated": true,
+          "u_mass_relative_error_to_smoothing_reference": 6.16928153883615e-11
+        }
+      ],
+      "total_s": 2.2595100924372673,
+      "validated": true
+    }
+  ]
+}

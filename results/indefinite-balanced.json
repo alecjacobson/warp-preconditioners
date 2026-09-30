@@ -1,0 +1,144 @@
+{
+  "warp": "1.15.0",
+  "gpu": "NVIDIA L40",
+  "vertices": 360757,
+  "protocol": "Zero initial guesses; native right GMRES with fixed restart; no extra Krylov restarts; same matrix and RHS per case",
+  "precision": "float64; FSAI factors stored in float32",
+  "preconditioner_parameters": {
+    "fsai_kap": 0.003,
+    "fsai_apply_lanes": 4,
+    "block_ilu_factor_sweeps": 16,
+    "block_ilu_relaxation": 0.8,
+    "shifted_ilu_factor_sweeps": 20,
+    "shifted_ilu_relaxation": 1.0
+  },
+  "timing": "Warmed operator construction + preconditioner setup + native GMRES; uploads and independent CPU verification excluded",
+  "validation": "Original-system relative residual < 1e-8 AND componentwise backward error < 1e-8; manufactured forward error additionally < 1e-6",
+  "maxiter": 12400,
+  "restart": 31,
+  "rtol": 1e-10,
+  "rhs": "nonlinear",
+  "equilibrate": true,
+  "results": [
+    {
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "jacobi",
+      "setup_s": 0.00030952319502830505,
+      "operator_setup_s": 0.014740973711013794,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 12400,
+          "solve_s": 8.537453930824995,
+          "relative_residual": 18.413998399249135,
+          "backward_error": 0.9966808046632173,
+          "block_relative_residuals": [
+            0.937900733462173,
+            18.390097315178103
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9557600921544281
+        }
+      ],
+      "total_s": 8.552504427731037,
+      "validated": false
+    },
+    {
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "block-jacobi",
+      "setup_s": 0.0017248690128326416,
+      "operator_setup_s": 0.014740973711013794,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 12400,
+          "solve_s": 8.62979406490922,
+          "relative_residual": 1.069096671948587,
+          "backward_error": 0.11073157283679508,
+          "block_relative_residuals": [
+            0.9420234450387842,
+            0.5055289536404474
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9420370093340472
+        }
+      ],
+      "total_s": 8.646259907633066,
+      "validated": false
+    },
+    {
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift8",
+      "setup_s": 0.010751519352197647,
+      "operator_setup_s": 0.014740973711013794,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 5952,
+          "solve_s": 5.023259066045284,
+          "relative_residual": 5.916841382502061e-09,
+          "backward_error": 5.841584748875792e-11,
+          "block_relative_residuals": [
+            7.259039764540902e-11,
+            5.916396080373473e-09
+          ],
+          "validated": true,
+          "solver_relative_residual": 9.36579511752812e-11
+        }
+      ],
+      "total_s": 5.048751559108496,
+      "validated": true
+    },
+    {
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift48",
+      "setup_s": 0.2376783788204193,
+      "operator_setup_s": 0.014740973711013794,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 2139,
+          "solve_s": 1.9934447519481182,
+          "relative_residual": 4.248250741353734e-09,
+          "backward_error": 4.681194331071339e-11,
+          "block_relative_residuals": [
+            6.634677970320218e-11,
+            4.247732626500351e-09
+          ],
+          "validated": true,
+          "solver_relative_residual": 7.876881868372365e-11
+        }
+      ],
+      "total_s": 2.2458641044795513,
+      "validated": true
+    },
+    {
+      "order": 2,
+      "data_weight": 0.0001,
+      "method": "shift-ilu8",
+      "setup_s": 0.0036229677498340607,
+      "operator_setup_s": 0.014740973711013794,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 12400,
+          "solve_s": 19.44349677860737,
+          "relative_residual": 4.387439538381795,
+          "backward_error": 0.9230533082417687,
+          "block_relative_residuals": [
+            0.9766212218824941,
+            4.277363287344739
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9775574636308845
+        }
+      ],
+      "total_s": 19.461860720068216,
+      "validated": false
+    }
+  ]
+}

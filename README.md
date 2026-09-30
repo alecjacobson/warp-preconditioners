@@ -77,6 +77,27 @@ assembled squared matrix.
 
 ![FSAI tuning: conditioning, total time, per-iteration cost, and parameter tradeoffs.](assets/dragon-dirichlet-tuning.png)
 
+## Indefinite mixed systems
+
+The new `MixedHarmonicSystem` and `ShiftedBlock` preconditioner solve the
+original mixed biharmonic dragon's **three coordinate RHSs in 0.615 s median
+total**, using Warp GMRES. A harder nonlinear case with data weight **1e-4**
+solves in **2.250 s median total** after symmetric block equilibration;
+its original-system relative residual is **4.25e-9**. Both totals include
+operator construction and preconditioner setup, excluding input uploads.
+These use a fixed GMRES restart, not the upstream adaptive-chunk schedule.
+
+Pure-Warp `BlockJacobi` and parallel `BlockILU0` are also available for
+scalar and square BSR blocks of size 1–4. ILU is a tested alternative, but
+FSAI in the first-order block construction was faster on these cases.
+The actual mixed triharmonic benchmark **remains unconverged**: its dumped
+signs give an indefinite Schur complement, unlike the positive triharmonic
+energy. Failed trials and manufactured-solution errors are reported.
+
+![Indefinite preconditioner results: successful biharmonic solves and unresolved triharmonic residuals.](assets/indefinite-preconditioners.png)
+
+[Algorithms, exact matrix signs, accuracy checks, API examples, and reproduction](results/indefinite.md).
+
 ```bash
 python -m pip install -e '.[test]'
 pytest -q

@@ -1,0 +1,258 @@
+{
+  "warp": "1.15.0",
+  "gpu": "NVIDIA L40",
+  "vertices": 360757,
+  "protocol": "Zero initial guesses; native right GMRES with fixed restart; no extra Krylov restarts; same matrix and RHS per case",
+  "maxiter": 310,
+  "restart": 31,
+  "rtol": 1e-10,
+  "rhs": "coordinates",
+  "results": [
+    {
+      "order": 2,
+      "data_weight": 1.0,
+      "method": "block-jacobi",
+      "setup_s": 0.0028015784919261932,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.24810413643717766,
+          "relative_residual": 0.032401798550496685,
+          "backward_error": 0.14023958560055064,
+          "block_relative_residuals": [
+            0.012431787974197058,
+            0.029922018599546032
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.032401798550497,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.25090571492910385,
+      "validated": false
+    },
+    {
+      "order": 2,
+      "data_weight": 1.0,
+      "method": "ilu4",
+      "setup_s": 0.011330809444189072,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.4044623486697674,
+          "relative_residual": 0.9465333539607081,
+          "backward_error": 1.0,
+          "block_relative_residuals": [
+            0.9274727992482482,
+            0.18899628783318906
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.946533353960708,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.41579315811395645,
+      "validated": false
+    },
+    {
+      "order": 2,
+      "data_weight": 1.0,
+      "method": "ilu8",
+      "setup_s": 0.010974489152431488,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.5237265862524509,
+          "relative_residual": 0.8303668053242759,
+          "backward_error": 0.6272872646248926,
+          "block_relative_residuals": [
+            0.6635338816129132,
+            0.4992312283262581
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.8303668053242759,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.5347010754048824,
+      "validated": false
+    },
+    {
+      "order": 2,
+      "data_weight": 1.0,
+      "method": "schur8",
+      "setup_s": 0.012074556201696396,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.3249478377401829,
+          "relative_residual": 0.9845094936316892,
+          "backward_error": 0.9960495816471511,
+          "block_relative_residuals": [
+            0.9845094936316892,
+            7.229472867253138e-16
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9845094936316892,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.3370223939418793,
+      "validated": false
+    },
+    {
+      "order": 2,
+      "data_weight": 1.0,
+      "method": "schur48",
+      "setup_s": 0.16695868968963623,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.3476192131638527,
+          "relative_residual": 0.9031941421911496,
+          "backward_error": 0.9974865964594051,
+          "block_relative_residuals": [
+            0.9031941421911496,
+            7.693390890254188e-15
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9031941421911496,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.5145779028534889,
+      "validated": false
+    },
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "block-jacobi",
+      "setup_s": 0.0032569989562034607,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 2.1660014800727367,
+          "relative_residual": 0.40011021255154516,
+          "backward_error": 0.7430708926659202,
+          "block_relative_residuals": [
+            0.14486615087540922,
+            0.2954668356324828,
+            0.22759905439151784
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.400110212551545,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 2.16925847902894,
+      "validated": false
+    },
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "ilu4",
+      "setup_s": 0.02761855348944664,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 1.129442099481821,
+          "relative_residual": 0.9846094272959869,
+          "backward_error": 1.0,
+          "block_relative_residuals": [
+            0.9827244448210973,
+            0.05275923899647941,
+            0.030411388848753405
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.984609427295987,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 1.1570606529712677,
+      "validated": false
+    },
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "ilu8",
+      "setup_s": 0.026745595037937164,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 1.860872469842434,
+          "relative_residual": 0.9754768724511235,
+          "backward_error": 1.0,
+          "block_relative_residuals": [
+            0.9741901603088343,
+            0.03098810700673232,
+            0.03934968193787941
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9754768724511234,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 1.887618064880371,
+      "validated": false
+    },
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "schur8",
+      "setup_s": 0.012376252561807632,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.5254162587225437,
+          "relative_residual": 0.9984880059038415,
+          "backward_error": 1.0,
+          "block_relative_residuals": [
+            0.9984880059038415,
+            1.9311088321199664e-19,
+            1.920666353486247e-20
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9984880059038415,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.5377925112843513,
+      "validated": false
+    },
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "schur48",
+      "setup_s": 0.16532696411013603,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 310,
+          "solve_s": 0.5601825229823589,
+          "relative_residual": 0.9989615828339811,
+          "backward_error": 1.0,
+          "block_relative_residuals": [
+            0.9989615828339811,
+            9.924986164143134e-20,
+            1.3088316328854985e-20
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.9989615828339811,
+          "warp_reported_iterations": 340
+        }
+      ],
+      "total_s": 0.725509487092495,
+      "validated": false
+    }
+  ],
+  "iteration_count_note": "Initial probe used Warp 1.15 check_every=0; returned count includes restart-1 initial offset. iterations below are actual Arnoldi steps; raw count retained."
+}

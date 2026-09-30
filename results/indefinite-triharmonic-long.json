@@ -1,0 +1,60 @@
+{
+  "warp": "1.15.0",
+  "gpu": "NVIDIA L40",
+  "vertices": 360757,
+  "protocol": "Zero initial guesses; native right GMRES with fixed restart; no extra Krylov restarts; same matrix and RHS per case",
+  "maxiter": 6200,
+  "restart": 93,
+  "rtol": 1e-10,
+  "rhs": "coordinates",
+  "results": [
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "shift48",
+      "setup_s": 0.16672330722212791,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 6231,
+          "solve_s": 21.706723988056183,
+          "relative_residual": 0.00022212704950838805,
+          "backward_error": 0.025839730281961362,
+          "block_relative_residuals": [
+            0.0001282487197512766,
+            0.00012826297166846143,
+            0.00012822364097246592
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.0002221270495083125
+        }
+      ],
+      "total_s": 21.87344729527831,
+      "validated": false
+    },
+    {
+      "order": 3,
+      "data_weight": 1.0,
+      "method": "shift-ilu8",
+      "setup_s": 0.004442010074853897,
+      "columns": [
+        {
+          "column": 0,
+          "iterations": 6231,
+          "solve_s": 26.289180636405945,
+          "relative_residual": 0.0009594880683370687,
+          "backward_error": 0.13036902482266544,
+          "block_relative_residuals": [
+            0.0005529401193800737,
+            0.0005541557367250275,
+            0.0005547846403027856
+          ],
+          "validated": false,
+          "solver_relative_residual": 0.0009594880683370885
+        }
+      ],
+      "total_s": 26.2936226464808,
+      "validated": false
+    }
+  ]
+}
