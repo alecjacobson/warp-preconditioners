@@ -173,6 +173,26 @@ Jacobi and **0.1693 s** for scalar Jacobi, including setup on NVIDIA L40.
 
 [Mesh-quality plots, boundary-transfer checks, convergence curves and reproduction](results/simjeb-mesh-comparison.md).
 
+### Displacement and larger loads
+
+Increasing the pin force to **2×, 5× and 10×** on the fTetWild mesh gives the
+same sampled iterations to relative accuracy: **2,059 for Jacobi, 1,834 for
+block Jacobi, and 1,182 for FSAI**. FSAI takes **0.131–0.133 s**, including
+setup, across these loads. Scaling the force in this linear model scales the
+displacement while leaving the stiffness matrix and conditioning unchanged.
+
+The figure below colors **displacement magnitude** and shows actual geometry
+at **1× display scale**, with the unloaded silhouette in gray. Maximum
+displacement grows from **0.8214 mm to 8.2138 mm**. Each row has its own labeled
+color range. The model remains small-strain linear elasticity at both loads;
+deformation-dependent stiffness would require a nonlinear experiment.
+
+![Actual displacement snapshots at 1x and 10x force, colored by displacement magnitude, with unloaded outlines.](assets/simjeb-displacement.png)
+
+![Relative convergence and five-repeat timing comparison as force increases.](assets/simjeb-load-scaling.png)
+
+[Load-scaling measurements, verification and reproduction](results/simjeb-load-scaling.md).
+
 ## Fixed sparsity, changing values
 
 `BlockJacobi.update(A)` recomputes only diagonal inverses. FSAI can cache the

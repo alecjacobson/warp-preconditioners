@@ -1,0 +1,74 @@
+{
+  "results_source": "results/simjeb-load-scaling.json",
+  "render": {
+    "cases": [
+      {
+        "scale": 1,
+        "objects": [
+          {
+            "name": "reference",
+            "field_sha256": "39867fbe75697f33b7b1a95ae55c1079a44868c5080677e3107b92a62e51fe20",
+            "label_x_fraction": 0.14705882352941174
+          },
+          {
+            "name": "jacobi",
+            "field_sha256": "23c12bb7c20ad494c4e9f3ec5c50e631bfd393d96122bcd62400bf67f91a8aa9",
+            "label_x_fraction": 0.38235294117647056
+          },
+          {
+            "name": "block",
+            "field_sha256": "2c361494ba4d01d10584ed10bf5bbe655d299b645979e59cf1a1e43944fd7209",
+            "label_x_fraction": 0.6176470588235294
+          },
+          {
+            "name": "fsai",
+            "field_sha256": "4deca6dfb4c039d0039344e0b066ca010b0f4bd924a2b465f6cf4987dc396125",
+            "label_x_fraction": 0.8529411764705883
+          }
+        ],
+        "scalar_range_m": [
+          0,
+          0.0008218978079939734
+        ],
+        "image": "data/simjeb-ftetwild/load-scaling/displacement-1.png"
+      },
+      {
+        "scale": 10,
+        "objects": [
+          {
+            "name": "reference",
+            "field_sha256": "19ff5f932f5221f3204b4eabc509545d42bc4a4bc333dd30f257165698308991",
+            "label_x_fraction": 0.14705882352941174
+          },
+          {
+            "name": "jacobi",
+            "field_sha256": "fa0b8aee8bc9a77b3a88c2d33a0029016ce75173d73346cb25ef8359321c2c5d",
+            "label_x_fraction": 0.38235294117647056
+          },
+          {
+            "name": "block",
+            "field_sha256": "fe9ecf050393702127077bc595b3fc5a35207fa4bf7cf77953e5e1e6ca4889df",
+            "label_x_fraction": 0.6176470588235294
+          },
+          {
+            "name": "fsai",
+            "field_sha256": "81266539504837353dab6f5d8d92478827d8a5445de10c2c4768bfaefa64f4e7",
+            "label_x_fraction": 0.8529411764705883
+          }
+        ],
+        "scalar_range_m": [
+          0,
+          0.008219088754169672
+        ],
+        "image": "data/simjeb-ftetwild/load-scaling/displacement-10.png"
+      }
+    ],
+    "amplification": 1,
+    "outline": "Unloaded surface silhouette in gray",
+    "colors": "Displacement magnitude, 26 striped OKLab intervals; shared within each row, separate physical ranges across rows",
+    "renderer": "4.5.3 LTS",
+    "device": "OptiX",
+    "samples": 64,
+    "model": "Small-strain linear elasticity even at 10x load; not a finite-deformation or plasticity simulation"
+  }
+}
