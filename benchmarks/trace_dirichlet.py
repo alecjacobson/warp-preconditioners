@@ -76,6 +76,7 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     for name, solver, budget, tol in [
         ("fsai_cg", linear.cg, 500000, 1e-12),
+        ("fsai_cr", linear.cr, 500000, 1e-12),
         ("jacobi_cr", linear.cr, 100 * k, 0.0),
         ("jacobi_cg", linear.cg, 100 * k, 0.0),
     ]:
@@ -86,7 +87,7 @@ def main():
             FSAI(
                 matrix, max_row_size=48, kap_tolerance=0.003, apply_lanes=4, factor_dtype=wp.float32
             )
-            if name == "fsai_cg"
+            if name.startswith("fsai_")
             else linear.preconditioner(matrix, "diag")
         )
         x = wp.zeros_like(b)
@@ -150,7 +151,7 @@ def main():
             samples=samples,
             preconditioner=(
                 "FSAI width=48, kap=0.003, float32 storage/float64 arithmetic, apply_lanes=4"
-                if name == "fsai_cg"
+                if name.startswith("fsai_")
                 else "Jacobi"
             ),
             relative_l2_difference_from_figure_field=discrepancy,

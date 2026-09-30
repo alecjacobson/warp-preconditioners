@@ -55,7 +55,7 @@ Cholesky corrections independently checks the result; the
 [original width-eight figure](visualization/dirichlet-original.md) is archived.
 [Region definitions, convergence checks, and reproduction](visualization/dirichlet.md).
 
-![Log-log residual convergence for the tuned dragon Dirichlet problem: FSAI-CG, Jacobi-CR, and Jacobi-CG, with independently recomputed and recursive residuals.](assets/dragon-dirichlet-residuals.png)
+![Log-log residual convergence for the tuned dragon Dirichlet problem: tuned FSAI-CG, tuned FSAI-CR, Jacobi-CR, and Jacobi-CG, with independently recomputed and recursive residuals.](assets/dragon-dirichlet-residuals.png)
 
 The log–log plot measures relative residual norm, $\|r_k\|_2/\|b\|_2$.
 Solid curves independently recompute the full biharmonic energy gradient;
@@ -65,6 +65,10 @@ Krylov state, with no restarts or smoothing. The zero-iteration residual is
 1 and is omitted from the logarithmic axis.
 Both Jacobi-CG and Jacobi-CR run through the same 3,337,400-iteration budget,
 so their convergence can be compared directly.
+Tuned FSAI-CR uses the same preconditioner as FSAI-CG and reaches the same
+recursive tolerance in **33,256 iterations**, versus CG's **33,374**.
+Their independently recomputed final residuals are **6.20e-9** and **8.82e-10**,
+respectively; equal recursive tolerances do not imply equal final accuracy.
 [Convergence data and reproduction](visualization/dirichlet.md#residual-history).
 
 The [FSAI tuning study](results/dirichlet-tuning/README.md) reduces

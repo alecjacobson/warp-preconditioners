@@ -127,9 +127,11 @@ triangle, yielding crisp isointervals rather than interpolated vertex colors.
 
 ![Measured log-log residual histories.](../assets/dragon-dirichlet-residuals.png)
 
-The plot includes tuned FSAI-CG, Jacobi-CR, and Jacobi-CG. All use the same full
+The plot includes tuned FSAI-CG, tuned FSAI-CR, Jacobi-CR, and Jacobi-CG. All use the same full
 factored operator, prescribed values, and zero free initial guess as the
 figure. Jacobi-CG uses the same diagonal preconditioner as Jacobi-CR.
+Both FSAI methods use width 48, `kap_tolerance=0.003`, float32 factor storage
+with float64 arithmetic, and four lanes per factor row.
 Its vertical quantity is a **relative Euclidean residual norm**,
 not squared residual loss, bending energy, or forward field error:
 
@@ -139,7 +141,7 @@ $$
 
 Solid curves recompute this quantity independently in CPU float64 at each
 sample. Dashed curves show the residual maintained by Warp's iterative
-recurrence. The horizontal tolerance applies to the recursive FSAI residual;
+recurrence. The horizontal tolerance applies to both recursive FSAI residuals;
 it is not a guarantee that the independently recomputed residual reaches
 that value. Residual drift and finite precision explain the visible gap
 near convergence. Field accuracy is checked separately as described above.
@@ -151,8 +153,23 @@ directions and reduction buffers; it never calls a fresh solve at a
 checkpoint. Iteration zero is saved with relative residual 1, but omitted
 from the log axis. Lines connect actual samples, without smoothing or
 cumulative-minimum filtering; unsampled intermediate oscillations are not
-shown. FSAI stops at its original tolerance, while both Jacobi methods run through
+shown. Both FSAI methods stop at recursive relative tolerance 1e-12, with a
+500,000-iteration cap, while both Jacobi methods run through
 $100k$ with tolerance zero, matching the figure's budget.
+
+The matched tuned FSAI comparison gives:
+
+| Method | Iterations | Recomputed relative residual | Recursive relative residual | Relative mass-norm field error |
+| --- | ---: | ---: | ---: | ---: |
+| Tuned FSAI-CG | 33,374 | 8.820e-10 | 9.756e-13 | 1.29e-9 |
+| Tuned FSAI-CR | 33,256 | 6.204e-9 | 8.425e-13 | 2.679e-6 |
+
+Field errors use the independently refined reference; CG's is from the saved
+figure verification and CR's is measured by the tracing driver. CR reduces
+the residual more smoothly and finishes in slightly fewer iterations, but
+its final true residual and field error are larger. The recursive residual
+underestimates the true residual for both methods. These are iteration and
+accuracy comparisons, not a comparison of uninstrumented solve times.
 
 The added Jacobi-CG run gives the following independently recomputed residuals:
 
@@ -174,8 +191,8 @@ baselines rather than claiming CR is uniformly superior.
 
 [`results/dirichlet-residuals.json`](../results/dirichlet-residuals.json)
 contains the sample values, configuration, input hash, and endpoint checks
-against the saved FSAI-CG and Jacobi-CR figure fields. Jacobi-CG has no
-corresponding field in the dragon rendering, so its figure check is null.
+against the saved FSAI-CG and Jacobi-CR figure fields. Jacobi-CG and FSAI-CR
+have no corresponding fields in the dragon rendering, so their figure checks are null.
 When a refined reference is available, new traces also record mass-weighted
 relative field errors. Instrumented wall times include graph
 captures, downloads, and CPU verification; they are **not solver benchmark

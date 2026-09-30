@@ -21,8 +21,8 @@ def main():
     )
     args = parser.parse_args()
     data = json.loads(args.input.read_text())
-    assert set(data["results"]) == {"fsai_cg", "jacobi_cr", "jacobi_cg"}, (
-        "All three completed trajectories are required"
+    assert set(data["results"]) == {"fsai_cg", "fsai_cr", "jacobi_cr", "jacobi_cg"}, (
+        "All four completed trajectories are required"
     )
     plt.rcParams.update(
         {
@@ -38,9 +38,19 @@ def main():
     )
     fig, ax = plt.subplots(figsize=(12.8, 7.8), facecolor="white")
     fig.subplots_adjust(left=0.10, right=0.97, bottom=0.17, top=0.81)
-    colors = {"fsai_cg": "#087E8B", "jacobi_cr": "#D17632", "jacobi_cg": "#8056B3"}
-    labels = {"fsai_cg": "Tuned FSAI-CG", "jacobi_cr": "Jacobi-CR", "jacobi_cg": "Jacobi-CG"}
-    for name in ["jacobi_cg", "jacobi_cr", "fsai_cg"]:
+    colors = {
+        "fsai_cg": "#087E8B",
+        "fsai_cr": "#3267C5",
+        "jacobi_cr": "#D17632",
+        "jacobi_cg": "#8056B3",
+    }
+    labels = {
+        "fsai_cg": "Tuned FSAI-CG",
+        "fsai_cr": "Tuned FSAI-CR",
+        "jacobi_cr": "Jacobi-CR",
+        "jacobi_cg": "Jacobi-CG",
+    }
+    for name in ["jacobi_cg", "jacobi_cr", "fsai_cg", "fsai_cr"]:
         samples = [s for s in data["results"][name]["samples"] if s["iteration"] > 0]
         iteration = np.array([s["iteration"] for s in samples])
         recomputed = np.array([s["relative_residual"] for s in samples])
@@ -68,7 +78,7 @@ def main():
     fsai = data["results"]["fsai_cg"]["samples"][-1]
     jacobi = data["results"]["jacobi_cr"]["samples"][-1]
     ax.annotate(
-        f"FSAI: {fsai['relative_residual']:.2e}\nat {k:,} iterations",
+        f"FSAI-CG: {fsai['relative_residual']:.2e}\nat {k:,} iterations",
         xy=(k, fsai["relative_residual"]),
         xytext=(k / 15, 3e-10),
         fontsize=10,
@@ -76,6 +86,17 @@ def main():
         ha="right",
         va="top",
         arrowprops={"arrowstyle": "-", "color": colors["fsai_cg"], "lw": 0.9},
+    )
+    fsai_cr = data["results"]["fsai_cr"]["samples"][-1]
+    ax.annotate(
+        f"FSAI-CR: {fsai_cr['relative_residual']:.2e}\nat {fsai_cr['iteration']:,} iterations",
+        xy=(fsai_cr["iteration"], fsai_cr["relative_residual"]),
+        xytext=(2e5, 2e-11),
+        fontsize=10,
+        color=colors["fsai_cr"],
+        ha="left",
+        va="top",
+        arrowprops={"arrowstyle": "-", "color": colors["fsai_cr"], "lw": 0.9},
     )
     ax.annotate(
         f"Jacobi-CR: {jacobi['relative_residual']:.2e}",
