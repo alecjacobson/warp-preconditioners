@@ -21,8 +21,8 @@ def main():
     )
     args = parser.parse_args()
     data = json.loads(args.input.read_text())
-    assert set(data["results"]) == {"fsai_cg", "jacobi_cr"}, (
-        "Both completed trajectories are required"
+    assert set(data["results"]) == {"fsai_cg", "jacobi_cr", "jacobi_cg"}, (
+        "All three completed trajectories are required"
     )
     plt.rcParams.update(
         {
@@ -38,9 +38,9 @@ def main():
     )
     fig, ax = plt.subplots(figsize=(12.8, 7.8), facecolor="white")
     fig.subplots_adjust(left=0.10, right=0.97, bottom=0.17, top=0.81)
-    colors = {"fsai_cg": "#087E8B", "jacobi_cr": "#D17632"}
-    labels = {"fsai_cg": "Tuned FSAI-CG", "jacobi_cr": "Jacobi-CR"}
-    for name in ["jacobi_cr", "fsai_cg"]:
+    colors = {"fsai_cg": "#087E8B", "jacobi_cr": "#D17632", "jacobi_cg": "#8056B3"}
+    labels = {"fsai_cg": "Tuned FSAI-CG", "jacobi_cr": "Jacobi-CR", "jacobi_cg": "Jacobi-CG"}
+    for name in ["jacobi_cg", "jacobi_cr", "fsai_cg"]:
         samples = [s for s in data["results"][name]["samples"] if s["iteration"] > 0]
         iteration = np.array([s["iteration"] for s in samples])
         recomputed = np.array([s["relative_residual"] for s in samples])
@@ -78,7 +78,7 @@ def main():
         arrowprops={"arrowstyle": "-", "color": colors["fsai_cg"], "lw": 0.9},
     )
     ax.annotate(
-        f"Jacobi: {jacobi['relative_residual']:.2e}",
+        f"Jacobi-CR: {jacobi['relative_residual']:.2e}",
         xy=(100 * k, jacobi["relative_residual"]),
         xytext=(100 * k / 1.3, 1e-5),
         fontsize=10,
@@ -130,7 +130,7 @@ def main():
     fig.text(
         0.10,
         0.031,
-        "Logarithmically sampled real iterates; no restarts, smoothing, or monotonic filtering. Iteration 0 is omitted.",
+        "Real sampled iterates; no restarts or smoothing. Iteration 0 and recursive values below 10⁻¹⁷ are outside the axes.",
         fontsize=10,
         color="#66758A",
     )

@@ -127,9 +127,10 @@ triangle, yielding crisp isointervals rather than interpolated vertex colors.
 
 ![Measured log-log residual histories.](../assets/dragon-dirichlet-residuals.png)
 
-The plot uses the same tuned FSAI-CG and Jacobi-CR configurations, full
+The plot includes tuned FSAI-CG, Jacobi-CR, and Jacobi-CG. All use the same full
 factored operator, prescribed values, and zero free initial guess as the
-figure. Its vertical quantity is a **relative Euclidean residual norm**,
+figure. Jacobi-CG uses the same diagonal preconditioner as Jacobi-CR.
+Its vertical quantity is a **relative Euclidean residual norm**,
 not squared residual loss, bending energy, or forward field error:
 
 $$
@@ -150,12 +151,33 @@ directions and reduction buffers; it never calls a fresh solve at a
 checkpoint. Iteration zero is saved with relative residual 1, but omitted
 from the log axis. Lines connect actual samples, without smoothing or
 cumulative-minimum filtering; unsampled intermediate oscillations are not
-shown. FSAI stops at its original tolerance, while Jacobi runs through
+shown. FSAI stops at its original tolerance, while both Jacobi methods run through
 $100k$ with tolerance zero, matching the figure's budget.
 
+The added Jacobi-CG run gives the following independently recomputed residuals:
+
+| Iterations | Jacobi-CR | Jacobi-CG |
+| --- | ---: | ---: |
+| $k=33{,}374$ | 4.877e-06 | 3.980e-05 |
+| $10k=333{,}740$ | 1.224e-06 | 2.115e-06 |
+| $100k=3{,}337{,}400$ | 8.438e-08 | 3.315e-07 |
+
+CR has the smaller residual at these three budgets, but this does not imply
+smaller field error at every budget. Against the refined reference, CG's
+mass-relative field errors are 0.8229, 0.8985, and 8.95e-12; CR's are 0.8374,
+0.8403, and 3.59e-11. Both final fields are highly accurate. These are
+iteration comparisons, not measurements at equal wall time.
+CG's recursive residual eventually reaches 5.30e-30 despite its much larger
+recomputed residual. Recursive values below 1e-17 fall outside the plot axes;
+the JSON retains all values. The plot therefore supports comparing both
+baselines rather than claiming CR is uniformly superior.
+
 [`results/dirichlet-residuals.json`](../results/dirichlet-residuals.json)
-contains the sample values, configuration, input hash, and endpoint check
-against the saved figure fields. Instrumented wall times include graph
+contains the sample values, configuration, input hash, and endpoint checks
+against the saved FSAI-CG and Jacobi-CR figure fields. Jacobi-CG has no
+corresponding field in the dragon rendering, so its figure check is null.
+When a refined reference is available, new traces also record mass-weighted
+relative field errors. Instrumented wall times include graph
 captures, downloads, and CPU verification; they are **not solver benchmark
 timings**. The diagnostic adapter uses Warp 1.15's private loop driver in
 a temporary, process-local context and restores it afterward; the library
@@ -170,7 +192,9 @@ python benchmarks/plot_dirichlet_residuals.py
 ```
 
 Only the plot command is needed to regenerate the image from the committed
-JSON. The PNG is tracked with Git LFS.
+JSON. Add `--resume` to the trace command to retain completed trajectories
+with matching input, operator, Warp version, and GPU, and collect only missing
+methods. The PNG is tracked with Git LFS.
 
 ## Reproduction
 

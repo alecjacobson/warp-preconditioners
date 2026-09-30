@@ -22,6 +22,9 @@ def main():
     parser.add_argument("--data", type=Path, default=Path("data/dirichlet-tuned"))
     parser.add_argument("--output", type=Path, default=Path("results/dirichlet-residuals.json"))
     parser.add_argument("--samples", type=int, default=240)
+    parser.add_argument(
+        "--resume", action="store_true", help="Keep completed matching trajectories"
+    )
     args = parser.parse_args()
     if args.samples < 2:
         parser.error("samples must be at least two")
@@ -57,15 +60,28 @@ def main():
         residual="norm((L.T @ ((L @ full_u) / mass))[free]) / norm(b), independently recomputed CPU float64",
         recursive_residual="Warp internal recursively updated Euclidean residual norm / norm(b)",
         initial_guess="zero at free vertices, exact prescribed values at fixed vertices",
-        operator="SquaredLaplacianOperator, float64, row_lanes=4; identical for both methods",
+        operator="SquaredLaplacianOperator, float64, row_lanes=4; identical for all methods",
         input_sha256=hashlib.sha256(b.numpy().tobytes() + free.tobytes()).hexdigest(),
         results={},
     )
+    if args.resume and args.output.exists():
+        previous = json.loads(args.output.read_text())
+        previous["operator"] = previous["operator"].replace("both methods", "all methods")
+        for key in ("input_sha256", "k", "warp", "gpu", "operator", "initial_guess"):
+            if previous[key] != records[key]:
+                raise ValueError(f"Cannot resume: {key} differs")
+        records["results"] = previous["results"]
+    refined_path = args.data / "refined_reference.npy"
+    refined = np.load(refined_path) if refined_path.exists() else None
     args.output.parent.mkdir(parents=True, exist_ok=True)
     for name, solver, budget, tol in [
         ("fsai_cg", linear.cg, 500000, 1e-12),
         ("jacobi_cr", linear.cr, 100 * k, 0.0),
+        ("jacobi_cg", linear.cg, 100 * k, 0.0),
     ]:
+        if name in records["results"]:
+            print(name, "already recorded", flush=True)
+            continue
         pre = (
             FSAI(
                 matrix, max_row_size=48, kap_tolerance=0.003, apply_lanes=4, factor_dtype=wp.float32
@@ -95,6 +111,10 @@ def main():
                     recursive_relative_residual=recursive / bnorm,
                 )
             )
+            if refined is not None:
+                samples[-1]["mass_relative_error_to_refined"] = float(
+                    np.sqrt(np.sum(mass * (full - refined) ** 2) / np.sum(mass * refined**2))
+                )
             now = time.perf_counter()
             if now - last_report > 25 or iteration in (0, k, 10 * k, 100 * k):
                 print(
@@ -113,15 +133,17 @@ def main():
                 operator, b, x, M=pre, tol=tol, atol=0.0, maxiter=budget, check_every=0
             )
         field = x.numpy()
-        reference_key = next(
+        reference_keys = [
             key
             for key in reference_meta["display_order"]
             if key.startswith(name + "_")
             and reference_meta["results"][key]["actual_iterations"] == nit
-        )
-        reference = data[reference_key][free]
-        discrepancy = norm(field - reference) / max(norm(reference), np.finfo(float).tiny)
-        assert discrepancy < 1e-7, (name, discrepancy)
+        ]
+        discrepancy = None
+        if reference_keys:
+            reference = data[reference_keys[0]][free]
+            discrepancy = norm(field - reference) / max(norm(reference), np.finfo(float).tiny)
+            assert discrepancy < 1e-7, (name, discrepancy)
         records["results"][name] = dict(
             actual_iterations=nit,
             tol=tol,
@@ -137,6 +159,7 @@ def main():
         )
         args.output.write_text(json.dumps(records, indent=2) + "\n")
         print(name, "DONE", nit, "field difference", discrepancy, flush=True)
+    args.output.write_text(json.dumps(records, indent=2) + "\n")
 
 
 if __name__ == "__main__":
