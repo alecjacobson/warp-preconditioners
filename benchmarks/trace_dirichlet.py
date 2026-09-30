@@ -19,9 +19,12 @@ from warp_preconditioners import FSAI, SquaredLaplacianOperator
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--data", type=Path, default=Path("data/dirichlet-tuned"))
+    parser.add_argument("--data", type=Path, default=Path("data/dirichlet-current"))
     parser.add_argument("--output", type=Path, default=Path("results/dirichlet-residuals.json"))
     parser.add_argument("--samples", type=int, default=240)
+    parser.add_argument(
+        "--methods", nargs="+", choices=["fsai_cg", "fsai_cr", "jacobi_cg", "jacobi_cr"]
+    )
     parser.add_argument(
         "--resume", action="store_true", help="Keep completed matching trajectories"
     )
@@ -31,6 +34,10 @@ def main():
     data = np.load(args.data / "fields.npz")
     reference_meta = json.loads((args.data / "solve.json").read_text())
     k = int(reference_meta["convergence"]["k"])
+    methods = args.methods or [
+        reference_meta.get("selected_fsai", "fsai_cg"),
+        reference_meta.get("jacobi_method", "jacobi_cg"),
+    ]
     L = load_laplacian(args.data)
     mass, free, prescribed = data["mass"], data["free"], data["constraints"]
     Q = L @ sp.diags(1 / mass) @ L
@@ -55,6 +62,8 @@ def main():
         warp=wp.__version__,
         gpu=wp.get_device().name,
         k=k,
+        methods=methods,
+        field_target=reference_meta["convergence"].get("field_target"),
         b_norm=bnorm,
         sampling="logarithmic checkpoints plus k, 10k, 100k; same live Krylov state, no restarts",
         residual="norm((L.T @ ((L @ full_u) / mass))[free]) / norm(b), independently recomputed CPU float64",
@@ -67,19 +76,28 @@ def main():
     if args.resume and args.output.exists():
         previous = json.loads(args.output.read_text())
         previous["operator"] = previous["operator"].replace("both methods", "all methods")
-        for key in ("input_sha256", "k", "warp", "gpu", "operator", "initial_guess"):
+        for key in (
+            "input_sha256",
+            "k",
+            "warp",
+            "gpu",
+            "operator",
+            "initial_guess",
+            "methods",
+            "field_target",
+        ):
             if previous[key] != records[key]:
                 raise ValueError(f"Cannot resume: {key} differs")
-        records["results"] = previous["results"]
+        records["results"] = {
+            name: row for name, row in previous["results"].items() if name in methods
+        }
     refined_path = args.data / "refined_reference.npy"
     refined = np.load(refined_path) if refined_path.exists() else None
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    for name, solver, budget, tol in [
-        ("fsai_cg", linear.cg, 500000, 1e-12),
-        ("fsai_cr", linear.cr, 500000, 1e-12),
-        ("jacobi_cr", linear.cr, 100 * k, 0.0),
-        ("jacobi_cg", linear.cg, 100 * k, 0.0),
-    ]:
+    for name in methods:
+        solver = getattr(linear, name.rsplit("_", 1)[1])
+        budget = k if name.startswith("fsai_") else 100 * k
+        tol = 0.0
         if name in records["results"]:
             print(name, "already recorded", flush=True)
             continue

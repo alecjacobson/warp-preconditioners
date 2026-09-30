@@ -21,9 +21,13 @@ def main():
     )
     args = parser.parse_args()
     data = json.loads(args.input.read_text())
-    assert set(data["results"]) == {"fsai_cg", "fsai_cr", "jacobi_cr", "jacobi_cg"}, (
-        "All four completed trajectories are required"
+    methods = data.get("methods", list(data["results"]))
+    assert len(methods) == 2 and sum(name.startswith("fsai_") for name in methods) == 1
+    assert set(methods) == set(data["results"]), (
+        "Exactly the two selected trajectories are required"
     )
+    fsai_name = next(name for name in methods if name.startswith("fsai_"))
+    jacobi_name = next(name for name in methods if name.startswith("jacobi_"))
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
@@ -50,7 +54,7 @@ def main():
         "jacobi_cr": "Jacobi-CR",
         "jacobi_cg": "Jacobi-CG",
     }
-    for name in ["jacobi_cg", "jacobi_cr", "fsai_cg", "fsai_cr"]:
+    for name in [jacobi_name, fsai_name]:
         samples = [s for s in data["results"][name]["samples"] if s["iteration"] > 0]
         iteration = np.array([s["iteration"] for s in samples])
         recomputed = np.array([s["relative_residual"] for s in samples])
@@ -73,39 +77,26 @@ def main():
             fontsize=10,
             color="#738094",
         )
-    ax.axhline(1e-12, color="#98A2B1", lw=1, ls=(0, (6, 4)), zorder=0)
-    ax.text(1.5, 1.6e-12, r"Recursive stopping tolerance: $10^{-12}$", fontsize=10, color="#738094")
-    fsai = data["results"]["fsai_cg"]["samples"][-1]
-    jacobi = data["results"]["jacobi_cr"]["samples"][-1]
+    fsai = data["results"][fsai_name]["samples"][-1]
+    jacobi = data["results"][jacobi_name]["samples"][-1]
     ax.annotate(
-        f"FSAI-CG: {fsai['relative_residual']:.2e}\nat {k:,} iterations",
+        f"{labels[fsai_name]}: {fsai['relative_residual']:.2e}\nat {k:,} iterations",
         xy=(k, fsai["relative_residual"]),
         xytext=(k / 15, 3e-10),
         fontsize=10,
-        color=colors["fsai_cg"],
+        color=colors[fsai_name],
         ha="right",
         va="top",
-        arrowprops={"arrowstyle": "-", "color": colors["fsai_cg"], "lw": 0.9},
-    )
-    fsai_cr = data["results"]["fsai_cr"]["samples"][-1]
-    ax.annotate(
-        f"FSAI-CR: {fsai_cr['relative_residual']:.2e}\nat {fsai_cr['iteration']:,} iterations",
-        xy=(fsai_cr["iteration"], fsai_cr["relative_residual"]),
-        xytext=(2e5, 2e-11),
-        fontsize=10,
-        color=colors["fsai_cr"],
-        ha="left",
-        va="top",
-        arrowprops={"arrowstyle": "-", "color": colors["fsai_cr"], "lw": 0.9},
+        arrowprops={"arrowstyle": "-", "color": colors[fsai_name], "lw": 0.9},
     )
     ax.annotate(
-        f"Jacobi-CR: {jacobi['relative_residual']:.2e}",
+        f"{labels[jacobi_name]}: {jacobi['relative_residual']:.2e}",
         xy=(100 * k, jacobi["relative_residual"]),
         xytext=(100 * k / 1.3, 1e-5),
         fontsize=10,
-        color=colors["jacobi_cr"],
+        color=colors[jacobi_name],
         ha="right",
-        arrowprops={"arrowstyle": "-", "color": colors["jacobi_cr"], "lw": 0.9},
+        arrowprops={"arrowstyle": "-", "color": colors[jacobi_name], "lw": 0.9},
     )
     ax.set_xlim(1, 100 * k * 1.5)
     ax.set_ylim(1e-17, 1.3)
@@ -137,7 +128,7 @@ def main():
     fig.text(
         0.10,
         0.896,
-        "Dragon Dirichlet problem  ·  Same operator and zero free initial guess",
+        f"Dragon Dirichlet problem  ·  Same operator and zero free initial guess  ·  FSAI selected at field error ≤ {data['field_target']:.0e}",
         fontsize=12,
         color="#66758A",
     )

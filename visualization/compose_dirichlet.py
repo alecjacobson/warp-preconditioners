@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--data", type=Path, default=Path("data/dirichlet"))
+    parser.add_argument("--data", type=Path, default=Path("data/dirichlet-current"))
     parser.add_argument(
         "--output", type=Path, default=Path("assets/dragon-dirichlet-comparison.png")
     )
@@ -20,7 +20,7 @@ def main():
     render = json.loads((args.data / "render.json").read_text())
     scene = Image.open(args.data / "five_dragons.png").convert("RGBA")
     width, ph = scene.size
-    header, footer = 260, 285
+    header, footer = 260, 340 if meta.get("refresh") else 285
     height = ph + header + footer
     canvas = Image.new("RGB", (width, height), "white")
     canvas.paste(scene, (0, header), scene)
@@ -64,12 +64,37 @@ def main():
             continue
         r = meta["results"][name]
         fsai = name.startswith("fsai")
-        text(cx, 185, "Warp CG + FSAI" if fsai else "Warp CR + Jacobi", 44, True)
+        solver = r["solver"].rsplit(".", 1)[1].upper()
+        text(cx, 185, f"Warp {solver} + " + ("FSAI" if fsai else "Jacobi"), 44, True)
         multiplier = r["iteration_multiplier"]
         label = "k" if multiplier == 1 else f"{multiplier}k"
         text(
             cx, 239, f"{label} = {r['actual_iterations']:,}" + (" · converged" if fsai else ""), 37
         )
+        if meta.get("refresh"):
+            text(cx, y, f"{r['total_s']:.2f} s total", 36, True)
+            text(
+                cx,
+                y + 46,
+                f"{r['solve_s']:.2f} s solve + {r['setup_s']:.3f} s setup",
+                28,
+                color="#657083",
+            )
+            text(
+                cx,
+                y + 86,
+                f"Field error {r['mass_relative_error_to_refined']:.2e}",
+                28,
+                color="#657083",
+            )
+            text(
+                cx,
+                y + 126,
+                f"True relative residual {r['relative_residual']:.2e}",
+                26,
+                color="#657083",
+            )
+            continue
         text(cx, y, f"{r['solve_s']:.2f} s solve", 36, True)
         text(cx, y + 49, f"Relative residual  {r['relative_residual']:.2e}", 29, color="#657083")
         metric = (
@@ -98,7 +123,9 @@ def main():
         height - 42,
         (
             f"Both methods: factored L M⁻¹ L · FSAI: float32 factors / float64 arithmetic · k from tolerance {meta['convergence']['fsai_rtol']:.0e} · Independently recomputed residuals · Exact constraints"
-            if meta.get("tuned")
+            if meta.get("tuned") and not meta.get("refresh")
+            else f"Same factored operator · FSAI width 48 · Field target {meta['convergence']['field_target']:.0e} vs refined reference · FSAI: median of 3 timings; Jacobi: single warm runs · NVIDIA L40"
+            if meta.get("refresh")
             else f"k from FSAI recursive stopping tolerance {meta['convergence']['fsai_rtol']:.0e} · Residuals recomputed independently · Constraints exact in every field · No clipping of overshoot"
         ),
         27,
@@ -116,7 +143,9 @@ def main():
     meta["render"] = render
     meta["figure_size"] = list(canvas.size)
     meta["note"] = (
-        "One scene; labels and legend added afterward. Single RHS timings exclude setup. Region diagram uses a categorical palette."
+        "One scene; labels and legend added afterward. Total timings include operator and preconditioner setup. FSAI median of 3; Jacobi single warm runs. Field errors use independent refined reference."
+        if meta.get("refresh")
+        else "One scene; labels and legend added afterward. Single RHS timings exclude setup. Region diagram uses a categorical palette."
     )
     args.output.with_suffix(".json").write_text(json.dumps(meta, indent=2) + "\n")
     print(args.output, canvas.size)

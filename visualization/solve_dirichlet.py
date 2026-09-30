@@ -24,6 +24,8 @@ def digest(x):
 
 def run_tuned(a, laplacian, mass, free, prescribed, method, budget, rtol=0.0):
     """Both methods use the same factored operator and zero free initial guess."""
+    if method not in ("fsai_cg", "fsai_cr", "jacobi_cg", "jacobi_cr"):
+        raise ValueError(f"Unknown tuned method: {method}")
     matrix = upload(a, "cuda:0")
     L = upload(laplacian, "cuda:0")
     mw = wp.array(mass, dtype=wp.float64, device="cuda:0")
@@ -33,7 +35,7 @@ def run_tuned(a, laplacian, mass, free, prescribed, method, budget, rtol=0.0):
         return SquaredLaplacianOperator(L, mw, fw, row_lanes=4)
 
     def make_preconditioner():
-        if method == "fsai_cg":
+        if method.startswith("fsai_"):
             return FSAI(
                 matrix,
                 max_row_size=48,
@@ -47,7 +49,7 @@ def run_tuned(a, laplacian, mass, free, prescribed, method, budget, rtol=0.0):
     b = operator.rhs(wp.array(prescribed, dtype=wp.float64, device="cuda:0"))
     b_np = b.numpy()
     x = wp.zeros_like(b)
-    solver = linear.cg if method == "fsai_cg" else linear.cr
+    solver = getattr(linear, method.rsplit("_", 1)[1])
     pre = make_preconditioner()
     solver(operator, b, x, M=pre, tol=0.0, atol=0.0, maxiter=10, check_every=0)
     wp.synchronize()
@@ -75,7 +77,7 @@ def run_tuned(a, laplacian, mass, free, prescribed, method, budget, rtol=0.0):
         solver="warp.optim.linear." + solver.__name__,
         preconditioner=(
             "FSAI, width=48, kap_tolerance=0.003, float32 storage, float64 accumulation, apply_lanes=4"
-            if method == "fsai_cg"
+            if method.startswith("fsai_")
             else "Jacobi"
         ),
         operator="full L.T M^-1 L, factored application; row_lanes=4; exact elimination",

@@ -1,239 +1,147 @@
 # Head-to-tail biharmonic interpolation
 
-![Prescribed regions, tuned FSAI-CG at convergence, and Jacobi-CR at k, 10k, and 100k.](../assets/dragon-dirichlet-comparison.png)
+![Prescribed regions, FSAI-CG, and Jacobi-CG at k, 10k, and 100k with refreshed timings](../assets/dragon-dirichlet-comparison.png)
 
-This regenerated comparison uses the [tuned FSAI recipe](../results/dirichlet-tuning/README.md):
-maximum width 48, `kap_tolerance=0.003`, float32 factor storage with float64
-accumulation, and four cooperating CUDA lanes per row. **Both solvers use
-the same factored squared-Laplacian operator.** The earlier width-eight,
-explicitly assembled comparison is [archived here](dirichlet-original.md).
+The current comparison uses **one FSAI method, CG**, and **Jacobi-CG**.
+It was rerun after the FSAI setup/packing changes. FSAI-CG and FSAI-CR were
+compared at the same independently checked field-accuracy target, then the
+faster qualifying method was retained in the rendering and residual plot.
+The former four-method residual plot and Jacobi-CR rendering remain in
+[the repository history](https://github.com/alecjacobson/warp-preconditioners/tree/f01f138).
+The [original width-eight experiment](dirichlet-original.md) is also archived.
 
-The problem and mesh are unchanged:
+## Problem and constraints
+
+We minimize
 
 $$
-E(u)=\frac12 u^TLM^{-1}Lu,
-\qquad u_i=-1\text{ on the tail},\quad u_i=1\text{ on the head}.
+E(u)=\tfrac12 u^T L M^{-1}L u,
+\qquad u_i=-1\text{ on the tail},\quad u_i=+1\text{ on the head}.
 $$
 
-There is **no data term or diagonal regularizer**. All free values start at
-zero. The first dragon shows the fixed regions; the next four show the
-actual final iterates of independent, uninterrupted solves. All solution
-dragons use the same 26-band striped colormap and scalar range, without
-clipping overshoot. Geometry, camera, lights, and spacing match the original
-scene.
+There is no data term or diagonal regularizer. Free variables start at zero,
+and constrained values are imposed exactly by elimination. The first dragon
+marks the prescribed regions: blue tail, red head, gray free vertices.
+The other four dragons share one scalar range and 26 crisp OKLab color bands;
+overshoot is retained. This is a scalar field on the original geometry.
 
-## Regions and reduced system
-
-The leftmost dragon identifies the constrained vertices: **blue is the tail
-at −1, red is the head at +1, and gray is free**. This view uses categorical
-colors, not the solution colorbar. The remaining four dragons share one
-26-band striped scalar colormap, including all their extrema.
-
-Selections use the original mesh coordinates:
-
-| Patch | Selection | Vertices | Value |
+| Patch | Selection in original coordinates | Vertices | Value |
 | --- | --- | ---: | ---: |
-| Raised tail | Largest connected component of $x<-70$ and $z>45$ | 12,684 | −1 |
-| Upper head | Largest connected component of $x>70$ and $z>55$ | 27,578 | +1 |
+| Tail | Largest connected component of x < −70 and z > 45 | 12,684 | −1 |
+| Head | Largest connected component of x > 70 and z > 55 | 27,578 | +1 |
 
-Both candidate selections already form single connected patches. The
-original mesh has 360,757 vertices and 721,510 triangles. After fixing
-40,262 vertices, the reduced system has **320,495 unknowns and 6,525,939
-stored nonzeros**.
+There are 360,757 vertices and 721,510 triangles, with **320,495 free
+unknowns**. The connected mesh and nonempty fixed regions remove the constant
+nullspace. The full squared operator is formed before elimination, retaining
+all rows of the Laplacian, including rows at constrained vertices. The
+assembled reduced matrix has 6,525,939 stored entries and supplies both
+preconditioners. Every Krylov matrix product uses the same float64 factored
+operator `Rᵀ Lᵀ M⁻¹ L R`, with four cooperating CUDA lanes per row.
 
-Let $b$ denote fixed indices and $f$ free indices. We form the **full**
-squared operator before eliminating fixed values:
+## Choosing the FSAI method fairly
 
-$$
-Q_{ff}u_f=-Q_{fb}u_b.
-$$
-
-In particular, the energy retains all rows of $L$, including those at fixed
-vertices. Squaring an already restricted Laplacian generally gives a
-different problem. The mesh is connected, so the nullspace of $L$, and
-therefore of $Q$, consists of constants. Fixing these nonempty patches
-removes that nullspace: $Q_{ff}$ is symmetric positive definite. An
-independent Cholesky factorization with AMD ordering checks this without
-any diagonal shift.
-
-## Updated solver comparison
-
-FSAI-CG reaches recursive relative tolerance $10^{-12}$ at
-**$k=33{,}374$ iterations**. Jacobi-CR runs for exactly $k$, $10k=333{,}740$,
-and $100k=3{,}337{,}400$ iterations. These budgets are smaller than in the
-original figure because $k$ now comes from the faster FSAI method.
-
-| Method | Iterations | Solve (s) | Setup (s) | Relative mass-norm difference from FSAI | Energy |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Tuned FSAI-CG | 33,374 | 8.56 | 1.073 | 0 | 0.0002063421512 |
-| Jacobi-CR, $k$ | 33,374 | 4.01 | 0.001 | 0.8374 | 0.04425449381 |
-| Jacobi-CR, $10k$ | 333,740 | 39.95 | 0.001 | 0.8403 | 0.006240283998 |
-| Jacobi-CR, $100k$ | 3,337,400 | 403.77 | 0.002 | 1.284e-09 | 0.0002063421512 |
-
-Timings are single runs on the L40 after warmup. Figure labels show solve
-time; the FSAI label also reports setup. Setup includes construction of the
-factored operator and preconditioner. Host assembly, uploads, RHS construction,
-verification, and rendering are excluded. For repeated timing estimates,
-see the tuning report.
-
-The factored operator applies
+FSAI settings remain width 48, κ=.003, float32 factor storage, float64
+accumulation, and four lanes per row. We compare CG and CR at relative
+lumped-mass field error **≤1e-8**, measured against the saved independently
+refined energy reference:
 
 $$
-Ax=R^TL^TM^{-1}LRx,
-\qquad b=-R^TL^TM^{-1}Lu_b,
+\frac{\sqrt{(u-u_*)^T M (u-u_*)}}{\sqrt{u_*^T M u_*}}\le10^{-8}.
 $$
 
-where $R$ inserts free values into a full vector and $u_b$ contains the
-prescribed values with zeros on free vertices. All rows of $L$ participate.
-The explicitly assembled $Q_{ff}$ is used to construct the preconditioners;
-the Krylov products use the factored form. No materialized squared matrix
-is used in those products. The problem remains float64; only the FSAI
-factor storage is compressed.
+This replaces the older choice of k from a recursive residual tolerance.
+Equal recursive tolerances had given substantially different field errors
+for CG and CR. Each solver's trajectory is sampled every 500 iterations,
+then every 25 within the first qualifying interval. The chosen endpoint is
+checked again with an uninstrumented solve. These are sampled qualifying
+stops, not claims of exact first crossings or a new search over FSAI widths.
 
-## Numerical and rendering checks
+| FSAI solver | Selected iterations | Field error | Median setup + solve |
+| --- | ---: | ---: | ---: |
+| CG | 33,125 | 9.32e-9 | **10.1437 s** |
+| CR | 33,425 | 6.60e-9 | 10.6070 s |
 
-The FSAI field differs from the independently refined energy reference by
-**1.29e-09** in relative mass norm. A separate $2k$ run changes it
-by **1.29e-09**. The Jacobi-$100k$ field differs
-from the refined reference by **3.59e-11**. All fields satisfy the
-prescribed values exactly. FSAI's range is **-1.151402890 to 1.020900690**;
-this genuine overshoot is retained in the shared color scale.
+Three interleaved warm repetitions per method select **FSAI-CG**, about 4.6%
+faster in this run. The figure uses the median-total trial: **9.0374 s solve + 1.1063 s setup**.
+Keeping those components paired makes their sum equal the displayed total.
+The rendered FSAI field is the last validated repeat; all repetitions meet
+the target.
 
-Field errors are relative mass norms of full fields. The figure's residuals
-are independently recomputed on the CPU from the full energy gradient:
+[Selection samples, all timing repetitions and provenance](../results/dirichlet-refresh.json).
 
-$$
-\frac{\|(L^TM^{-1}Lu)_f\|_2}{\|b\|_2}.
-$$
+## Fresh rendering measurements
 
-These differ from the internal recursive residuals. Neither a small residual
-nor a lower bending energy guarantees that an unconverged iterate is close
-to the final field in mass norm. In particular, Jacobi's field error need
-not decrease monotonically with iteration budget.
+| Method | Iterations | Setup (s) | Solve (s) | Total (s) | Relative field error | True relative residual |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| FSAI-CG | 33,125 | 1.106 | 9.04 | 10.14 | 9.320e-09 | 1.165e-09 |
+| Jacobi-CG, 1k | 33,125 | 0.003 | 3.82 | 3.82 | 8.235e-01 | 2.393e-05 |
+| Jacobi-CG, 10k | 331,250 | 0.002 | 38.07 | 38.07 | 8.965e-01 | 2.012e-06 |
+| Jacobi-CG, 100k | 3,312,500 | 0.003 | 383.05 | 383.05 | 8.953e-12 | 3.315e-07 |
 
-The refined reference evaluates stationarity in long double, using
-AMD Cholesky correction solves. Agreement with the old explicitly assembled
-Cholesky solution is also recorded, but is not used as the accuracy gate:
-that matrix has a documented cancellation-error limit. The verification
-checks exact constraints, the full-energy restriction, energies, independent
-residuals, and agreement of FSAI with the refined reference.
+All numerical solves and preconditioners run in Warp on NVIDIA L40. FSAI
+labels use three-repeat medians; each Jacobi image uses one warm,
+uninterrupted run at its stated iteration budget. Total time includes
+factored-operator and preconditioner setup. Uploads, host assembly, JIT,
+verification and rendering are excluded. These are **iteration-budget
+comparisons**, not snapshots at equal wall time.
 
-Every rendered field is SHA-256 checked. Blender's actual scalar attribute
-is read back and compared exactly with the float32 conversion of the saved
-float64 field. Colors are assigned after scalar interpolation on each
-triangle, yielding crisp isointervals rather than interpolated vertex colors.
+The displayed field errors use the same independently refined reference for
+both methods. True residuals independently evaluate the full energy gradient
+`(Lᵀ((L u)/mass))[free]`, divided by the norm of the eliminated right-hand
+side. Neither a small recursive residual nor a small true residual alone is
+used as proof of field accuracy on this ill-conditioned problem.
 
 ## Residual history
 
-![Measured log-log residual histories.](../assets/dragon-dirichlet-residuals.png)
+![Fresh trajectories for selected FSAI-CG and Jacobi-CG only](../assets/dragon-dirichlet-residuals.png)
 
-The plot includes tuned FSAI-CG, tuned FSAI-CR, Jacobi-CR, and Jacobi-CG. All use the same full
-factored operator, prescribed values, and zero free initial guess as the
-figure. Jacobi-CG uses the same diagonal preconditioner as Jacobi-CR.
-Both FSAI methods use width 48, `kap_tolerance=0.003`, float32 factor storage
-with float64 arithmetic, and four lanes per factor row.
-Its vertical quantity is a **relative Euclidean residual norm**,
-not squared residual loss, bending energy, or forward field error:
+The plot contains **only FSAI-CG and Jacobi-CG**. Solid curves independently
+recompute the relative residual; dashed curves show Warp's internal
+recursive residual. Both start with true relative residual 1 at iteration
+zero, which is omitted from the logarithmic axis. FSAI runs to its selected
+field-accuracy stop k; Jacobi runs to 100k. The FSAI stopping target is a
+field error, not a horizontal residual threshold.
 
-$$
-\rho_k=\frac{\|(L^T M^{-1} L u_k)_f\|_2}{\|b\|_2}.
-$$
+Samples retain each solver's live Krylov state, without restarts or smoothing.
+The diagnostic sampler's endpoints are checked against the separately timed
+rendered fields. Its wall time includes transfers, graph captures and CPU
+checks and is excluded from benchmark solve timings. The temporary sampler
+uses Warp 1.15's private loop driver; CPU/CUDA regression tests check its
+endpoints against native CG and CR.
 
-Solid curves recompute this quantity independently in CPU float64 at each
-sample. Dashed curves show the residual maintained by Warp's iterative
-recurrence. The horizontal tolerance applies to both recursive FSAI residuals;
-it is not a guarantee that the independently recomputed residual reaches
-that value. Residual drift and finite precision explain the visible gap
-near convergence. Field accuracy is checked separately as described above.
+Both sampled final fields match the separately timed figure fields **exactly**
+(zero relative L2 difference). The true residual and reference-field error
+also agree at every rendered k, 10k and 100k checkpoint. FSAI ends at true
+relative residual **1.16e-9**, versus recursive **1.47e-10**. Jacobi ends at
+true residual **3.31e-7**, versus recursive **3.18e-30**, while its field error
+is **8.95e-12**. The large residual gap is reported directly.
 
-Each curve comes from a single live Krylov recurrence. The sampling driver
-pauses the native GPU iteration loop at logarithmically spaced checkpoints
-and at the figure's $k$, $10k$, and $100k$. It preserves all search
-directions and reduction buffers; it never calls a fresh solve at a
-checkpoint. Iteration zero is saved with relative residual 1, but omitted
-from the log axis. Lines connect actual samples, without smoothing or
-cumulative-minimum filtering; unsampled intermediate oscillations are not
-shown. Both FSAI methods stop at recursive relative tolerance 1e-12, with a
-500,000-iteration cap, while both Jacobi methods run through
-$100k$ with tolerance zero, matching the figure's budget.
-
-The matched tuned FSAI comparison gives:
-
-| Method | Iterations | Recomputed relative residual | Recursive relative residual | Relative mass-norm field error |
-| --- | ---: | ---: | ---: | ---: |
-| Tuned FSAI-CG | 33,374 | 8.820e-10 | 9.756e-13 | 1.29e-9 |
-| Tuned FSAI-CR | 33,256 | 6.204e-9 | 8.425e-13 | 2.679e-6 |
-
-Field errors use the independently refined reference; CG's is from the saved
-figure verification and CR's is measured by the tracing driver. CR reduces
-the residual more smoothly and finishes in slightly fewer iterations, but
-its final true residual and field error are larger. The recursive residual
-underestimates the true residual for both methods. These are iteration and
-accuracy comparisons, not a comparison of uninstrumented solve times.
-
-The added Jacobi-CG run gives the following independently recomputed residuals:
-
-| Iterations | Jacobi-CR | Jacobi-CG |
-| --- | ---: | ---: |
-| $k=33{,}374$ | 4.877e-06 | 3.980e-05 |
-| $10k=333{,}740$ | 1.224e-06 | 2.115e-06 |
-| $100k=3{,}337{,}400$ | 8.438e-08 | 3.315e-07 |
-
-CR has the smaller residual at these three budgets, but this does not imply
-smaller field error at every budget. Against the refined reference, CG's
-mass-relative field errors are 0.8229, 0.8985, and 8.95e-12; CR's are 0.8374,
-0.8403, and 3.59e-11. Both final fields are highly accurate. These are
-iteration comparisons, not measurements at equal wall time.
-CG's recursive residual eventually reaches 5.30e-30 despite its much larger
-recomputed residual. Recursive values below 1e-17 fall outside the plot axes;
-the JSON retains all values. The plot therefore supports comparing both
-baselines rather than claiming CR is uniformly superior.
-
-[`results/dirichlet-residuals.json`](../results/dirichlet-residuals.json)
-contains the sample values, configuration, input hash, and endpoint checks
-against the saved FSAI-CG and Jacobi-CR figure fields. Jacobi-CG and FSAI-CR
-have no corresponding fields in the dragon rendering, so their figure checks are null.
-When a refined reference is available, new traces also record mass-weighted
-relative field errors. Instrumented wall times include graph
-captures, downloads, and CPU verification; they are **not solver benchmark
-timings**. The diagnostic adapter uses Warp 1.15's private loop driver in
-a temporary, process-local context and restores it afterward; the library
-and its public solver API are unchanged. CPU/CUDA tests compare sampled
-and native endpoints exactly for both CG and CR.
-
-After preparing `data/dirichlet-tuned/` below, collect and plot with:
-
-```bash
-OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/trace_dirichlet.py
-python benchmarks/plot_dirichlet_residuals.py
-```
-
-Only the plot command is needed to regenerate the image from the committed
-JSON. Add `--resume` to the trace command to retain completed trajectories
-with matching input, operator, Warp version, and GPU, and collect only missing
-methods. The PNG is tracked with Git LFS.
+[Raw trajectories and endpoint checks](../results/dirichlet-residuals.json).
+The independent reference is the unchanged long-double energy-gradient
+refinement, with diagonally equilibrated float64 AMD Cholesky corrections,
+from the earlier audit. Its array hash is verified before this experiment;
+no external solver produces any rendered iterative field.
 
 ## Reproduction
 
-Generate the benchmark dumps in `/tmp/dump` as in the main README, then:
+Prepare the original `data/dirichlet-tuned/` fields and independently refined
+reference using the [earlier commands](https://github.com/alecjacobson/warp-preconditioners/blob/f01f138/visualization/dirichlet.md#reproduction).
+The benchmark Laplacian dump remains in `/tmp/dump/k4_Q.mtx`. Then:
 
 ```bash
-OPENBLAS_NUM_THREADS=1 python visualization/solve_dirichlet.py \
-  --dir /tmp/dump --mesh /path/to/xyzrgb_dragon-720K.ply \
-  --output data/dirichlet-tuned --tuned
-# Independent reference requires SuiteSparse and scikit-sparse.
-OPENBLAS_NUM_THREADS=1 python benchmarks/refine_dirichlet.py \
-  --data data/dirichlet-tuned --output data/dirichlet-tuned
-OPENBLAS_NUM_THREADS=1 python visualization/verify_dirichlet.py \
-  --data data/dirichlet-tuned \
-  --refined-reference data/dirichlet-tuned/refined_reference.npy
-blender -b --factory-startup --python visualization/render_dragon.py -- \
-  --data data/dirichlet-tuned --width 6000 --height 1120 --samples 64
-python visualization/compose_dirichlet.py --data data/dirichlet-tuned
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/refresh_dirichlet.py --stage select
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/refresh_dirichlet.py --stage fields
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/trace_dirichlet.py
+python benchmarks/plot_dirichlet_residuals.py
+# Blender 4.5 with OptiX; run after solver timing measurements finish:
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=8 blender -b --factory-startup \
+  --python visualization/render_dragon.py -- \
+  --data data/dirichlet-current --width 6000 --height 1120 --samples 64
+python visualization/compose_dirichlet.py
 ```
 
-The saved fields and editable Blender scene are in ignored
-`data/dirichlet-tuned/`. Published [figure metadata](../assets/dragon-dirichlet-comparison.json)
-contains timings, diagnostics, hashes, the Cholesky/refined-reference audit,
-and render settings. The PNG uses Git LFS. The
-[nonlinear data-smoothing comparison](README.md) is a separate experiment.
+Fresh fields and intermediate renders live in ignored `data/dirichlet-current/`.
+[Figure metadata](../assets/dragon-dirichlet-comparison.json) includes current
+timings, selected FSAI measurements, independent field errors and render hashes.
+PNGs are tracked with Git LFS. The [data-smoothing comparison](README.md)
+and [SimJEB elasticity experiments](../results/elasticity.md) are separate problems.

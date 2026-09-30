@@ -39,45 +39,40 @@ checks field accuracy. This nonlinear, stronger-smoothing example
 is a different problem from the α = 1 height benchmark timings above.
 [Target formula, convergence checks, and reproduction](visualization/README.md).
 
-![Head and tail constraints, followed by FSAI-CG and Jacobi-CR biharmonic interpolation at k, 10k and 100k.](assets/dragon-dirichlet-comparison.png)
+![Head and tail constraints, followed by selected FSAI-CG and Jacobi-CG at k, 10k and 100k, with refreshed timings.](assets/dragon-dirichlet-comparison.png)
 
-A second comparison prescribes **−1 on the tail and +1 on the head**, then
+This comparison prescribes **−1 on the tail and +1 on the head**, then
 minimizes $u^TLM^{-1}Lu/2$ with **no data term**. Free vertices start at zero.
-The first dragon marks the fixed regions; the next four compare converged
-FSAI-CG with Jacobi-CR at matched iteration budgets. The reduced system is
-SPD with 320,495 unknowns; constraints are enforced exactly by elimination.
-The regenerated figure uses tuned width-48 FSAI and the same factored
-operator for both solvers. Here **k = 33,374**: FSAI takes **8.56 s to solve
-plus 1.07 s setup**. Jacobi's relative field error is **83.7% at k**, **84.0%
-at 10k**, and **1.28e-9 at 100k** (403.77 s). The nonmonotonic early field
-error is reported directly. A long-double energy reference with AMD
-Cholesky corrections independently checks the result; the
-[original width-eight figure](visualization/dirichlet-original.md) is archived.
-[Region definitions, convergence checks, and reproduction](visualization/dirichlet.md).
+The first dragon marks the fixed regions; the next four show **FSAI-CG** and
+**Jacobi-CG at k, 10k and 100k**. Both use the same factored operator, with
+exact constraint elimination and 320,495 free unknowns.
 
-![Log-log residual convergence for the tuned dragon Dirichlet problem: tuned FSAI-CG, tuned FSAI-CR, Jacobi-CR, and Jacobi-CG, with independently recomputed and recursive residuals.](assets/dragon-dirichlet-residuals.png)
+The image has been rerun after the FSAI setup/packing changes. We compared
+FSAI-CG and FSAI-CR at **relative mass-weighted field error ≤1e-8** against the
+independently refined reference. **CG wins: 10.14 s median setup + solve**,
+versus **10.61 s for CR**, across three interleaved warm repeats. The retained
+width-48 FSAI-CG reaches the target at **k = 33,125** sampled iterations.
+Labels show total time, separate solve/setup components, field error and
+independently recomputed residual. Jacobi timings are single warm runs.
 
-The log–log plot measures relative residual norm, $\|r_k\|_2/\|b\|_2$.
-Solid curves independently recompute the full biharmonic energy gradient;
-dashed curves show Warp's recursive residual. They can diverge near
-convergence on this ill-conditioned system. Samples preserve each solver's
-Krylov state, with no restarts or smoothing. The zero-iteration residual is
-1 and is omitted from the logarithmic axis.
-Both Jacobi-CG and Jacobi-CR run through the same 3,337,400-iteration budget,
-so their convergence can be compared directly.
-Tuned FSAI-CR uses the same preconditioner as FSAI-CG and reaches the same
-recursive tolerance in **33,256 iterations**, versus CG's **33,374**.
-Their independently recomputed final residuals are **6.20e-9** and **8.82e-10**,
-respectively; equal recursive tolerances do not imply equal final accuracy.
-[Convergence data and reproduction](visualization/dirichlet.md#residual-history).
+[Fresh selection measurements](results/dirichlet-refresh.json),
+[problem, accuracy checks and reproduction](visualization/dirichlet.md).
+The [original width-eight figure](visualization/dirichlet-original.md) is archived.
 
-The [FSAI tuning study](results/dirichlet-tuning/README.md) reduces
-this unregularized solve to about **10 seconds including setup**, using
-wider adaptive factors and a factored squared-Laplacian operator. A sparser
-alternative roughly halves the original cost per iteration. Controlled
-tests explain the large timing change when the data term is removed, and a
-higher-precision reference exposes an accuracy limit in the previously
-assembled squared matrix.
+![Fresh log-log residual trajectories for selected FSAI-CG and Jacobi-CG only.](assets/dragon-dirichlet-residuals.png)
+
+The residual plot contains **only those two methods**. Solid curves recompute
+$\|r_k\|_2/\|b\|_2$ from the full biharmonic energy gradient; dashed curves
+show Warp's recursive residual. They can diverge on this ill-conditioned
+system. Samples preserve Krylov state without restarts or smoothing, and
+both initial residuals are 1. Iteration zero is omitted from the log axis.
+The selected FSAI endpoint is based on verified **field accuracy**, not a
+recursive residual threshold. Jacobi runs through **3,312,500 iterations**.
+
+The [earlier FSAI tuning study](results/dirichlet-tuning/README.md) explains
+why wider factors and a factored squared-Laplacian operator help this
+unregularized problem, and why assembling the squared matrix limits accuracy.
+Its historical timings are separate from the refreshed measurements above.
 
 ![FSAI tuning: conditioning, total time, per-iteration cost, and parameter tradeoffs.](assets/dragon-dirichlet-tuning.png)
 
