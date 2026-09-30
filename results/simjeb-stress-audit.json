@@ -1,0 +1,145 @@
+{
+  "deck_sha256": "1dc777d4e6d7a8f10aac7bf3994df849b8b38f7853cf3374ea46189e586c1b33",
+  "subcase": 1,
+  "spc": 1,
+  "load": 2,
+  "exact_constraint_mask_match": true,
+  "fixed_vertices": 428,
+  "exact_loaded_vertex_mask_match": true,
+  "loaded_vertices": 753,
+  "applied_force_n": [
+    0.0,
+    0.0,
+    35585.77
+  ],
+  "applied_reference_m": [
+    -0.021027999999999998,
+    -0.0749383,
+    0.04462994
+  ],
+  "independent_load_relative_difference": 2.247517200425263e-15,
+  "maximum_fixed_displacement_m": 0.0,
+  "bolts": [
+    {
+      "element": 251620,
+      "center": 44122,
+      "vertices": 106,
+      "reaction_n": [
+        72.5546310610711,
+        1471.8691284035172,
+        2671.6132624569796
+      ],
+      "min_m": [
+        0.04689333,
+        -0.0035734,
+        -6.27e-17
+      ],
+      "max_m": [
+        0.057200980000000005,
+        0.006736529,
+        0.0078486
+      ]
+    },
+    {
+      "element": 251621,
+      "center": 44123,
+      "vertices": 109,
+      "reaction_n": [
+        1437.4750941011011,
+        22481.962343853113,
+        -20385.915520608876
+      ],
+      "min_m": [
+        -0.005331540000000001,
+        -0.005333999999999999,
+        2.1560000000000002e-16
+      ],
+      "max_m": [
+        0.005331542,
+        0.005333910999999999,
+        0.0078486
+      ]
+    },
+    {
+      "element": 251622,
+      "center": 44124,
+      "vertices": 108,
+      "reaction_n": [
+        -2423.4575820155383,
+        -27407.824735966944,
+        -28279.48301144768
+      ],
+      "min_m": [
+        -0.00515382,
+        -0.15328,
+        1.112e-15
+      ],
+      "max_m": [
+        0.005153824,
+        -0.14297100000000001,
+        0.0078486
+      ]
+    },
+    {
+      "element": 251623,
+      "center": 44125,
+      "vertices": 105,
+      "reaction_n": [
+        913.4278568590652,
+        3453.9932637125357,
+        10408.015269592996
+      ],
+      "min_m": [
+        0.03292946,
+        -0.152122,
+        9.725999999999999e-16
+      ],
+      "max_m": [
+        0.04323711,
+        -0.141813,
+        0.0078486
+      ]
+    }
+  ],
+  "force_balance_n": [
+    5.702148004743346e-09,
+    2.228858890280465e-09,
+    -6.51925802230835e-09
+  ],
+  "moment_balance_nm": [
+    1.646185410209e-10,
+    2.5136159820249304e-10,
+    4.582707484424844e-10
+  ],
+  "free_relative_force_residual": 1.0349517011495163e-11,
+  "independent_stress_relative_difference": 3.826652109613994e-15,
+  "reference_displacement_sha256": "9274e66411226cbf93ad8e03ea035bcc2b1ba7c9e9d0dfcc9577c493ed5b63f3",
+  "reference_stress_sha256": "20bd70b0b241ee855aa21866936872d48150cfd7a240caa5704975cc5d899208",
+  "maximum_displacement_mm": 0.7988059942380153,
+  "peak": {
+    "node": 283,
+    "nastran_id": 284,
+    "position_mm": [
+      -1.04908,
+      -143.07600000000002,
+      1.278e-12
+    ],
+    "fixed": true,
+    "stress_mpa": 1012.5607385975001
+  },
+  "surface_stress_percentiles_mpa": {
+    "50": 75.56443159228562,
+    "90": 190.4052811734307,
+    "95": 241.5208431217558,
+    "99": 491.81268115460495,
+    "99.9": 767.2964322933117,
+    "100": 1012.5607385975001
+  },
+  "hottest_0_1_percent": {
+    "nodes": 19,
+    "max_distance_to_fixed_mm": 1.7391562858167997,
+    "fixed_nodes": 13
+  },
+  "gray_masked_surface_triangles_in_previous_render": 712,
+  "limitations": "Audits consistency with the imported SimJEB deck and independent stress evaluation; not a mesh-convergence study or a validation of every OptiStruct RBE3 implementation detail."
+}

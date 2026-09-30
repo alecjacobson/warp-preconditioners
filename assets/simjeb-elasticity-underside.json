@@ -99,8 +99,8 @@
     "geometry": "Original SimJEB tet boundary plus actual saved physical displacement; no exaggeration",
     "colormap": "isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
     "clamps": "Stress colormap retained on all constrained surfaces",
-    "view": "top",
-    "display_rotation_x_radians": 0.0,
+    "view": "underside",
+    "display_rotation_x_radians": 3.141592653589793,
     "image_size": [
       4800,
       1150

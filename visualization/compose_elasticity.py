@@ -1,6 +1,7 @@
 """Label the simultaneous elasticity rendering with measured times and errors."""
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -9,10 +10,12 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def main():
+    underside = "--underside" in sys.argv
+    suffix = "-underside" if underside else ""
     root = Path("data/simjeb")
     meta = json.loads(Path("results/elasticity.json").read_text())
-    render = json.loads((root / "render.json").read_text())
-    scene = Image.open(root / "elasticity-render.png").convert("RGBA")
+    render = json.loads((root / f"render{suffix}.json").read_text())
+    scene = Image.open(root / f"elasticity{suffix}-render.png").convert("RGBA")
     width, ph = scene.size
     header, footer = 255, 270
     canvas = Image.new("RGB", (width, ph + header + footer), "white")
@@ -25,11 +28,19 @@ def main():
         )
         draw.text((x, y), label, font=font, fill=color, anchor="mt")
 
-    text(width / 2, 20, "SimJEB #225: fixed bolt holes, vertical pin load ↑", 60, True)
+    text(
+        width / 2,
+        20,
+        "SimJEB #225: underside reveals bolt-hole stress concentrations"
+        if underside
+        else "SimJEB #225: fixed bolt holes, vertical pin load ↑",
+        60,
+        True,
+    )
     text(
         width / 2,
         104,
-        f"Frozen near {meta['snapshot_budget_s']:.3f} s setup + solve  ·  NVIDIA L40  ·  Actual displacement, no exaggeration  ·  Dark gray = fixed",
+        f"Frozen near {meta['snapshot_budget_s']:.3f} s setup + solve  ·  NVIDIA L40  ·  Actual displacement, no exaggeration  ·  Stress colors retained on fixed surfaces",
         31,
         color="#657083",
     )
@@ -88,7 +99,11 @@ def main():
         25,
         color="#657083",
     )
-    out = Path("assets/simjeb-elasticity-comparison.png")
+    out = Path(
+        "assets/simjeb-elasticity-underside.png"
+        if underside
+        else "assets/simjeb-elasticity-comparison.png"
+    )
     canvas.save(out, optimize=True)
     figure_meta = {
         k: meta[k] for k in ["mesh", "gpu", "warp", "snapshot_budget_s", "winner", "stress"]

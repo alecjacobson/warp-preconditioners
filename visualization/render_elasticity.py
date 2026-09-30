@@ -19,6 +19,8 @@ from render_dragon import area, look_at
 
 
 def main():
+    underside = "--underside" in sys.argv
+    suffix = "-underside" if underside else ""
     root = Path("data/simjeb").resolve()
     fields = np.load(root / "comparison.npz")
     meta = json.loads(Path("results/elasticity.json").read_text())
@@ -79,15 +81,6 @@ def main():
     links.new(attr.outputs["Fac"], normalize.inputs["Value"])
     links.new(normalize.outputs["Result"], ramp.inputs["Fac"])
     links.new(ramp.outputs["Color"], bsdf.inputs["Base Color"])
-    clamp = bpy.data.materials.new("Fixed bolt-hole surfaces")
-    clamp.use_nodes = True
-    clamp.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (
-        0.12,
-        0.14,
-        0.17,
-        1,
-    )
-    clamp.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.8
     objects = []
     ground_z = (
         min(float(((v + amplification * fields[n] - center) * scale)[:, 2].min()) for n in order)
@@ -112,10 +105,6 @@ def main():
         mesh.polygons.foreach_set("loop_total", np.full(len(f), 3, dtype=np.int32))
         mesh.polygons.foreach_set("use_smooth", np.ones(len(f), dtype=bool))
         mesh.materials.append(mat)
-        mesh.materials.append(clamp)
-        mesh.polygons.foreach_set(
-            "material_index", np.all(fields["fixed"][f], axis=1).astype(np.int32)
-        )
         mesh.update()
         stress = fields["von_mises_" + name]
         assert (
@@ -134,6 +123,10 @@ def main():
         ob = bpy.data.objects.new(name, mesh)
         bpy.context.collection.objects.link(ob)
         ob.location = (i - 1.5) * 2.08 * right
+        if underside:
+            # A rigid display rotation only; the saved physical field is unchanged.
+            ob.rotation_euler[0] = math.pi
+            ob.location.z = float(positions[:, 2].max())
         objects.append(
             dict(
                 name=name,
@@ -151,16 +144,22 @@ def main():
     camera = bpy.data.objects.new("camera", camera_data)
     bpy.context.collection.objects.link(camera)
     target = Vector((0, 0, 0.36))
-    direction = Vector((math.cos(az) * math.cos(elevation), math.sin(az) * math.cos(elevation), math.sin(elevation)))
+    direction = Vector(
+        (
+            math.cos(az) * math.cos(elevation),
+            math.sin(az) * math.cos(elevation),
+            math.sin(elevation),
+        )
+    )
     camera.location = target + 5 * direction
     look_at(camera, target)
     camera_data.type = "ORTHO"
     camera_data.ortho_scale = 8.84
     scene.camera = camera
-    scene.render.filepath = str(root / "elasticity-render.png")
-    bpy.ops.wm.save_as_mainfile(filepath=str(root / "elasticity.blend"))
+    scene.render.filepath = str(root / f"elasticity{suffix}-render.png")
+    bpy.ops.wm.save_as_mainfile(filepath=str(root / f"elasticity{suffix}.blend"))
     bpy.ops.render.render(write_still=True)
-    (root / "render.json").write_text(
+    (root / f"render{suffix}.json").write_text(
         json.dumps(
             dict(
                 objects=objects,
@@ -171,7 +170,9 @@ def main():
                 samples=96,
                 geometry="Original SimJEB tet boundary plus actual saved physical displacement; no exaggeration",
                 colormap="isolines_stripe_map(okloop(26,-4/3*pi,-1/2*pi))",
-                clamps="Dark gray surface patches",
+                clamps="Stress colormap retained on all constrained surfaces",
+                view="underside" if underside else "top",
+                display_rotation_x_radians=math.pi if underside else 0.0,
                 image_size=[4800, 1150],
             ),
             indent=2,

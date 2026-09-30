@@ -132,6 +132,12 @@ SimJEB metadata to its reported precision.
 
 ![Reference and actual bracket iterates frozen near the first winner's wall-clock time.](assets/simjeb-elasticity-comparison.png)
 
+The peak stress is on the **underside of a fixed bolt hole**. The
+[boundary-condition and stress audit](results/elasticity.md#boundary-condition-and-stress-audit)
+checks the source deck, reaction balance, and an independent stress calculation.
+An [underside view](assets/simjeb-elasticity-underside.png) exposes those concentrations;
+stress colors now remain visible on constrained surfaces.
+
 [Problem, tuning, PR comparison, verification, attribution, and reproduction](results/elasticity.md).
 The [earlier dragon elasticity results](results/archive/dragon-elasticity.md) remain archived.
 

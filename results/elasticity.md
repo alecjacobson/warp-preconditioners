@@ -109,7 +109,7 @@ on this problem, so the rendered shapes and stresses should look similar.
 Geometry uses the **actual physical displacement, with no amplification**.
 All four brackets share camera, white background, lighting, and a linear
 **MPa** stress scale with 26 crisp `isolines_stripe_map(okloop(...))` bands.
-Dark gray marks fixed surface triangles. The reference is shown first.
+Stress colors are retained on fixed surface triangles. The reference is shown first.
 The shader interpolates the recovered scalar before the discrete lookup.
 
 Linear-tet stress is constant per element. For visualization, Warp
@@ -119,6 +119,63 @@ is not the peak raw element stress (reference: **1012.56 MPa** nodal,
 **1299.15 MPa** element). Affine/hydrostatic tests verify the
 invariant. Saved displacements and stress fields are hash checked; Blender
 coordinates and scalar attributes are read back and checked before rendering.
+
+## Boundary-condition and stress audit
+
+The imported vertical case was rechecked against the original deck and
+[SimJEB's simulation description, §3.4](https://arxiv.org/html/2105.03534).
+It uses the same four fixed bolt interfaces and pin-load arrangement described
+by the [challenge rules](https://blog.grabcad.com/ge-terms-of-service/).
+SimJEB notes that its detailed modeling assumptions may differ from those
+used by the challenge or individual designers.
+
+- `SUBCASE 1` selects `SPC=1`, `LOAD=2`.
+- Four RBE2 centers (44122–44125) have all six DOFs fixed. Their dependent
+  physical nodes are exactly the **428 fixed vertices** in our imported mesh;
+  saved displacements are identically zero there.
+- `FORCE 2` applies **35,585.77 N in +Z** at node 44126. Its RBE3 connects
+  exactly the **753 loaded physical vertices** used here. An independent
+  six-DOF least-squares construction checks the force distribution.
+- Reactions computed from independent element forces balance the applied
+  force within **1e-8 N**, and its moment within **1e-9 N·m**.
+- Independent NumPy tensor recovery agrees with the saved Warp nodal von
+  Mises field to **3.83e-15 relative error**. This checks indexing, gradients,
+  units, averaging and the invariant, without calling the Warp stress kernel.
+
+The recovered peak is **1012.56 MPa at fixed GRID 284**, on the underside
+at approximately `(-1.05, -143.08, 0)` mm. All 19 vertices in the highest
+0.1% of surface stresses lie within **1.74 mm** of a fixed node; 13 are fixed.
+There are also concentrations around the loaded pin interface. Meanwhile,
+90% of surface vertices are below **190.41 MPa**, so most of the model uses
+the low end of the shared 0–1013 MPa color scale.
+
+The original figure made the concentrations hard to see: the top view hid
+the underside, and a gray boundary-condition material replaced stress colors
+on 712 constrained surface triangles. That mask has been removed. The new
+view below is a rigid display rotation of the same saved fields, with the
+same scale and no displacement amplification.
+
+![Underside stress concentrations around the fixed bolt holes](../assets/simjeb-elasticity-underside.png)
+
+The remaining mottling is consistent with stress variation from first-order
+tetrahedra and nodal recovery, emphasized by alternating crisp color bands.
+Each tet has constant strain/stress; volume-averaging at vertices does not
+provide a mesh-independent smooth stress field. The
+[SimJEB paper](https://arxiv.org/html/2105.03534) likewise distinguishes robust
+displacement prediction from stress accuracy, which can benefit from better
+mesh quality, higher-order elements and fillets. We have **not** performed a
+stress mesh-convergence study, so these checks do not establish that every
+small-scale feature is physically resolved. No additional smoothing or
+numerical changes were made to produce the new images.
+
+[Reproducible audit](../benchmarks/audit_simjeb_stress.py),
+[raw checks and per-bolt reactions](simjeb-stress-audit.json):
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/audit_simjeb_stress.py
+blender -b --factory-startup --python visualization/render_elasticity.py -- --underside
+python visualization/compose_elasticity.py --underside
+```
 
 ## Verification and reproduction
 
