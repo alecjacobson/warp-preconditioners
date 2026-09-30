@@ -137,6 +137,12 @@ verified reference. It shows **actual displacement**, colored by recovered
 Maximum reference displacement is **0.798806 mm**, matching the published
 SimJEB metadata to its reported precision.
 
+The image distinguishes **time to target** from **snapshot time**. All three
+snapshots stop near the same budget; only FSAI meets both error targets there.
+Block Jacobi's 0.0814 s snapshot still has 0.0479% displacement error and
+0.145% energy error, above the 0.01% target. Its time to target is 0.1038 s,
+compared with FSAI's 0.0820 s.
+
 ![Reference and actual bracket iterates frozen near the first winner's wall-clock time.](assets/simjeb-elasticity-comparison.png)
 
 The peak stress is on the **underside of a fixed bolt hole**. The

@@ -17,7 +17,7 @@ def main():
     render = json.loads((root / f"render{suffix}.json").read_text())
     scene = Image.open(root / f"elasticity{suffix}-render.png").convert("RGBA")
     width, ph = scene.size
-    header, footer = 255, 270
+    header, footer = 255, 330
     canvas = Image.new("RGB", (width, ph + header + footer), "white")
     canvas.paste(scene, (0, header), scene)
     draw = ImageDraw.Draw(canvas)
@@ -40,7 +40,7 @@ def main():
     text(
         width / 2,
         104,
-        f"Frozen near {meta['snapshot_budget_s']:.3f} s setup + solve  ·  NVIDIA L40  ·  Actual displacement, no exaggeration  ·  Stress colors retained on fixed surfaces",
+        f"Snapshots near {meta['snapshot_budget_s']:.3f} s setup + solve  ·  NVIDIA L40  ·  Actual displacement (1×)  ·  Time to target = median setup + solve",
         31,
         color="#657083",
     )
@@ -64,16 +64,25 @@ def main():
             row = meta["finalists"][name]
             snap = row["snapshot"]
             text(cx, 240, f"{snap['iterations']:,} iterations", 30)
-            text(cx, y, f"{snap['total_s']:.3f} s setup + solve", 33, True)
+            text(cx, y, f"Time to target: {row['total_s']:.4f} s", 33, True)
+            passed = max(snap["mass_error"], snap["energy_error"]) <= meta["target"]
+            status = "target met" if passed else "target not reached"
             text(
                 cx,
                 y + 48,
+                f"Snapshot {snap['total_s']:.4f} s · {status}",
+                27,
+                color="#087E8B" if passed else "#9B5625",
+            )
+            text(
+                cx,
+                y + 90,
                 f"Displacement error  {100 * snap['mass_error']:.3g}%",
                 27,
                 color="#657083",
             )
             text(
-                cx, y + 87, f"Energy error  {100 * snap['energy_error']:.3g}%", 26, color="#657083"
+                cx, y + 130, f"Energy error  {100 * snap['energy_error']:.3g}%", 26, color="#657083"
             )
     _, palette = striped_okloop()
     lw = 2100
@@ -95,7 +104,7 @@ def main():
     text(
         width / 2,
         canvas.height - 36,
-        f"Von Mises stress (MPa), shared scale  ·  {meta['mesh']['tetrahedra']:,} tetrahedra  ·  {meta['mesh']['free_dofs']:,} free DOFs  ·  Relative displacement and energy errors ≤ 10⁻⁴",
+        f"Von Mises stress (MPa), shared scale  ·  {meta['mesh']['tetrahedra']:,} tetrahedra  ·  Target: displacement and energy errors each ≤ {100 * meta['target']:g}%",
         25,
         color="#657083",
     )
@@ -110,6 +119,9 @@ def main():
     }
     figure_meta["results_source"] = "results/elasticity.json"
     figure_meta["render"] = render
+    figure_meta["timing_labels"] = (
+        "Time to target: median setup + solve at required accuracy. Snapshot: elapsed setup + solve for the displayed field; status checks both errors."
+    )
     figure_meta["finalists"] = {
         name: {k: value for k, value in row.items() if k not in ["samples", "timed_prefixes"]}
         for name, row in meta["finalists"].items()
