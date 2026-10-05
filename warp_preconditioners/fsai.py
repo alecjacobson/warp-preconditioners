@@ -40,7 +40,7 @@ def _kernels(dtype, width, step_size=1):
                 result = values[lo]
         return result
 
-    @wp.kernel(enable_backward=False)
+    @wp.kernel(enable_backward=False, module="unique")
     def diagonal(
         offsets: wp.array(dtype=int),
         columns: wp.array(dtype=int),
@@ -56,7 +56,7 @@ def _kernels(dtype, width, step_size=1):
             scale[i] = dtype(0)
             wp.atomic_add(status, 0, 1)
 
-    @wp.kernel(enable_backward=False)
+    @wp.kernel(enable_backward=False, module="unique")
     def build(
         offsets: wp.array(dtype=int),
         columns: wp.array(dtype=int),
@@ -157,9 +157,10 @@ def _kernels(dtype, width, step_size=1):
                     a -= chol[q, p] * z[q]
                 z[p] = a / chol[p, p]
             # psi=1/z[0]. Relative reduction is 1-old_z0/new_z0.
-            if stopped or dtype(1) - old_z0 / z[0] <= tolerance:
+            if stopped or (tolerance > dtype(0) and dtype(1) - old_z0 / z[0] <= tolerance):
                 break
         norm = wp.sqrt(z[0])
+        valid = bool(True)
         for p in range(wp.static(width)):
             e = i * wp.static(width) + p
             cols_out[e] = -1
@@ -167,6 +168,12 @@ def _kernels(dtype, width, step_size=1):
             if p < size:
                 cols_out[e] = pattern[p]
                 vals_out[e] = z[p] / norm * scale[pattern[p]]
+                if not wp.isfinite(vals_out[e]):
+                    valid = False
+                if p == 0 and vals_out[e] <= dtype(0):
+                    valid = False
+        if not valid:
+            wp.atomic_add(status, 2, 1)
 
     return diagonal, build
 
@@ -196,7 +203,7 @@ class FSAI(LinearOperator):
     ``max_step_size`` distinct largest-residual entries from the lower-triangular
     graph frontier (default one). Larger batches reduce search work but change
     the selected supports. ``kap_tolerance`` tests relative energy improvement
-    after each complete batch; retune it when changing batch size.
+    after each complete batch; zero disables this test. Retune it when changing batch size.
     Square blocks are scalarized on device. Float32 and float64 are supported.
     ``apply_lanes`` selects cooperative CUDA factor products (1 keeps CSR).
     It changes application arithmetic/order, not the factor construction.
@@ -271,7 +278,7 @@ class FSAI(LinearOperator):
         n = scalar.nrow
         dtype, device = scalar.scalar_type, scalar.device
         scale = wp.empty(n, dtype=dtype, device=device)
-        status = wp.zeros(2, dtype=int, device=device)
+        status = wp.zeros(3, dtype=int, device=device)
         diagonal, build = _kernels(dtype, max_row_size, max_step_size)
         wp.launch(
             diagonal,
@@ -303,6 +310,8 @@ class FSAI(LinearOperator):
                 f"FSAI requires finite positive diagonals ({diagnostics[0]} invalid rows)"
             )
         self.truncated_rows = int(diagnostics[1])
+        if diagnostics[2]:
+            raise ValueError("FSAI factor lost finite entries or a positive diagonal")
         from .fsai_pack import pack_factor
 
         self.G = pack_factor(n, max_row_size, cols, vals)
@@ -360,6 +369,7 @@ class FSAI(LinearOperator):
         x = x.view(self.scalar_type).flatten()
         z = z.view(self.scalar_type).flatten()
         y = y.view(self.scalar_type).flatten()
-        _matvec(self.G, x, self._tmp, self._tmp, 1.0, 0.0, self.apply_lanes)
+        if alpha != 0.0:
+            _matvec(self.G, x, self._tmp, self._tmp, 1.0, 0.0, self.apply_lanes)
         # x is fully consumed before writing z, including when x, y, z alias.
         _matvec(self.GT, self._tmp, y, z, alpha, beta, self.apply_lanes)

@@ -105,3 +105,16 @@ def test_refit_requires_explicit_plan():
     a = from_scipy(np.eye(3), "cpu")
     with pytest.raises(ValueError, match="reuse_pattern=True"):
         FSAI(a).update(a)
+
+
+@pytest.mark.parametrize("device", DEVICES)
+def test_empty_reusable_fsai(device):
+    for dtype in [wp.float32, wp.float64]:
+        matrix = sp.bsr_zeros(0, 0, dtype, device=device)
+        pre = FSAI(matrix, reuse_pattern=True)
+        assert pre.update() is pre
+        assert pre.G.nnz_sync() == 0
+        assert pre.GT.nnz_sync() == 0
+        vector = wp.empty(0, dtype=dtype, device=device)
+        pre.matvec(vector, vector, vector, 1.0, 0.0)
+        wp.synchronize_device(device)

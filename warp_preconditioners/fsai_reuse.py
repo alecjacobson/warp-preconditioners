@@ -185,7 +185,10 @@ class RefitPlan:
 
     @staticmethod
     def arrays(A):
-        return [A.offsets[: A.nrow + 1], A.columns[: A.nnz_sync()]] + (
+        nnz = A.nnz_sync()
+        # Warp rejects zero-length slices, including [:0] on an empty array.
+        columns = A.columns[:nnz] if nnz else wp.empty(0, dtype=int, device=A.device)
+        return [A.offsets[: A.nrow + 1], columns] + (
             [A.row_counts] if A.row_counts is not None else []
         )
 

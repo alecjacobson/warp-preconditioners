@@ -201,3 +201,13 @@ def test_batch_grows_through_narrow_frontier(device, step_size):
         rhs[-1] = 1
         z = np.linalg.solve(a[np.ix_(support, support)], rhs)
         np.testing.assert_allclose(g[i, support], z / np.sqrt(z[-1]), rtol=1e-12)
+
+
+@pytest.mark.parametrize("device", DEVICES)
+def test_zero_tolerance_disables_roundoff_stopping(device):
+    n = 32
+    a = np.diag(np.full(n, 3.0)) + np.diag(-np.ones(n - 1), 1) + np.diag(-np.ones(n - 1), -1)
+    pre = FSAI(from_scipy(a, device), max_row_size=n, kap_tolerance=0, max_step_size=3)
+    np.testing.assert_array_equal(np.diff(pre.G.offsets.numpy()), np.arange(1, n + 1))
+    g = dense(pre.G)
+    np.testing.assert_allclose(g.T @ g, np.linalg.inv(a), rtol=1e-12, atol=1e-15)

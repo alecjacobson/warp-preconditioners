@@ -1,0 +1,103 @@
+FSAI review and upstream preparation
+===================================
+
+Scope
+-----
+The candidate branch contains scalar adaptive FSAI, its private construction,
+packing, refit and application kernels, NumPy-only unittest coverage, API export,
+preconditioner factory integration, test registration and API documentation.
+It does not include benchmarks, assets, geometry/problem setup, BlockJacobi,
+experimental block FSAI, SparseOperator or the standalone quality estimator.
+
+PR: https://github.com/alecjacobson/warp/pull/16
+Branch: https://github.com/alecjacobson/warp/tree/alecjacobson/fsai
+Commit: 8b0e91e42e5b97c9693179de3dfa2419842d9fbe
+Base: NVIDIA/warp 5a0c33d17d847d0be07ae1003263b572aae0729a
+Implementation: warp/_src/optim/fsai.py
+Public API: from warp.optim.linear import FSAI
+Tests: warp/tests/test_fsai.py
+
+Findings fixed
+--------------
+1. A zero kap_tolerance did not actually disable early stopping. On a 32-row
+   tridiagonal SPD matrix (diagonal 3, off-diagonal -1), supports stopped at 20
+   entries when energy improvement rounded to zero. The new condition only
+   checks improvement for a strictly positive tolerance. CPU and CUDA reproduce
+   the original failure; a regression requires all 32 entries and checks the
+   factor against independent principal-submatrix solves.
+
+2. reuse_pattern=True rejected an empty matrix because Warp disallows columns[:0].
+   The topology snapshot now handles zero active entries explicitly. Regression
+   coverage constructs, applies and updates empty float32/float64 operators on
+   both CPU and CUDA.
+
+Additional hardening
+--------------------
+- Validate finite factor entries and a positive diagonal before publishing even
+  when storage precision is unchanged; previously only compression was checked.
+  This adds no extra kernel or host synchronization to the construction path.
+- Use Warp's existing BSR lookup in the upstream port instead of duplicating
+  binary search routines.
+- Give generated construction kernels unique modules, avoiding accumulation of
+  all width/step/dtype specializations in one module.
+- Skip the first sparse product when alpha is zero, so ignored x values are not
+  consumed. Preserve the existing no-read behavior for beta=0.
+- Document canonical BSR input, both-triangle storage, local pivot truncation,
+  refit rollback, capture limits, scratch ownership and non-differentiability.
+
+Validation results
+------------------
+- Native FSAI suite: 34 tests passed on CPU/CUDA (20.890 s, including JIT).
+- Existing Warp linear solvers: 80 tests passed on CPU/CUDA (81.315 s).
+- Downstream repository: 202 tests passed (25.38 s).
+- API documentation: successful HTML build, no warnings.
+- Applicable pre-commit checks and git diff --check: passed.
+
+No timing assertions or performance claims are based on these test runtimes.
+
+Validation coverage
+-------------------
+Independent NumPy solves verify local factors, full-pattern inverse identities
+and adaptive support selection. Native tests also cover float32/float64, scalar,
+1x1 matrix and 3x3 block storage, padded input, stored zeros becoming nonzero,
+unused capacity, narrow frontiers, mixed storage, every cooperative lane count,
+all alias combinations, zero alpha/beta, CG/CR true residuals, failed refits,
+unchanged factor buffers and CUDA graph replay after updates.
+
+Tests use NumPy only; no SciPy or external numerical backend is used by FSAI.
+Numerical matrix construction, factorization, packing, transpose, refitting and
+application all run through Warp on the matrix device.
+
+Submission notes
+----------------
+The branch is a fork-only handoff PR on alecjacobson/warp, as requested.
+No NVIDIA pull request or issue was opened. The user will repost internally.
+The public issue/PR search for FSAI returned no matches on 2026-10-05.
+NVIDIA/warp CONTRIBUTING.md asks contributors to discuss substantial features
+before opening a PR. changelog/README.md requires an issue-numbered fragment
+for substantial features, and prohibits an orphan '+' fragment for them.
+When preparing the internal submission, add the appropriately identified
+changelog fragment under the internal tracking rules. Suggested text:
+
+Add an adaptive factorized sparse approximate inverse preconditioner for SPD
+BSR matrices, with CPU/CUDA construction and application, mixed-precision
+factor storage, and fixed-pattern numerical updates.
+
+The implementation assumes SPD input; it does not perform global symmetry or
+positive-definiteness validation. Each instance owns scratch, so use separate
+instances for concurrent streams. Refits preserve supports and may require a
+rebuild after substantial numerical changes. Setup/refits synchronize; warmed
+application is CUDA graph-capturable. G and GT are inspection-only arrays.
+
+Reproduction in the Warp checkout
+--------------------------------
+uv run build_lib.py --quick --cuda-path /home/horde/warp-cuda/12.6
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run -m warp.tests.test_fsai
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run -m warp.tests.test_linear_solvers
+uv run --extra docs build_docs.py
+uvx pre-commit run --files warp/_src/optim/fsai.py warp/_src/optim/linear.py warp/optim/linear.py warp/tests/test_fsai.py warp/tests/unittest_suites.py docs/api_reference/warp_optim_linear.rst docs/conf.py
+
+This machine uses an NVIDIA L40, CUDA toolkit 12.6, and driver 570.158.01.
+The upstream checkout uses Python 3.12.13 and its own freshly built native
+libraries. The original benchmark repository uses installed Warp 1.15.0 under
+Python 3.10; its regression suite is checked separately.

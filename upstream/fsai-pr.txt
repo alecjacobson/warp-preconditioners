@@ -1,0 +1,57 @@
+Published at https://github.com/alecjacobson/warp/pull/16
+
+## What problem are you trying to solve?
+
+Jacobi preconditioning converges slowly on the SPD biharmonic and elasticity systems in [warp-preconditioners](https://github.com/alecjacobson/warp-preconditioners). These workloads need a stronger preconditioner built and applied in Warp, including repeated solves with fixed sparsity and changing numerical entries.
+
+**This is a handoff PR on `alecjacobson/warp`. Alec will repost it to internal NVIDIA Warp from another machine.**
+
+## What does this change?
+
+Add `warp.optim.linear.FSAI` and `preconditioner(A, "fsai")`. Adaptive, diagonally equilibrated row construction produces a lower-triangular factor `G`; application uses `G.T @ G`. Square BSR blocks are scalarized on device. No multigrid, external factorization, SciPy numerical backend, benchmarks, assets, or experimental block preconditioners are included.
+
+Retain batched support growth, optional float32 factor storage with matrix-precision accumulation, cooperative CUDA application, and transactional fixed-pattern refits. The seven-file diff includes the implementation, tests, and API/documentation/test registration.
+
+```python
+from warp.optim.linear import FSAI, cg
+
+M = FSAI(A, max_row_size=16, reuse_pattern=True)
+cg(A, b, x, M=M)
+# Modify A.values while preserving compact BSR topology.
+M.update()
+cg(A, b, x, M=M)
+```
+
+The review fixed two bugs in the downstream implementation: `kap_tolerance=0` could still stop growth when improvement rounded to zero, and reusable empty matrices failed on a zero-length slice. Construction now also checks factor validity before publication without adding a validation kernel or synchronization.
+
+Input must be canonical SPD BSR with both triangles stored; global symmetry/SPD validation is not performed. Setup/refits synchronize. Warmed application supports CUDA graph capture. Each instance owns scratch and must not be applied concurrently on separate streams. Refits preserve supports and reject invalid updates without changing either factor. No automatic differentiation is provided.
+
+## Existing pull requests
+
+- [x] I searched open pull requests for duplicate or overlapping work.
+- Related pull requests: public FSAI issue/PR search on 2026-10-05 found no matches. Existing block-Jacobi functionality is complementary.
+
+## Validation
+
+- **34 FSAI tests passed**, CPU and CUDA. Independent NumPy oracles check full-pattern inverses, local solves, adaptive supports and true CG/CR residuals. Other coverage includes float32/float64, mixed storage, scalar/1x1/3x3 blocks, padded input, unused capacity, all lane counts and alias patterns, failed-update rollback, and graph replay after updates.
+- **80 existing Warp linear-solver tests passed**, CPU and CUDA.
+- **202 downstream repository tests passed** after backporting the review fixes.
+- Regression validation: the original 32-row tridiagonal reproducer stopped at 20 entries despite zero tolerance; the corrected implementation reaches 32. Reusable empty matrices originally raised on `columns[:0]`; construction/application/update now succeed on CPU and CUDA.
+- NVIDIA GPU: **L40**, Ubuntu 22.04.5, driver 570.158.01, CUDA toolkit 12.6. Freshly built Warp libraries, Python 3.12.13.
+- API documentation builds without warnings. All applicable pre-commit checks pass.
+
+Reproduce from this checkout:
+
+```sh
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run -m warp.tests.test_fsai
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 uv run -m warp.tests.test_linear_solvers
+uv run --extra docs build_docs.py
+uvx pre-commit run --files warp/_src/optim/fsai.py warp/_src/optim/linear.py warp/optim/linear.py warp/tests/test_fsai.py warp/tests/unittest_suites.py docs/api_reference/warp_optim_linear.rst docs/conf.py
+```
+
+## Checklist
+
+- [x] I have read the contributing guidelines. This fork-only PR is for the requested internal handoff; no NVIDIA issue or PR was opened.
+- [x] This pull request does not bundle unrelated changes.
+- [x] The branch is based on `main` at `5a0c33d` and contains one signed-off commit.
+- [ ] Add the appropriately tracked changelog fragment when preparing the internal submission. An orphan `+` fragment is intentionally omitted because upstream reserves those for changes that do not require an issue.
