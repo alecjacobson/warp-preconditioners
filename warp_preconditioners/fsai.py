@@ -204,7 +204,7 @@ class FSAI(LinearOperator):
     graph frontier (default one). Larger batches reduce search work but change
     the selected supports. ``kap_tolerance`` tests relative energy improvement
     after each complete batch; zero disables this test. Retune it when changing batch size.
-    Square blocks are scalarized on device. Float32 and float64 are supported.
+    Square blocks are scalarized on device. Float16, float32 and float64 are supported.
     ``apply_lanes`` selects cooperative CUDA factor products (1 keeps CSR).
     It changes application arithmetic/order, not the factor construction.
     ``factor_dtype=wp.float32`` optionally compresses the completed factor;
@@ -236,8 +236,8 @@ class FSAI(LinearOperator):
             or A.block_shape[0] != A.block_shape[1]
         ):
             raise ValueError("FSAI requires a square BSR matrix with square blocks")
-        if A.scalar_type not in (wp.float32, wp.float64):
-            raise TypeError("FSAI supports float32 and float64")
+        if A.scalar_type not in (wp.float16, wp.float32, wp.float64):
+            raise TypeError("FSAI supports float16, float32 and float64")
         if not isinstance(max_row_size, int) or not 1 <= max_row_size <= 64:
             raise ValueError("max_row_size must be an integer in [1, 64]")
         if not isinstance(max_step_size, int) or not 1 <= max_step_size <= 64:
@@ -245,15 +245,21 @@ class FSAI(LinearOperator):
         if not 0 <= kap_tolerance < 1:
             raise ValueError("kap_tolerance must be in [0, 1)")
         if pivot_floor is None:
-            pivot_floor = 1.0e-6 if A.scalar_type == wp.float32 else 1.0e-12
+            pivot_floor = {wp.float16: 1.0e-3, wp.float32: 1.0e-6, wp.float64: 1.0e-12}[
+                A.scalar_type
+            ]
         if not 0 < pivot_floor < 1:
             raise ValueError("pivot_floor must be in (0, 1)")
         if not isinstance(apply_lanes, int) or apply_lanes not in (1, 2, 4, 8, 16, 32):
             raise ValueError("apply_lanes must be one of 1, 2, 4, 8, 16, 32")
         if factor_dtype is None:
             factor_dtype = A.scalar_type
-        if factor_dtype not in (A.scalar_type, wp.float32):
-            raise ValueError("factor_dtype must be the matrix scalar type or wp.float32")
+        if factor_dtype != A.scalar_type and not (
+            A.scalar_type == wp.float64 and factor_dtype == wp.float32
+        ):
+            raise ValueError(
+                "factor_dtype must be the matrix scalar type, or wp.float32 for a float64 matrix"
+            )
         if reuse_pattern and A.row_counts is not None:
             raise ValueError(
                 "reuse_pattern requires compact BSR storage; canonicalize with bsr_copy"

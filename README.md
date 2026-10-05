@@ -274,10 +274,13 @@ with wp.ScopedDevice(A.device):
     iterations, residual, tolerance = cg(A, b, x, M=P, tol=1e-10)
 ```
 
-Scalar CSR and square BSR blocks work in float32 or float64. Block inputs
+Scalar CSR and square BSR blocks work in float16, float32 or float64. Block inputs
 are scalarized **on the device** during setup; vector-valued solver arrays
 are supported. This is scalar FSAI on a BSR input, not a dense block-FSAI
 algorithm. Use float64 for the poorly conditioned biharmonic benchmark.
+Float16 uses native half-precision construction, factors and application.
+The [Warp handoff PR](https://github.com/alecjacobson/warp/pull/16) also fixes
+half-precision CR compilation; older Warp releases may require that fix.
 
 `FSAI` is a `LinearOperator` implementing `z = alpha * P*x + beta*y`,
 including aliased buffers and `beta=0`. Apply uses two sparse products,
@@ -319,12 +322,12 @@ current top selection are skipped; other duplicates may be evaluated again. The 
   `psi=1/z_i` drops below this value. Checked after each batch; retune when
   changing batch size. Zero disables this early stopping.
 - `pivot_floor`: stop growing a row if an equilibrated local pivot is too
-  small (defaults: `1e-12` in float64, `1e-6` in float32). The accepted
+  small (defaults: `1e-12` in float64, `1e-6` in float32, `1e-3` in float16). The accepted
   positive factor is retained; `P.truncated_rows` counts these events.
 - `apply_lanes=1`: CUDA threads cooperating on each factor row; accepts
   1, 2, 4, 8, 16, or 32. Four helps the tuned dragon. CPU uses ordinary CSR.
-- `factor_dtype=None`: defaults to matrix precision. `wp.float32` stores
-  the completed factors in float32 while accumulating in matrix precision.
+- `factor_dtype=None`: defaults to matrix precision. For float64 input,
+  `wp.float32` stores the completed factors in float32 while accumulating in float64.
   The rounded factor is validated before constructing its transpose;
   this option adds a setup synchronization. Validate solution accuracy
   for the intended problem.
@@ -429,6 +432,6 @@ Normwise relative residual is reported too. Backward error alone is not a
 forward-error guarantee on an ill-conditioned system.
 
 Tests compare factors with independent dense/local solves, exercise
-CPU/CUDA and float32/float64, check block input and solver integration,
+CPU/CUDA and float16/float32/float64, check block input and solver integration,
 verify alpha/beta aliasing and graph replay, and validate the lifted
 system against the original biharmonic solve.

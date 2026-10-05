@@ -11,7 +11,7 @@ experimental block FSAI, SparseOperator or the standalone quality estimator.
 
 PR: https://github.com/alecjacobson/warp/pull/16
 Branch: https://github.com/alecjacobson/warp/tree/alecjacobson/fsai
-Commit: 8b0e91e42e5b97c9693179de3dfa2419842d9fbe
+Commit: d76aecb17765957fba6ca323044205f74783b4d3
 Base: NVIDIA/warp 5a0c33d17d847d0be07ae1003263b572aae0729a
 Implementation: warp/_src/optim/fsai.py
 Public API: from warp.optim.linear import FSAI
@@ -101,3 +101,17 @@ This machine uses an NVIDIA L40, CUDA toolkit 12.6, and driver 570.158.01.
 The upstream checkout uses Python 3.12.13 and its own freshly built native
 libraries. The original benchmark repository uses installed Warp 1.15.0 under
 Python 3.10; its regression suite is checked separately.
+
+Native float16 follow-up (2026-10-05)
+-----------------------------------
+The branch now has two signed-off commits. FSAI supports native float16 with
+a 1e-3 pivot floor; float32/float64 numerical helpers remain unchanged. Two
+typed-zero comparisons also fix half-precision CR compilation. Coverage now
+totals 43 FSAI + 82 linear-solver tests, all passing on CPU/CUDA, including the
+shared dtype/scaled-block checks and half-precision true CG/CR residuals.
+The downstream suite has 208 passing tests. Docs and pre-commit checks pass.
+
+Nine paired timing trials across 10 CPU/CUDA configurations found no meaningful
+float32/64 regression (largest median increase 2.02%). Factors, application
+outputs and CG solutions match bitwise. See results/fsai-float16-regression.txt
+and its JSON companion for methodology, raw samples and reproduction.

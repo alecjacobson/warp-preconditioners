@@ -1,0 +1,67 @@
+Native float16 FSAI validation (2026-10-05)
+=========================================
+
+Warp PR: https://github.com/alecjacobson/warp/pull/16
+Baseline: 8b0e91e42e5b97c9693179de3dfa2419842d9fbe
+Candidate: d76aecb17765957fba6ca323044205f74783b4d3
+
+Native half-precision construction, factors, refits and application use the
+existing dtype-specialized kernels. There is no float32 promotion wrapper.
+The default equilibrated pivot floor is 1e-3 for half; float32/64 defaults
+are unchanged. Float64-to-float32 factor compression remains supported.
+Two dtype-specific zero comparisons fix half-precision CR compilation.
+
+Validation
+----------
+- 125 Warp unittest cases passed on CPU/CUDA (43 FSAI + 82 linear solvers).
+- 208 downstream pytest cases passed on CPU/CUDA.
+- Existing preconditioner dtype and scaled-block checks also run FSAI.
+- Half coverage includes dense/local reference factors, scalar/3x3 inputs,
+  all application lane counts and aliases, empty/padded storage, rank-deficient
+  pivot safeguards, CG/CR true residuals, failed-refit rollback, and CUDA
+  graph replay after updates. Native tests use NumPy for independent oracles.
+- Documentation builds without warnings; applicable pre-commit checks pass.
+
+Float32/float64 performance regression
+-------------------------------------
+Nine alternating-order paired trials per configuration on an NVIDIA L40.
+Warp 1.19.0.dev0, Python 3.12.13, CUDA toolkit 12.6, driver 570.158.01.
+Synchronized warm wall times exclude compilation, matrix assembly, checks
+and cyclic garbage collection. Setup includes the reuse plan; refit uses
+1.01*A; apply averages 100 graph-captured calls (one ordinary CPU call);
+solve executes 100 CG iterations, not convergence to a problem-specific target.
+Each pair checks GPU exclusivity before/after. Interrupted configurations
+were discarded and restarted; only completed isolated configurations are
+included. CPU checks use a 16x16 grid, GPU checks a 128x128 grid and SimJEB
+fTetWild elasticity with 204231 unknowns and 3x3 BSR blocks.
+
+Every numerical FSAI helper is AST-identical; construction kernel hashes
+match. Initial/refitted factors, application outputs and CG solutions are
+bitwise identical in all 10 configurations. Float32/64 paths gain no extra
+kernel launches, conversions or numerical dispatch.
+
+Median candidate/baseline time (1.00 means unchanged):
+device problem              dtype   width lanes storage   setup refit apply solve
+cuda:0 grid_biharmonic      float32     8     1 float32  0.837 0.959 0.988 0.951
+cuda:0 grid_biharmonic      float32    48     4 float32  0.986 0.989 0.997 0.969
+cuda:0 grid_biharmonic      float64     8     1 float64  0.874 0.977 1.003 0.977
+cuda:0 grid_biharmonic      float64    48     4 float32  1.008 0.994 1.005 0.997
+cuda:0 simjeb_ftetwild      float32     8     1 float32  1.014 0.992 1.004 0.991
+cuda:0 simjeb_ftetwild      float32    48     4 float32  1.001 1.002 1.003 0.943
+cuda:0 simjeb_ftetwild      float64     8     1 float64  0.977 0.976 1.013 1.020
+cuda:0 simjeb_ftetwild      float64    48     4 float32  1.003 0.989 1.002 0.997
+cpu    grid_biharmonic      float32     8     1 float32  0.973 1.005 0.969 1.002
+cpu    grid_biharmonic      float64     8     1 float64  0.963 1.007 0.985 0.999
+
+No meaningful slowdown was observed: the largest median increase across
+all checks is 2.02%. Small apparent improvements are not claimed as speedups;
+the numerical kernels are unchanged and host timing varies. This is bounded
+regression evidence on these configurations, not a guarantee for all systems.
+Raw samples, matrix hashes and medians: fsai-float16-regression.json.
+
+Reproduce from this repository using the Warp checkout environment:
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /path/to/warp/.venv/bin/python \
+  benchmarks/fsai_dtype_regression.py --warp-repo /path/to/warp \
+  --repeats 9 --output results/fsai-float16-regression.json
+Requires data/simjeb-ftetwild/mesh.npz and mesh.json from the elasticity setup.
+Use --resume after interference to retain completed isolated configurations.
