@@ -1,0 +1,225 @@
+{
+  "description": "Untimed 8^3 tensor-grid audit. Rotate the same probe and transform output back. Fixed-pattern refit keeps the aligned block supports.",
+  "source_sha256": {
+    "/home/horde/projects/preconditioners/benchmarks/block_rotation_audit.py": "060b0e9d7f751a30f9549a4dff5bb085715a06566777d2520774ce1fb54e67f8",
+    "benchmarks/block_fsai_candidate.py": "58257b5650920ca0c592fc06038f926c8f1b02dca4ae9a7ef4cd9c87b7120aca"
+  },
+  "cases": [
+    {
+      "contrast": 1,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.6300691385678502e-16,
+      "fixed_pattern_action_rotation_error": 1.6300691385678502e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.5899418134865037e-16,
+      "fixed_pattern_action_rotation_error": 1.5899418134865037e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.7260645227396426e-16,
+      "fixed_pattern_action_rotation_error": 1.7260645227396426e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.637998250242974e-16,
+      "fixed_pattern_action_rotation_error": 1.637998250242974e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.939201807340769e-16,
+      "fixed_pattern_action_rotation_error": 1.973829937259803e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.9050917166240235e-16,
+      "fixed_pattern_action_rotation_error": 2.0066338313805757e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.9140086437680443e-16,
+      "fixed_pattern_action_rotation_error": 1.9140086437680443e-16
+    },
+    {
+      "contrast": 1,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.9354956321788023e-16,
+      "fixed_pattern_action_rotation_error": 1.9354956321788023e-16
+    },
+    {
+      "contrast": 100,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 4.147486242595847e-15,
+      "fixed_pattern_action_rotation_error": 4.147486242595847e-15
+    },
+    {
+      "contrast": 100,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.8663575090927952e-15,
+      "fixed_pattern_action_rotation_error": 1.8663575090927952e-15
+    },
+    {
+      "contrast": 100,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 6.461986396340995e-08,
+      "fixed_pattern_action_rotation_error": 6.461986396340995e-08
+    },
+    {
+      "contrast": 100,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 4.67104660915154e-08,
+      "fixed_pattern_action_rotation_error": 4.67104660915154e-08
+    },
+    {
+      "contrast": 100,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 4.7548178976758444e-15,
+      "fixed_pattern_action_rotation_error": 4.976282691342173e-15
+    },
+    {
+      "contrast": 100,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.9734142516776932e-15,
+      "fixed_pattern_action_rotation_error": 1.990068643640859e-15
+    },
+    {
+      "contrast": 100,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 3.0510065555794026e-08,
+      "fixed_pattern_action_rotation_error": 3.051006555169849e-08
+    },
+    {
+      "contrast": 100,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 4.653357973672624e-08,
+      "fixed_pattern_action_rotation_error": 4.6533579734810955e-08
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.084611479602964e-11,
+      "fixed_pattern_action_rotation_error": 1.084611479602964e-11
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.3273225940758018e-10,
+      "fixed_pattern_action_rotation_error": 1.3273225940758018e-10
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 2.7869561760425397e-08,
+      "fixed_pattern_action_rotation_error": 2.7869561760425397e-08
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 2,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 9.209290161146332e-08,
+      "fixed_pattern_action_rotation_error": 9.209290161146332e-08
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.022770991780559e-11,
+      "fixed_pattern_action_rotation_error": 1.0457495796872458e-11
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float64'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 1.6743105562608386e-10,
+      "fixed_pattern_action_rotation_error": 1.6467398004004907e-10
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 5.182334959067872e-08,
+      "fixed_pattern_action_rotation_error": 5.1823359904723295e-08
+    },
+    {
+      "contrast": 1000000.0,
+      "blocks": 4,
+      "storage": "<class 'warp._src.types.float32'>",
+      "direction": "rotated2",
+      "changed_block_rows_fraction": 0.0,
+      "adaptive_action_rotation_error": 3.477512257959179e-08,
+      "fixed_pattern_action_rotation_error": 3.477511056703675e-08
+    }
+  ]
+}

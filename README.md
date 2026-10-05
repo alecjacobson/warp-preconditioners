@@ -85,6 +85,33 @@ growth remains the default. Separate factor thread counts, a fused application,
 and a block-FSAI prototype did not produce repeatable wins and remain
 experiments. The figures above retain their recorded single-entry settings.
 
+## Stronger tests for blocking
+
+A [controlled coupling and anisotropic-elasticity study](results/block-challenge.md)
+tests scalar Jacobi, block Jacobi, scalar FSAI and block FSAI with CG and CR.
+On `A = K ⊗ C`, rotating a component contrast of **10⁶** exposes a large
+blocking benefit: block Jacobi takes **6.08 ms**, versus **788.84 ms** for
+scalar Jacobi, including setup—about **130× faster** at the same verified
+solution and energy accuracy. Block Jacobi needs 100 sampled iterations
+at every tested contrast and orientation.
+
+![Controlled component coupling: total time and verified solution error.](assets/block-coupling.png)
+
+The obliquely reinforced fTetWild SimJEB bracket still favors **scalar FSAI**.
+At reinforcement contrast **1,000**, its median total is **0.584 s**, versus
+**0.871 s** for block Jacobi, **1.139 s** for block FSAI, and **2.104 s** for
+scalar Jacobi. These are five warmed trials at both relative displacement
+and energy errors ≤10⁻⁴, with the original mesh, constraints and load.
+
+![Reinforced bracket: total time and verified displacement error.](assets/block-elasticity.png)
+
+The study also measures fixed-pattern numerical refits and actual factor
+allocations. Independent reference and element-energy checks are included.
+A separate cantilever refinement test shows substantial mesh-dependent
+stiffening under strong reinforcement, so the high-contrast results establish
+algebraic solver performance, not mesh-converged physical stresses. The block prototypes
+remain under `benchmarks/`; no additional supported API is introduced.
+
 ## Indefinite mixed systems
 
 The new `MixedHarmonicSystem` and `ShiftedBlock` preconditioner solve the

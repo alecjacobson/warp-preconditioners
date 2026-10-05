@@ -1,0 +1,77 @@
+{
+  "description": "Nested Freudenthal tetrahedra, 4x1x1 cantilever, x=0 fixed, constant gravity, nu=.342; no timings claimed",
+  "cases": [
+    {
+      "contrast": 10.0,
+      "level": 4,
+      "tets": 1536,
+      "dofs": 1200,
+      "compliance": 0.004222867175895209,
+      "iterations": 137,
+      "correction_iterations": 327,
+      "element_relative_residual": 7.688150818360592e-12,
+      "correction_relative_displacement": 4.136923806970172e-13,
+      "maximum_displacement": 0.00027357812393019224
+    },
+    {
+      "contrast": 10.0,
+      "level": 8,
+      "tets": 12288,
+      "dofs": 7776,
+      "compliance": 0.005318751573900132,
+      "iterations": 307,
+      "correction_iterations": 713,
+      "element_relative_residual": 3.5987918748883034e-11,
+      "correction_relative_displacement": 1.184028388170489e-12,
+      "maximum_displacement": 0.00034193289484040466
+    },
+    {
+      "contrast": 10.0,
+      "level": 16,
+      "tets": 98304,
+      "dofs": 55488,
+      "compliance": 0.005747254297316171,
+      "iterations": 889,
+      "correction_iterations": 1489,
+      "element_relative_residual": 1.472174290590028e-10,
+      "correction_relative_displacement": 1.1370852285022987e-12,
+      "maximum_displacement": 0.00036768878260765904
+    },
+    {
+      "contrast": 100.0,
+      "level": 4,
+      "tets": 1536,
+      "dofs": 1200,
+      "compliance": 0.0025061031013655895,
+      "iterations": 179,
+      "correction_iterations": 425,
+      "element_relative_residual": 6.019826532788723e-11,
+      "correction_relative_displacement": 3.03692700646974e-12,
+      "maximum_displacement": 0.00016865945772377927
+    },
+    {
+      "contrast": 100.0,
+      "level": 8,
+      "tets": 12288,
+      "dofs": 7776,
+      "compliance": 0.004190532311987181,
+      "iterations": 668,
+      "correction_iterations": 1130,
+      "element_relative_residual": 3.614837625416532e-10,
+      "correction_relative_displacement": 4.489281361696342e-12,
+      "maximum_displacement": 0.00027859180841455607
+    },
+    {
+      "contrast": 100.0,
+      "level": 16,
+      "tets": 98304,
+      "dofs": 55488,
+      "compliance": 0.0051888786878808765,
+      "iterations": 1699,
+      "correction_iterations": 2928,
+      "element_relative_residual": 1.737749210238158e-09,
+      "correction_relative_displacement": 3.4579679579476616e-13,
+      "maximum_displacement": 0.0003394659821414179
+    }
+  ]
+}

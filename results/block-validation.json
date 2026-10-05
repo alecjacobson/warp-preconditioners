@@ -1,0 +1,15 @@
+{
+  "native_trials_verified": 2520,
+  "cases": 18,
+  "repeats": 5,
+  "maximum_error_fraction_of_target": 0.9989615569873812,
+  "maximum_reference_element_relative_residual": 1.101703881280456e-09,
+  "unconverged_candidates": [],
+  "tests": "198 passed; CPU and CUDA; OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m pytest -q",
+  "source_results_sha256": {
+    "results/block-coupling.json": "657f2fb8cb0ecaa839081696b91ff23d4fb728023053ed6b7df8486879ab1b5b",
+    "results/block-elasticity-rotated.json": "5b66fbcebc14b97cbbed84c851a92edeabc253ae04362390a030ea7f70849d0e",
+    "results/block-elasticity-directions.json": "96b2dcc09574f8d5251a17d84d72576e8a72b6fbe285d2ac7dcec408937b2050",
+    "results/block-wide-check.json": "528afc6e37fc01ef4ccbc9dd2125fa5c732067bf5a034cb0dd6769cd293ce1da"
+  }
+}

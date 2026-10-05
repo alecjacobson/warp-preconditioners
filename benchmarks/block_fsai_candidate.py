@@ -67,11 +67,18 @@ def kernels(dtype, block, max_blocks):
         cols: wp.array(dtype=int),
         vals: wp.array(dtype=dtype),
         status: wp.array(dtype=int),
+        refit: bool,
     ):
         i = wp.tid()
         pattern = pattern_type(-1)
         pattern[0] = i
         size = int(1)
+        if refit:
+            for p in range(wp.static(max_blocks)):
+                c = cols[i * wp.static(block * width) + p * wp.static(block)]
+                if c >= 0 and c // wp.static(block) != i:
+                    pattern[size] = c // wp.static(block)
+                    size += 1
         z = rhs_mat(dtype(0))
         for step in range(wp.static(max_blocks)):
             chol = mat(dtype(0))
@@ -106,7 +113,7 @@ def kernels(dtype, block, max_blocks):
                     for q in range(p + 1, count):
                         v -= chol[q, p] * z[q, c]
                     z[p, c] = v / chol[p, p]
-            if step == wp.static(max_blocks - 1):
+            if refit or step == wp.static(max_blocks - 1):
                 break
             best = int(-1)
             best_score = dtype(0)
@@ -172,7 +179,9 @@ def kernels(dtype, block, max_blocks):
 
 
 class BlockFSAI(LinearOperator):
-    def __init__(self, a, max_blocks=2, apply_lanes=1, factor_dtype=wp.float32):
+    def __init__(
+        self, a, max_blocks=2, apply_lanes=1, factor_dtype=wp.float32, reuse_pattern=False
+    ):
         if a.row_counts is not None:
             a = sp.bsr_copy(a)
         block = a.block_shape[0]
@@ -188,7 +197,7 @@ class BlockFSAI(LinearOperator):
         wp.launch(
             build,
             a.nrow,
-            [a.offsets, a.columns, a.values, scale, cols, vals, status],
+            [a.offsets, a.columns, a.values, scale, cols, vals, status, False],
             device=device,
         )
         if status.numpy()[0]:
@@ -199,7 +208,51 @@ class BlockFSAI(LinearOperator):
         self.GT = sp.bsr_transposed(self.G)
         self._tmp = wp.empty(n, dtype=dtype, device=device)
         self.apply_lanes = apply_lanes
+        self._reuse = None
+        if reuse_pattern:
+            self._reuse = (a, width, scale, status, cols, vals, diagonal, build, factor_dtype)
         super().__init__(a.shape, a.dtype, device, self._apply)
+
+    def update(self, a):
+        """Experimental fixed-support refit, including factor repacking/transposition.
+
+        Unlike the supported scalar refit this replaces factor buffers; recapture
+        graphs after updating. Input topology must be identical. Failed updates
+        leave the published factors unchanged.
+        """
+        if self._reuse is None:
+            raise ValueError("Construct with reuse_pattern=True")
+        old, width, scale, status, cols, vals, diagonal, build, storage = self._reuse
+        if (a.shape, a.dtype, a.device) != (old.shape, old.dtype, old.device):
+            raise ValueError("refit requires identical shape, dtype and device")
+        if a.row_counts is not None:
+            a = sp.bsr_copy(a)
+        from warp_preconditioners.fsai_reuse import compare
+
+        if a.nnz_sync() != old.nnz_sync():
+            raise ValueError("refit requires identical topology")
+        status.zero_()
+        wp.launch(compare, a.nrow + 1, [a.offsets, old.offsets, status], device=a.device)
+        wp.launch(compare, a.nnz, [a.columns, old.columns, status], device=a.device)
+        if status.numpy()[0]:
+            raise ValueError("refit requires identical topology")
+        wp.launch(
+            diagonal, a.shape[0], [a.offsets, a.columns, a.values, scale, status], device=a.device
+        )
+        wp.launch(
+            build,
+            a.nrow,
+            [a.offsets, a.columns, a.values, scale, cols, vals, status, True],
+            device=a.device,
+        )
+        if status.numpy()[0]:
+            raise ValueError("Nonpositive block FSAI pivot")
+        g = pack_factor(a.shape[0], width, cols, vals)
+        if storage != a.scalar_type:
+            g = sp.bsr_copy(g, scalar_type=storage)
+        gt = sp.bsr_transposed(g)
+        self.G, self.GT = g, gt
+        return self
 
     def _apply(self, x, y, z, alpha, beta):
         x, y, z = (v.view(self.scalar_type).flatten() for v in (x, y, z))
@@ -248,6 +301,12 @@ class BsrBlockFSAI(BlockFSAI):
         self.BT = sp.bsr_transposed(self.B)
         self._vec = wp.types.vector(block, a.scalar_type)
         self._mv = block_product(a.scalar_type, self.B.scalar_type, block)
+
+    def update(self, a):
+        super().update(a)
+        self.B = sp.bsr_copy(self.G, block_shape=a.block_shape)
+        self.BT = sp.bsr_transposed(self.B)
+        return self
 
     def _apply(self, x, y, z, alpha, beta):
         x, y, z = (v.view(self._vec).flatten() for v in (x, y, z))

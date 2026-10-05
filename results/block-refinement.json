@@ -1,0 +1,101 @@
+{
+  "description": "Nested Freudenthal tetrahedra, 4x1x1 cantilever, x=0 fixed, constant gravity, nu=.342; no timings claimed",
+  "cases": [
+    {
+      "contrast": 1,
+      "level": 2,
+      "tets": 192,
+      "dofs": 216,
+      "compliance": 0.0032600479955602977,
+      "iterations": 55,
+      "correction_iterations": 124,
+      "element_relative_residual": 5.208607950900681e-13,
+      "correction_relative_displacement": 5.614044478441792e-14,
+      "maximum_displacement": 0.00020114194971564923
+    },
+    {
+      "contrast": 1,
+      "level": 4,
+      "tets": 1536,
+      "dofs": 1200,
+      "compliance": 0.004930831847852584,
+      "iterations": 104,
+      "correction_iterations": 255,
+      "element_relative_residual": 3.4664331010800446e-12,
+      "correction_relative_displacement": 5.103473640623796e-14,
+      "maximum_displacement": 0.0003073193898239624
+    },
+    {
+      "contrast": 1,
+      "level": 8,
+      "tets": 12288,
+      "dofs": 7776,
+      "compliance": 0.005871069057592152,
+      "iterations": 222,
+      "correction_iterations": 520,
+      "element_relative_residual": 1.7842165306708764e-11,
+      "correction_relative_displacement": 1.8350954466315568e-13,
+      "maximum_displacement": 0.00036606330548803474
+    },
+    {
+      "contrast": 1,
+      "level": 16,
+      "tets": 98304,
+      "dofs": 55488,
+      "compliance": 0.006210394659809389,
+      "iterations": 463,
+      "correction_iterations": 1048,
+      "element_relative_residual": 7.78039518979712e-11,
+      "correction_relative_displacement": 8.670412866355647e-14,
+      "maximum_displacement": 0.000387023832141263
+    },
+    {
+      "contrast": 1000,
+      "level": 2,
+      "tets": 192,
+      "dofs": 216,
+      "compliance": 0.00020104460360986646,
+      "iterations": 78,
+      "correction_iterations": 165,
+      "element_relative_residual": 1.3168111407675312e-11,
+      "correction_relative_displacement": 1.4859490286762406e-12,
+      "maximum_displacement": 1.624690428665558e-05
+    },
+    {
+      "contrast": 1000,
+      "level": 4,
+      "tets": 1536,
+      "dofs": 1200,
+      "compliance": 0.0005779598258181702,
+      "iterations": 299,
+      "correction_iterations": 448,
+      "element_relative_residual": 1.591970403084075e-10,
+      "correction_relative_displacement": 6.77531011171183e-12,
+      "maximum_displacement": 4.130169133530774e-05
+    },
+    {
+      "contrast": 1000,
+      "level": 8,
+      "tets": 12288,
+      "dofs": 7776,
+      "compliance": 0.0016130611558769082,
+      "iterations": 836,
+      "correction_iterations": 1327,
+      "element_relative_residual": 1.8046886209103306e-09,
+      "correction_relative_displacement": 1.3152215324592343e-11,
+      "maximum_displacement": 0.00011093869264739006
+    },
+    {
+      "contrast": 1000,
+      "level": 16,
+      "tets": 98304,
+      "dofs": 55488,
+      "compliance": 0.0033036449814348758,
+      "iterations": 2497,
+      "correction_iterations": 3964,
+      "element_relative_residual": 1.4930057577734317e-08,
+      "correction_relative_displacement": 1.0741645382984584e-10,
+      "maximum_displacement": 0.00022434899013175192
+    }
+  ]
+}

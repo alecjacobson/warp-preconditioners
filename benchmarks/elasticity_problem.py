@@ -20,6 +20,8 @@ def element_blocks(
     lame: wp.float64,
     mu: wp.float64,
     material_scale: wp.array(dtype=wp.float64),
+    fiber: wp.array(dtype=wp.vec3d),
+    reinforcement: wp.array(dtype=wp.float64),
     rows: wp.array(dtype=int),
     cols: wp.array(dtype=int),
     values: wp.array(dtype=wp.mat33d),
@@ -57,6 +59,10 @@ def element_blocks(
                         lame * wp.outer(gi, gj)
                         + mu * wp.outer(gj, gi)
                         + mu * wp.dot(gi, gj) * wp.identity(n=3, dtype=wp.float64)
+                        + reinforcement[e]
+                        * wp.dot(fiber[e], gi)
+                        * wp.dot(fiber[e], gj)
+                        * wp.outer(fiber[e], fiber[e])
                     )
                 )
             values[out] = block
@@ -83,7 +89,28 @@ def assemble(
     density=1000.0,
     device="cuda:0",
     material_scale=None,
+    fiber=None,
+    reinforcement=None,
 ):
+    # Additional energy density: tau/2 * (q^T epsilon q)^2, tau >= 0.
+    # This is directional reinforcement, not a nearly incompressible material.
+    if fiber is None:
+        fiber = np.tile([1.0, 0.0, 0.0], (len(tets), 1))
+    fiber = np.asarray(fiber, dtype=np.float64)
+    if (
+        fiber.shape != (len(tets), 3)
+        or not np.all(np.isfinite(fiber))
+        or np.any(np.linalg.norm(fiber, axis=1) == 0)
+    ):
+        raise ValueError("fiber must contain one finite nonzero direction per tet")
+    fiber = fiber / np.linalg.norm(fiber, axis=1)[:, None]
+    if reinforcement is None:
+        reinforcement = np.zeros(len(tets))
+    reinforcement = np.broadcast_to(
+        np.asarray(reinforcement, dtype=np.float64), (len(tets),)
+    ).copy()
+    if not np.all(np.isfinite(reinforcement)) or np.any(reinforcement < 0):
+        raise ValueError("reinforcement must be finite and nonnegative")
     if material_scale is None:
         material_scale = np.ones(len(tets))
     material_scale = np.asarray(material_scale, dtype=np.float64)
@@ -113,6 +140,8 @@ def assemble(
                 young * poisson / ((1 + poisson) * (1 - 2 * poisson)),
                 young / (2 * (1 + poisson)),
                 wp.array(material_scale, dtype=wp.float64),
+                wp.array(fiber, dtype=wp.vec3d),
+                wp.array(reinforcement, dtype=wp.float64),
                 rows,
                 cols,
                 values,
@@ -140,7 +169,7 @@ def cpu_matrix(matrix):
     ).tocsr()
 
 
-def independent_force(vertices, tets, displacement, young, poisson):
+def independent_force(vertices, tets, displacement, young, poisson, fiber=None, reinforcement=None):
     """Element strain/stress contraction, independent of the BSR assembly kernel."""
     out = np.zeros_like(vertices)
     mu = young / (2 * (1 + poisson))
@@ -153,6 +182,12 @@ def independent_force(vertices, tets, displacement, young, poisson):
         grad = np.einsum("eia,eib->eab", displacement[t], g)
         stress = mu * (grad + grad.transpose(0, 2, 1))
         stress += lame * np.trace(grad, axis1=1, axis2=2)[:, None, None] * np.eye(3)
+        if fiber is not None:
+            q = fiber[start : start + len(t)]
+            q = q / np.linalg.norm(q, axis=1)[:, None]
+            tau = np.broadcast_to(reinforcement, (len(tets),))[start : start + len(t)]
+            axial = np.einsum("ea,eab,eb->e", q, grad, q)
+            stress += (tau * axial)[:, None, None] * np.einsum("ea,eb->eab", q, q)
         force = np.einsum("eab,eib->eia", stress, g)
         force *= (np.abs(np.linalg.det(edges)) / 6)[:, None, None]
         np.add.at(out, t.ravel(), force.reshape(-1, 3))
