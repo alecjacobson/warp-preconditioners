@@ -1,0 +1,112 @@
+{
+  "baseline": "8f25bf7",
+  "provenance": {
+    "utc": "2026-10-05T15:07:42.695914+00:00",
+    "matrix_rhs_sha256": "a132a3ff636626a133434e00bd0b328fdf65ec237a4293dd3307170c42c2f379",
+    "library_sha256": "a543b0725708f9c82d77907acf700d7ba75dc43af3a006afca44cab1c32a6d4f",
+    "clocks": "unlocked; untimed native solve immediately before every measured setup/solve",
+    "gpu_isolation": "Reject other compute processes at start and before/after every timed trial",
+    "trials": "alternating forward/reverse order after warming all candidates"
+  },
+  "problem": "dragon",
+  "stage": "setup",
+  "gpu": "NVIDIA L40",
+  "warp": "1.15.0",
+  "width": 48,
+  "results": {
+    "baseline": {
+      "trials": [
+        {
+          "setup_s": 1.0425583012402058,
+          "solve_s": 0.5099000334739685,
+          "total_s": 1.5524583347141743,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 1.0455763973295689,
+          "solve_s": 0.5117650926113129,
+          "total_s": 1.5573414899408817,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 1.0406273417174816,
+          "solve_s": 0.5112991444766521,
+          "total_s": 1.5519264861941338,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 1.042521022260189,
+          "solve_s": 0.513238862156868,
+          "total_s": 1.555759884417057,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 1.057543519884348,
+          "solve_s": 0.5090685747563839,
+          "total_s": 1.5666120946407318,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        }
+      ],
+      "factor_nnz": 4228590,
+      "mean_factor_row_size": 13.193934382751682,
+      "identical_baseline_factor": true
+    },
+    "current": {
+      "trials": [
+        {
+          "setup_s": 0.8791932500898838,
+          "solve_s": 0.5115946903824806,
+          "total_s": 1.3907879404723644,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 0.8619218729436398,
+          "solve_s": 0.5106821916997433,
+          "total_s": 1.372604064643383,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 0.8830376863479614,
+          "solve_s": 0.5074719972908497,
+          "total_s": 1.3905096836388111,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 0.8752546198666096,
+          "solve_s": 0.5123780593276024,
+          "total_s": 1.387632679194212,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        },
+        {
+          "setup_s": 0.8587559759616852,
+          "solve_s": 0.5116428174078465,
+          "total_s": 1.3703987933695316,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971,
+          "true_relative_residual": 5.125593748640519e-05
+        }
+      ],
+      "factor_nnz": 4228590,
+      "mean_factor_row_size": 13.193934382751682,
+      "identical_baseline_factor": true
+    }
+  }
+}

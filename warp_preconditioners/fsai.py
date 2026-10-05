@@ -10,7 +10,9 @@ from .sparse_operator import _matvec
 
 
 @lru_cache(None)
-def _kernels(dtype, width):
+def _kernels(dtype, width, step_size=1):
+    best_indices = wp.types.vector(length=step_size, dtype=wp.int32)
+    best_scores = wp.types.vector(length=step_size, dtype=dtype)
     indices = wp.types.vector(length=width, dtype=wp.int32)
     vector = wp.types.vector(length=width, dtype=dtype)
     matrix = wp.types.matrix(shape=(width, width), dtype=dtype)
@@ -70,15 +72,17 @@ def _kernels(dtype, width):
         pattern = indices(-1)
         chol = matrix(dtype(0))
         z = vector(dtype(0))
+        v = vector(dtype(0))
         pattern[0] = i
         chol[0, 0] = dtype(1)
         z[0] = dtype(1)
+        v[0] = dtype(1)
         size = int(1)
         # Search the frontier of the current support. Duplicates are harmless:
         # candidate scores are evaluated exactly, without a truncated hash table.
-        for step in range(wp.static(width - 1)):
-            best = int(-1)
-            best_score = dtype(0)
+        while size < wp.static(width):
+            candidates = best_indices(-1)
+            scores = best_scores(dtype(0))
             for p in range(size):
                 row = pattern[p]
                 for e in range(offsets[row], offsets[row + 1]):
@@ -86,6 +90,9 @@ def _kernels(dtype, width):
                     selected = bool(c >= i)
                     for q in range(size):
                         if pattern[q] == c:
+                            selected = True
+                    for q in range(wp.static(step_size)):
+                        if candidates[q] == c:
                             selected = True
                     if not selected:
                         residual = dtype(0)
@@ -95,42 +102,54 @@ def _kernels(dtype, width):
                                 entry(offsets, columns, values, c, j) * scale[c] * scale[j] * z[q]
                             )
                         score = wp.abs(residual)
-                        if score > best_score or (score == best_score and c < best):
-                            best = c
-                            best_score = score
-            if best < 0 or best_score == dtype(0):
+                        for rank in range(wp.static(step_size)):
+                            if score > scores[rank] or (
+                                score == scores[rank] and c < candidates[rank]
+                            ):
+                                for rev in range(wp.static(step_size - 1)):
+                                    dest = wp.static(step_size - 1) - rev
+                                    if dest > rank:
+                                        candidates[dest] = candidates[dest - 1]
+                                        scores[dest] = scores[dest - 1]
+                                candidates[rank] = c
+                                scores[rank] = score
+                                break
+            if candidates[0] < 0:
                 break
-            # Border the Cholesky factor of the selected principal submatrix.
-            w = vector(dtype(0))
-            pivot = dtype(1)
-            for p in range(size):
-                a = (
-                    entry(offsets, columns, values, best, pattern[p])
-                    * scale[best]
-                    * scale[pattern[p]]
-                )
-                for q in range(p):
-                    a -= chol[p, q] * w[q]
-                w[p] = a / chol[p, p]
-                pivot -= w[p] * w[p]
-            if pivot <= pivot_floor or not wp.isfinite(pivot):
-                wp.atomic_add(status, 1, 1)
-                break
-            pattern[size] = best
-            for p in range(size):
-                chol[size, p] = w[p]
-            chol[size, size] = wp.sqrt(pivot)
-            size += 1
             old_z0 = z[0]
+            stopped = bool(False)
+            for rank in range(wp.static(step_size)):
+                best = candidates[rank]
+                if best < 0 or size == wp.static(width):
+                    break
+                # Border the Cholesky factor of the selected principal submatrix.
+                w = vector(dtype(0))
+                pivot = dtype(1)
+                for p in range(size):
+                    a = (
+                        entry(offsets, columns, values, best, pattern[p])
+                        * scale[best]
+                        * scale[pattern[p]]
+                    )
+                    for q in range(p):
+                        a -= chol[p, q] * w[q]
+                    w[p] = a / chol[p, p]
+                    pivot -= w[p] * w[p]
+                if pivot <= pivot_floor or not wp.isfinite(pivot):
+                    wp.atomic_add(status, 1, 1)
+                    stopped = True
+                    break
+                pattern[size] = best
+                for p in range(size):
+                    chol[size, p] = w[p]
+                chol[size, size] = wp.sqrt(pivot)
+                # Existing forward-solve entries are unchanged by bordering L.
+                rhs = dtype(0)
+                for p in range(size):
+                    rhs -= w[p] * v[p]
+                v[size] = rhs / chol[size, size]
+                size += 1
             # A[S,S] z = e_0; no global factorization or triangular dependency.
-            v = vector(dtype(0))
-            for p in range(size):
-                a = dtype(0)
-                if p == 0:
-                    a = dtype(1)
-                for q in range(p):
-                    a -= chol[p, q] * v[q]
-                v[p] = a / chol[p, p]
             for rev in range(size):
                 p = size - 1 - rev
                 a = v[p]
@@ -138,7 +157,7 @@ def _kernels(dtype, width):
                     a -= chol[q, p] * z[q]
                 z[p] = a / chol[p, p]
             # psi=1/z[0]. Relative reduction is 1-old_z0/new_z0.
-            if dtype(1) - old_z0 / z[0] <= tolerance:
+            if stopped or dtype(1) - old_z0 / z[0] <= tolerance:
                 break
         norm = wp.sqrt(z[0])
         for p in range(wp.static(width)):
@@ -173,9 +192,11 @@ def _validate_float32_factor(
 class FSAI(LinearOperator):
     """Approximate inverse ``G.T @ G`` of an SPD BSR matrix.
 
-    ``max_row_size`` includes the diagonal. Each step adds the largest residual
-    entry from the lower-triangular graph frontier (one entry per step).
-    ``kap_tolerance`` stops rows whose relative energy improvement stagnates.
+    ``max_row_size`` includes the diagonal. Each search selects up to
+    ``max_step_size`` distinct largest-residual entries from the lower-triangular
+    graph frontier (default one). Larger batches reduce search work but change
+    the selected supports. ``kap_tolerance`` tests relative energy improvement
+    after each complete batch; retune it when changing batch size.
     Square blocks are scalarized on device. Float32 and float64 are supported.
     ``apply_lanes`` selects cooperative CUDA factor products (1 keeps CSR).
     It changes application arithmetic/order, not the factor construction.
@@ -200,6 +221,7 @@ class FSAI(LinearOperator):
         apply_lanes=1,
         factor_dtype=None,
         reuse_pattern=False,
+        max_step_size=1,
     ):
         if (
             not isinstance(A, sp.BsrMatrix)
@@ -211,6 +233,8 @@ class FSAI(LinearOperator):
             raise TypeError("FSAI supports float32 and float64")
         if not isinstance(max_row_size, int) or not 1 <= max_row_size <= 64:
             raise ValueError("max_row_size must be an integer in [1, 64]")
+        if not isinstance(max_step_size, int) or not 1 <= max_step_size <= 64:
+            raise ValueError("max_step_size must be an integer in [1, 64]")
         if not 0 <= kap_tolerance < 1:
             raise ValueError("kap_tolerance must be in [0, 1)")
         if pivot_floor is None:
@@ -228,6 +252,7 @@ class FSAI(LinearOperator):
                 "reuse_pattern requires compact BSR storage; canonicalize with bsr_copy"
             )
         self.max_row_size = max_row_size
+        self.max_step_size = max_step_size
         self.factor_dtype = factor_dtype
         self.apply_lanes = apply_lanes
         self.source = A
@@ -247,7 +272,7 @@ class FSAI(LinearOperator):
         dtype, device = scalar.scalar_type, scalar.device
         scale = wp.empty(n, dtype=dtype, device=device)
         status = wp.zeros(2, dtype=int, device=device)
-        diagonal, build = _kernels(dtype, max_row_size)
+        diagonal, build = _kernels(dtype, max_row_size, max_step_size)
         wp.launch(
             diagonal,
             n,
@@ -315,7 +340,9 @@ class FSAI(LinearOperator):
         A = self.source if A is None else A
         if not isinstance(A, sp.BsrMatrix):
             raise ValueError("update requires a Warp BSR matrix")
-        self._refit.update(self, A, _kernels(self.scalar_type, self.max_row_size)[0])
+        self._refit.update(
+            self, A, _kernels(self.scalar_type, self.max_row_size, self.max_step_size)[0]
+        )
         self.source = A
         return self
 

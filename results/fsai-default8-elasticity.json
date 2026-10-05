@@ -1,0 +1,122 @@
+{
+  "baseline": "8f25bf7",
+  "provenance": {
+    "utc": "2026-10-05T15:04:04.595533+00:00",
+    "matrix_rhs_sha256": "1764745c10a82d6391357af5cc0f23fefd1c9f415a51fd0b0a94390d266a5356",
+    "library_sha256": "a543b0725708f9c82d77907acf700d7ba75dc43af3a006afca44cab1c32a6d4f",
+    "clocks": "unlocked; untimed native solve immediately before every measured setup/solve",
+    "gpu_isolation": "Reject other compute processes at start and before/after every timed trial",
+    "trials": "alternating forward/reverse order after warming all candidates"
+  },
+  "problem": "simjeb-ftetwild",
+  "stage": "setup",
+  "gpu": "NVIDIA L40",
+  "warp": "1.15.0",
+  "width": 8,
+  "results": {
+    "baseline": {
+      "trials": [
+        {
+          "setup_s": 0.04030308872461319,
+          "solve_s": 0.2819201983511448,
+          "total_s": 0.322223287075758,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.04043763503432274,
+          "solve_s": 0.29868168383836746,
+          "total_s": 0.3391193188726902,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.04031539335846901,
+          "solve_s": 0.27775344997644424,
+          "total_s": 0.31806884333491325,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.039886895567178726,
+          "solve_s": 0.31027617678046227,
+          "total_s": 0.350163072347641,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.0403180867433548,
+          "solve_s": 0.2962132506072521,
+          "total_s": 0.3365313373506069,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        }
+      ],
+      "factor_nnz": 1405145,
+      "mean_factor_row_size": 6.880174899990696,
+      "identical_baseline_factor": true
+    },
+    "current": {
+      "trials": [
+        {
+          "setup_s": 0.03787417709827423,
+          "solve_s": 0.28874656558036804,
+          "total_s": 0.3266207426786423,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.040424346923828125,
+          "solve_s": 0.26309356838464737,
+          "total_s": 0.3035179153084755,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.0392347127199173,
+          "solve_s": 0.2905248776078224,
+          "total_s": 0.3297595903277397,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.03891082480549812,
+          "solve_s": 0.25583840534090996,
+          "total_s": 0.2947492301464081,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        },
+        {
+          "setup_s": 0.043140992522239685,
+          "solve_s": 0.28837328776717186,
+          "total_s": 0.33151428028941154,
+          "iterations": 2000,
+          "field_error": 1.2842249437850525e-13,
+          "energy_error": 8.405290327382023e-13,
+          "true_relative_residual": 8.479483381199777e-11
+        }
+      ],
+      "factor_nnz": 1405145,
+      "mean_factor_row_size": 6.880174899990696,
+      "identical_baseline_factor": true
+    }
+  }
+}

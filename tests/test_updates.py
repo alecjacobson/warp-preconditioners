@@ -10,12 +10,15 @@ from warp_preconditioners import FSAI, BlockJacobi
 @pytest.mark.parametrize("device", DEVICES)
 @pytest.mark.parametrize("block", [1, 3])
 @pytest.mark.parametrize("dtype", [wp.float32, wp.float64])
-def test_refit_local_solves_and_rollback(device, block, dtype):
+@pytest.mark.parametrize("step_size", [1, 3])
+def test_refit_local_solves_and_rollback(device, block, dtype, step_size):
     rng = np.random.default_rng(48)
     r = rng.normal(size=(12, 12))
     a = r @ r.T + np.eye(12) * 3
     A = sp.bsr_copy(from_scipy(a, device, dtype), block_shape=(block, block))
-    m = FSAI(A, max_row_size=5, reuse_pattern=True, factor_dtype=wp.float32)
+    m = FSAI(
+        A, max_row_size=5, reuse_pattern=True, factor_dtype=wp.float32, max_step_size=step_size
+    )
     gptr, tptr = m.G.values.ptr, m.GT.values.ptr
     b = a + np.diag(np.arange(12))
     B = sp.bsr_copy(from_scipy(b, device, dtype), block_shape=(block, block))

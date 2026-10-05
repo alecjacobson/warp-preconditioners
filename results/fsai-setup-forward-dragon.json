@@ -1,0 +1,89 @@
+{
+  "baseline": "8f25bf7",
+  "problem": "dragon",
+  "stage": "setup",
+  "gpu": "NVIDIA L40",
+  "warp": "1.15.0",
+  "width": 48,
+  "results": {
+    "baseline": {
+      "trials": [
+        {
+          "setup_s": 1.0405295714735985,
+          "solve_s": 0.5116644948720932,
+          "total_s": 1.5521940663456917,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.0475108958780766,
+          "solve_s": 0.5118459984660149,
+          "total_s": 1.5593568943440914,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.0337279736995697,
+          "solve_s": 0.5141511894762516,
+          "total_s": 1.5478791631758213,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.0542439632117748,
+          "solve_s": 0.50757772102952,
+          "total_s": 1.5618216842412949,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.0367433279752731,
+          "solve_s": 0.5144950523972511,
+          "total_s": 1.5512383803725243,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        }
+      ]
+    },
+    "current": {
+      "trials": [
+        {
+          "setup_s": 1.0412911176681519,
+          "solve_s": 0.5144798792898655,
+          "total_s": 1.5557709969580173,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.028682466596365,
+          "solve_s": 0.512334305793047,
+          "total_s": 1.541016772389412,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.0443121194839478,
+          "solve_s": 0.5121682174503803,
+          "total_s": 1.556480336934328,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.0311681181192398,
+          "solve_s": 0.5113222524523735,
+          "total_s": 1.5424903705716133,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        },
+        {
+          "setup_s": 1.047757163643837,
+          "solve_s": 0.5102173946797848,
+          "total_s": 1.5579745583236217,
+          "iterations": 2000,
+          "field_error": 0.7426637799225971
+        }
+      ]
+    }
+  },
+  "timing_status": "Exploratory screen before the GPU-isolation guard; use the guarded final comparisons for performance claims."
+}

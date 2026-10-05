@@ -77,6 +77,14 @@ Its historical timings are separate from the refreshed measurements above.
 
 ![FSAI tuning: conditioning, total time, per-iteration cost, and parameter tradeoffs.](assets/dragon-dirichlet-tuning.png)
 
+A [follow-up performance study](results/fsai-followup.md) adds optional
+**batched support growth**: `max_step_size=2` with the width-48 recipe reduces
+median dragon setup-plus-solve time from **10.19 s to 9.46 s (7.2% less)**
+in five isolated GPU trials at the same verified field accuracy. Single-entry
+growth remains the default. Separate factor thread counts, a fused application,
+and a block-FSAI prototype did not produce repeatable wins and remain
+experiments. The figures above retain their recorded single-entry settings.
+
 ## Indefinite mixed systems
 
 The new `MixedHarmonicSystem` and `ShiftedBlock` preconditioner solve the
@@ -265,20 +273,24 @@ G[i,S] = z^T D[S]^-1 / sqrt(z_i)
 P = G^T G
 ```
 
-Each row starts with only its diagonal. A greedy step selects the largest
-absolute residual entry from the graph frontier of the current support.
-The local Cholesky factor is extended by bordering, and `z` is recomputed
-by two local triangular solves. Rows run independently; neither setup nor
+Each row starts with only its diagonal. A greedy search selects the largest
+absolute residual entries from the graph frontier of the current support.
+The local Cholesky factor is extended by bordering; the forward solve is
+extended with each new entry, then a backward solve updates `z`. Rows run independently; neither setup nor
 apply requires a global triangular solve. There is no bounded candidate
-hash table: all frontier entries are considered, with duplicates evaluated
-again. The resulting lower triangular `G` has a positive diagonal, so
+hash table: all frontier entries are considered. Candidates already in the
+current top selection are skipped; other duplicates may be evaluated again. The resulting lower triangular `G` has a positive diagonal, so
 `G^T G` is SPD and suitable for CG.
 
 - `max_row_size=8`: maximum entries including the diagonal, range 1–64.
   Eight is a useful starting point for the dragon benchmark. One recovers
   Jacobi exactly. Denser rows increase setup and application cost.
+- `max_step_size=1`: maximum entries added per search, range 1–64. The
+  default preserves single-entry growth. Batching can reduce setup and total
+  time but changes the supports; larger batches are not always faster.
 - `kap_tolerance=1e-3`: stop after relative improvement in row energy
-  `psi=1/z_i` drops below this value. Zero disables this early stopping.
+  `psi=1/z_i` drops below this value. Checked after each batch; retune when
+  changing batch size. Zero disables this early stopping.
 - `pivot_floor`: stop growing a row if an equilibrated local pivot is too
   small (defaults: `1e-12` in float64, `1e-6` in float32). The accepted
   positive factor is retained; `P.truncated_rows` counts these events.
@@ -293,8 +305,8 @@ again. The resulting lower triangular `G` has a positive diagonal, so
 
 This is an independent implementation inspired by [hypre's adaptive
 FSAI](https://hypre.readthedocs.io/en/latest/solvers-fsai.html). Differences
-include diagonal equilibration, adding one entry per step, and bordering
-local Cholesky factors. It is not a bitwise port or a comparison against
+include diagonal equilibration, single-entry growth by default, and
+bordering local Cholesky factors. It is not a bitwise port or a comparison against
 hypre's compiled implementation. Positive diagonals are checked; full
 symmetry and positive definiteness remain caller preconditions. Supply
 both triangular halves of `A`, with canonical sorted BSR topology.

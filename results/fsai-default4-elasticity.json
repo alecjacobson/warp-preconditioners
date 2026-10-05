@@ -1,0 +1,122 @@
+{
+  "baseline": "8f25bf7",
+  "provenance": {
+    "utc": "2026-10-05T15:03:56.369135+00:00",
+    "matrix_rhs_sha256": "1764745c10a82d6391357af5cc0f23fefd1c9f415a51fd0b0a94390d266a5356",
+    "library_sha256": "a543b0725708f9c82d77907acf700d7ba75dc43af3a006afca44cab1c32a6d4f",
+    "clocks": "unlocked; untimed native solve immediately before every measured setup/solve",
+    "gpu_isolation": "Reject other compute processes at start and before/after every timed trial",
+    "trials": "alternating forward/reverse order after warming all candidates"
+  },
+  "problem": "simjeb-ftetwild",
+  "stage": "setup",
+  "gpu": "NVIDIA L40",
+  "warp": "1.15.0",
+  "width": 4,
+  "results": {
+    "baseline": {
+      "trials": [
+        {
+          "setup_s": 0.009702619165182114,
+          "solve_s": 0.20736601203680038,
+          "total_s": 0.2170686312019825,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.010254189372062683,
+          "solve_s": 0.20324550569057465,
+          "total_s": 0.21349969506263733,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.010067995637655258,
+          "solve_s": 0.2023431807756424,
+          "total_s": 0.21241117641329765,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.014134205877780914,
+          "solve_s": 0.2040870077908039,
+          "total_s": 0.21822121366858482,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.008848078548908234,
+          "solve_s": 0.20675727352499962,
+          "total_s": 0.21560535207390785,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        }
+      ],
+      "factor_nnz": 776801,
+      "mean_factor_row_size": 3.80354108827749,
+      "identical_baseline_factor": true
+    },
+    "current": {
+      "trials": [
+        {
+          "setup_s": 0.008584298193454742,
+          "solve_s": 0.20783154293894768,
+          "total_s": 0.21641584113240242,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.009494207799434662,
+          "solve_s": 0.20290853828191757,
+          "total_s": 0.21240274608135223,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.009643886238336563,
+          "solve_s": 0.20094553008675575,
+          "total_s": 0.21058941632509232,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.012350175529718399,
+          "solve_s": 0.2019294910132885,
+          "total_s": 0.2142796665430069,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        },
+        {
+          "setup_s": 0.009942762553691864,
+          "solve_s": 0.20164750143885612,
+          "total_s": 0.211590263992548,
+          "iterations": 2000,
+          "field_error": 1.1445836607277473e-13,
+          "energy_error": 9.215153593075544e-13,
+          "true_relative_residual": 9.37156724317106e-11
+        }
+      ],
+      "factor_nnz": 776801,
+      "mean_factor_row_size": 3.80354108827749,
+      "identical_baseline_factor": true
+    }
+  }
+}
