@@ -1,88 +1,64 @@
-Title: FEM magnetostatics example: incompatible discrete load and unattained residual target
+Title: [BUG] FEM magnetostatics: incompatible discrete load prevents convergence
 
-The default example_magnetostatics.py assembles a curl-curl system with
-homogeneous essential boundary conditions and solves it using Jacobi + CR.
-Its source already notes that the RHS may not lie in the matrix image. A
-compatibility diagnostic suggests this is a substantial discretization issue,
-not just float32 roundoff or an insufficient iteration budget.
+### Bug Description
 
-Environment
------------
-Warp 1.19.0.dev0, alecjacobson/warp commit
- d76aecb17765957fba6ca323044205f74783b4d3
-NVIDIA L40; CUDA toolkit 12.6; driver 570.158.01 (CUDA 12.8).
-Default grid resolution 32, radius 2, current 1e6; 104544 unknowns.
-The diagnostic uses original Warp FEM assembly and stock Jacobi/CR only.
-No FSAI or external numerical solver is used. Assembly and solves run on CUDA;
-NumPy provides diagnostic reductions and the seeded control vector.
+The default FEM magnetostatics example does not reach its requested residual tolerance. Its assembled current load has a substantial component along the curl–curl operator's gradient nullspace, including when the geometry and system are freshly assembled in float64.
 
-Evidence
---------
-Freshly assembled float64, including float64 geometry and FEM integration:
+The prescribed physical current appears compatible: it circulates around the coil, is divergence-free, and is tangent to the surfaces where its support ends. The issue is with compatibility of the **discrete assembled load**, rather than the physical loading itself.
 
-  ||b||                                     92438.74661
-  ||K||_F                                   2.130662219e9
-  ||q||                                     2.070196678
-  ||K^T q||                                 2.191144105e-9
-  ||K^T q|| / (||K||_F ||q||)                4.967578382e-19
-  |q^T b| / (||q|| ||b||)                    0.216024690
+The [example already notes that the RHS may not lie in the matrix image](https://github.com/NVIDIA/warp/blob/5a0c33d17d847d0be07ae1003263b572aae0729a/warp/examples/fem/example_magnetostatics.py#L243). The measurements below suggest this is large enough to prevent a meaningful solve to the stated tolerance, not just a small float32 effect.
 
-Here q is a discrete gradient of a scalar Q1 field with zero boundary values.
-The scalar probe is selected from the assembled current/gradient pairing.
-The gradient is interpolated on the undeformed base grid, retaining reference
-edge DOFs under the covariant Piola map. This avoids interpolating through the
-cylindrical mapping's singular axis. K is the boundary-projected system used by
-the original example.
+#### Reproduction
 
-Thus a mode annihilated by K^T to roundoff has a 21.6% RHS projection, whereas
-the example requests a relative residual of 1e-4 (0.01%). For the intended
-singular operator, this one witness alone implies a residual floor of at least
-21.6%. This is not a claim of exact algebraic inconsistency of the rounded
-floating-point matrix: rounding can lift null modes. Solving those tiny lifted
-modes would not resolve the underlying compatibility defect.
+The original example runs with:
 
-Stock Jacobi + CR, with the budget increased from 250 to 2000:
+```sh
+python -m warp.examples.fem.example_magnetostatics --device cuda:0 --headless --fp64
+```
 
-  Original float64 load:      2000 iterations, true relative residual 0.362870335
-  Compatible control K*x*:      30 iterations, true relative residual 8.95099e-5
+For an independent true-residual and nullspace check, download this [standalone diagnostic](https://github.com/alecjacobson/warp-preconditioners/blob/82c9a1e/benchmarks/warp_magnetostatics_diagnostic.py) and run it with the same Warp installation:
 
-Both use the same float64 matrix, zero initial guess, and tolerance 1e-4.
-The seeded control x* has zero boundary values. Its load is different and may
-be easier; this is a solvability/control check, not a performance comparison.
-Float32 assembly gives essentially the same 21.6025% compatibility witness.
+```sh
+python warp_magnetostatics_diagnostic.py --fp64
+python warp_magnetostatics_diagnostic.py
+```
 
-Reproduce
----------
-Using the tested Warp checkout's Python, from warp-preconditioners:
+It captures the original example's boundary-projected matrix and RHS, uses stock Jacobi + CR, and increases the iteration limit from 250 to 2,000. Assembly, interpolation, and solves run in Warp on CUDA. NumPy is used only for diagnostic reductions and generation of the seeded control vector; there is no external sparse solver.
 
-  OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/warp_magnetostatics_diagnostic.py --fp64 --output results/magnetostatics-diagnostic/float64.json
-  OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python benchmarks/warp_magnetostatics_diagnostic.py --output results/magnetostatics-diagnostic/float32.json
+#### Results
 
-The standalone diagnostic is at:
-https://github.com/alecjacobson/warp-preconditioners/blob/main/benchmarks/warp_magnetostatics_diagnostic.py
+Default grid resolution 32, radius 2, current 1e6: 104,544 unknowns.
 
-The unmodified example can also be run headlessly, but prints its recursively
-updated residual rather than the independently evaluated residual above:
+For fresh float64 assembly, construct a discrete gradient `q` from a scalar Q1 field with zero boundary values. The scalar probe comes from the assembled current/gradient pairing. Its gradient is constructed on the undeformed base grid, retaining reference edge DOFs under the covariant Piola map.
 
-  python -m warp.examples.fem.example_magnetostatics --device cuda:0 --headless --fp64
+```text
+||b||                              92438.74661
+||K||_F                            2.130662219e9
+||q||                              2.070196678
+||K^T q||                          2.191144105e-9
+||K^T q|| / (||K||_F ||q||)         4.967578382e-19
+|q^T b| / (||q|| ||b||)             0.216024690
+```
 
-Suggested resolution
---------------------
-Clarify whether the example intends a compatible Maxwell solve or an
-approximate least-squares solve. For the former, assemble/project a discretely
-compatible current and handle the gradient gauge freedom. For the latter,
-document the objective and use an appropriate convergence criterion, such as
-stationarity or the residual of the compatible component, while also reporting
-the original true residual. Merely increasing max_iters or changing the
-preconditioner cannot remove an incompatible load component in the intended
-singular system.
+A gradient mode annihilated by the matrix transpose to roundoff thus captures **21.6% of the load**, while the requested relative residual is **0.01%**. Float32 assembly gives essentially the same compatibility defect.
 
-The exact source of the compatibility error (e.g. current quadrature around the
-sharp coil boundaries) has not yet been isolated. Gauge nonuniqueness is
-expected and is not itself a bug; adding a gauge alone does not make the
-original unconstrained equations compatible. These measurements also do not
-establish that the rendered magnetic field curl(A) is inaccurate.
+| Load, freshly assembled float64 matrix | Jacobi + CR iterations | True relative residual |
+| --- | ---: | ---: |
+| Original current load | 2,000 (limit) | 0.362870335 |
+| Manufactured compatible load `K*x*` | 30 | 8.95099e-5 |
 
-A public issue search for magnetostatics and curl-curl on 2026-10-06 found no
-matching compatibility/convergence report (the magnetostatics hit #1118 is an
-unrelated CUDA 13.1 compilation issue). This draft has not been posted.
+Both use the same matrix, zero initial guess, and tolerance `1e-4`. The seeded control `x*` is zero on the boundary. The control has a different, potentially easier RHS; this is a compatibility/control check, not a performance comparison. [Full float64 results](https://github.com/alecjacobson/warp-preconditioners/blob/82c9a1e/results/magnetostatics-diagnostic/float64.json).
+
+#### Interpretation / expected behavior
+
+This is **not necessarily an issue with the choice of iterative solver**. For the intended singular operator, an incompatible load component cannot be removed by changing solvers or preconditioners, or simply allowing more iterations. Rounding can lift null modes, so the diagnostic is not a claim of exact algebraic inconsistency of the stored floating-point matrix.
+
+Ideally the example should assemble a discretely compatible load and converge to its stated tolerance. If an approximate least-squares solution is intentional, it should document that objective and use a corresponding convergence criterion, while reporting the true residual.
+
+The precise assembly mechanism has not yet been isolated; quadrature across the sharp coil boundaries is one possibility. Gradient gauge freedom is expected and is not itself a bug. These measurements also do not establish that the rendered magnetic field `curl(A)` is inaccurate.
+
+### System Information
+
+- Warp 1.19.0.dev0; tested checkout: `alecjacobson/warp@d76aecb17765957fba6ca323044205f74783b4d3`, based on upstream `5a0c33d17d847d0be07ae1003263b572aae0729a`. The magnetostatics example is unchanged from that upstream revision.
+- Python 3.12.13, Linux x86_64.
+- NVIDIA L40, CUDA toolkit 12.6, driver 570.158.01 (CUDA 12.8).
