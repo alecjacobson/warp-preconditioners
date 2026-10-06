@@ -1,0 +1,173 @@
+[
+  {
+    "example": "convection_diffusion_dg",
+    "site": 148,
+    "settings": {
+      "quiet": true,
+      "degree": 2,
+      "resolution": 50,
+      "mesh": "grid",
+      "viscosity": 0.001,
+      "ang_vel": 1.0
+    },
+    "method": "bicgstab",
+    "tol": 0.0001,
+    "maxiter": 0,
+    "check_every": 0,
+    "rhs_vector_length": 1,
+    "matrices": {
+      "A": {
+        "nrow": 22500,
+        "ncol": 22500,
+        "block_shape": [
+          1,
+          1
+        ],
+        "dtype": "float32",
+        "nnz": 643500
+      }
+    },
+    "kind": "bsr",
+    "relative_asymmetry": 0.7740257644818057,
+    "variants": {
+      "jacobi": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.0006038062274456024,
+            "solve_s": 0.0028865300118923187,
+            "total_s": 0.003490336239337921,
+            "iterations": [
+              6
+            ],
+            "reported_error": [
+              8.76847735860156e-05
+            ],
+            "tolerance": [
+              9.999999525523424e-05
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              8.768346176524936e-05
+            ],
+            "true_relative_residual": 0.0005113991573664304,
+            "finite": true
+          },
+          {
+            "setup_s": 0.00038468465209007263,
+            "solve_s": 0.0022984668612480164,
+            "total_s": 0.002683151513338089,
+            "iterations": [
+              6
+            ],
+            "reported_error": [
+              8.76847735860156e-05
+            ],
+            "tolerance": [
+              9.999999525523424e-05
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              8.768346176524936e-05
+            ],
+            "true_relative_residual": 0.0005113991573664304,
+            "finite": true
+          },
+          {
+            "setup_s": 0.00036872923374176025,
+            "solve_s": 0.0022285431623458862,
+            "total_s": 0.0025972723960876465,
+            "iterations": [
+              6
+            ],
+            "reported_error": [
+              8.76847735860156e-05
+            ],
+            "tolerance": [
+              9.999999525523424e-05
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              8.768346176524936e-05
+            ],
+            "true_relative_residual": 0.0005113991573664304,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0004828609526157379,
+            "solve_s": 0.0025141462683677673,
+            "total_s": 0.0029970072209835052,
+            "iterations": [
+              6
+            ],
+            "reported_error": [
+              8.76847735860156e-05
+            ],
+            "tolerance": [
+              9.999999525523424e-05
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              8.768346176524936e-05
+            ],
+            "true_relative_residual": 0.0005113991573664304,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0004122108221054077,
+            "solve_s": 0.002340078353881836,
+            "total_s": 0.0027522891759872437,
+            "iterations": [
+              6
+            ],
+            "reported_error": [
+              8.76847735860156e-05
+            ],
+            "tolerance": [
+              9.999999525523424e-05
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              8.768346176524936e-05
+            ],
+            "true_relative_residual": 0.0005113991573664304,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.0004122108221054077,
+          "solve_s": 0.002340078353881836,
+          "total_s": 0.0027522891759872437
+        }
+      },
+      "fsai_4": {
+        "status": "not_applicable",
+        "reason": "Nonsymmetric operator; FSAI requires SPD input."
+      },
+      "fsai_8": {
+        "status": "not_applicable",
+        "reason": "Nonsymmetric operator; FSAI requires SPD input."
+      },
+      "fsai_16": {
+        "status": "not_applicable",
+        "reason": "Nonsymmetric operator; FSAI requires SPD input."
+      },
+      "fsai_32": {
+        "status": "not_applicable",
+        "reason": "Nonsymmetric operator; FSAI requires SPD input."
+      }
+    },
+    "residual_units": "norm",
+    "warp_revision": "d76aecb17765957fba6ca323044205f74783b4d3",
+    "snapshot_sha256": "000c0fe0e23838bed9caf18de4f111c6b9f7002f9c203afb9712f9b962e22955",
+    "repeats": 5,
+    "device": "NVIDIA L40",
+    "frame": 1,
+    "unknowns": 22500
+  }
+]

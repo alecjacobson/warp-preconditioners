@@ -1,0 +1,20 @@
+{
+  "diffusion": 0,
+  "diffusion_3d": 0,
+  "deformed_geometry": 0,
+  "convection_diffusion": 0,
+  "convection_diffusion_dg": 0,
+  "distortion_energy": 0,
+  "mixed_elasticity": 0,
+  "nonconforming_contact": 0,
+  "stokes_transfer": 0,
+  "magnetostatics": 0,
+  "darcy_ls_optimization": 0,
+  "elastic_shape_optimization": 0,
+  "cantilever_topology_optimization": 0,
+  "stokes": 0,
+  "navier_stokes": 0,
+  "taylor_green": 0,
+  "apic_fluid": 0,
+  "apic_fluid_multi_env": 0
+}

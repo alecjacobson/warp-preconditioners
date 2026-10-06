@@ -1,0 +1,112 @@
+Warp example preconditioner comparison — 2026-10-06
+=================================================
+
+Warp branch: alecjacobson/fsai, commit d76aecb17765957fba6ca323044205f74783b4d3
+Pull --ff-only found no new branch commits. Source checkout: /home/horde/projects/warp-fsai-review.
+
+Scope: all Jacobi/block-Jacobi preconditioned iterative solve call sites in
+warp/examples, warp/examples/benchmarks and asv/benchmarks on this branch.
+18 example files contain such solves; none selects block Jacobi. No standalone
+or ASV benchmark uses either preconditioner in an iterative solve.
+There are 21 source call sites and 20 captured systems, including separate
+forward/adjoint solves. APIC uses its noncapturable assembled branch for
+snapshot extraction; the default captured branch is also listed in inventory.json.
+
+Five alternating-order trials on the L40; median synchronized warm setup +
+solve wall time in milliseconds. Assembly, rendering, JIT, copying and checks
+are excluded. Preconditioner setup and solver allocation/graph creation are
+included. Numerical operations use Warp on CUDA. No other GPU process was
+present at the checks before/after each trial. Cyclic GC is outside timing.
+
+The original solver, matrix dtype, RHS, initial guess and stopping options
+are unchanged. CLI-default spatial/physical settings, first step and first
+solve per call site; APIC instead uses its first pressure RHS norm > 1e-5:
+frame 37 for single environment and frame 40 for multi-environment.
+These are isolated linear-solve timings; full animation and optimization runs
+are not timed.
+FSAI default uses width 8. The width sweep is 4/8/16/32, all other settings
+default; it is not an exhaustive tuning study. Best below means minimum
+observed total time in that sweep, with accuracy failures marked explicitly.
+
+Example | Unknowns | Solver | Original Jacobi ms | FSAI default ms | Fastest FSAI ms (width)
+--- | ---: | --- | ---: | ---: | ---:
+apic_fluid | 531,441 | CR | 4.19 | N/A | N/A
+apic_fluid_multi_env [assembled preconditioner] | 16,741 | CR | 2.37 | 7.69 | 4.25 (w=4)
+cantilever_topology_optimization | 2,574 | CG | 6.03 | 14.86 | 11.73 (w=4)
+convection_diffusion | 10,201 | CG | 2.12* | 2.89* | 2.79* (w=4)
+convection_diffusion_dg | 22,500 | BICGSTAB | 2.75 | N/A | N/A
+darcy_ls_optimization (forward) | 10,201 | CG | 7.95* | N/A | N/A
+darcy_ls_optimization (adjoint) | 10,201 | CG | 7.89* | N/A | N/A
+deformed_geometry | 10,201 | CG | 8.67* | 5.62* | 5.62* (w=8)
+diffusion | 10,201 | CG | 3.12 | 4.30 | 4.19 (w=4)
+diffusion_3d | 9,471 | CG | 2.68 | 12.03 | 4.46 (w=4)
+distortion_energy | 1,352 | CG | 22.66* | 7.67* | 7.67* (w=8)
+elastic_shape_optimization (forward) | 312 | CG | 4.43* | 4.06* | 3.94* (w=4)
+elastic_shape_optimization (adjoint) | 312 | CG | 4.21* | 4.31* | 4.00* (w=4)
+magnetostatics | 104,544 | CR | 14.89* | 25.19* | 18.00* (w=4)
+mixed_elasticity | 3,952 | CG | 10.16 | 8.62 | 6.54 (w=4)
+navier_stokes [velocity block] | 5,878 | CG | 5.41 | 8.81 | 6.35 (w=4)
+nonconforming_contact | 6,402 | CG | 20.52* | 13.94* | 13.77* (w=4)
+stokes [velocity block] | 23,003 | CG | 34.58 | 24.96 | 24.96 (w=8)
+stokes_transfer | 4,906 | CG | 4.71 | N/A | N/A
+taylor_green [velocity block] | 37,507 | CG | 6.86 | 9.59 | 7.02 (w=4)
+
+* The recomputed float64 residual does not meet the example’s original
+absolute stopping target. These times must not be presented as successful
+time-to-accuracy comparisons. Magnetostatics also reaches its 250-iteration
+limit under all tested preconditioners. Other marked examples report
+recursive convergence despite the larger true residual.
+
+A true-relative residual above the requested relative tolerance can still
+satisfy the solver’s absolute tolerance floor; the validity check uses the
+actual returned absolute target, not just relative residual.
+
+The confirmed total-time wins that meet the original true-residual target
+are mixed elasticity (10.16 to 6.54 ms, 1.55x) and the Stokes velocity-block
+substitution (34.58 to 24.96 ms, 1.39x). Apparent wins in starred rows do not
+establish a successful time-to-accuracy improvement.
+
+Special cases and limitations
+-----------------------------
+- DG convection-diffusion is nonsymmetric (relative asymmetry about 0.774);
+  direct FSAI construction violates its SPD contract and was not attempted.
+- Darcy has 10099 negative interior diagonal entries and 102 positive
+  boundary entries. FSAI rejects this unmodified system.
+- Stokes transfer has 120 inactive zero diagonal entries; FSAI rejects them.
+- Single-environment APIC has 461362 inactive zero rows in this snapshot;
+  FSAI rejects them. Removing inactive rows would be an additional change.
+- Saddle-point rows replace only the SPD velocity block of the existing
+  block-diagonal preconditioner with FSAI. The original pressure Schur
+  diagonal and full-system solver remain unchanged. Full saddle matrices
+  are indefinite and cannot be passed directly to FSAI.
+- Multi-environment APIC retains its original matrix-free, batched operator.
+  FSAI requires assembling its pressure matrix; that assembly is charged to
+  FSAI setup. Original diagonal construction is timed using its original kernel.
+- Outer frame graph capture is disabled for snapshot extraction in APIC and
+  Taylor-Green; solve replay uses CUDA graphs. Timings exclude whole-frame
+  graphs. Dynamic FSAI setup cannot be inserted into the APIC frame graph.
+- Fixed-matrix reuse can amortize setup. The CSV and raw JSON separate setup
+  from solve time; no refit or factor-reuse speedup is claimed here.
+- Default mesh choices only; this does not cover every CLI mesh/degree/frame
+  combination or later nonlinear/optimization systems.
+
+Excluded search matches
+-----------------------
+- example_diffusion_mgpu explicitly disables diagonal preconditioning.
+- distributed/example_jacobi_{mpi,nccl,nvshmem} implement Jacobi relaxation.
+- optim/example_fluid_checkpoint{,_custom_backward} use Jacobi pressure
+  iterations, not Jacobi-preconditioned Krylov solves.
+
+Files and reproduction
+----------------------
+inventory.json: source revision, settings, call sites, snapshot hashes, scope.
+comparison.csv: all methods, setup/solve totals, iteration counts, residuals.
+Per-example JSON: five raw samples for each method and rejection reasons.
+Snapshots are generated into ignored data/warp-examples; no mesh download is needed.
+Using the Warp checkout’s Python from this repository:
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /path/to/warp/.venv/bin/python \
+  benchmarks/warp_example_fsai.py capture all
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /path/to/warp/.venv/bin/python \
+  benchmarks/warp_example_fsai.py measure all --repeats 5
+The measure-all command waits for idle GPU before each example; if another
+GPU process appears during a trial, rerun the affected example.

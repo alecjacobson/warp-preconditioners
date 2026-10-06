@@ -1,0 +1,169 @@
+[
+  {
+    "example": "stokes_transfer",
+    "site": 172,
+    "settings": {
+      "quiet": true,
+      "resolution": 50
+    },
+    "method": "cg",
+    "tol": 0.0001,
+    "maxiter": 0,
+    "check_every": 0,
+    "rhs_vector_length": 2,
+    "matrices": {
+      "A": {
+        "nrow": 2453,
+        "ncol": 2453,
+        "block_shape": [
+          2,
+          2
+        ],
+        "dtype": "float32",
+        "nnz": 20645
+      }
+    },
+    "kind": "bsr",
+    "relative_asymmetry": 7.80142632418012e-10,
+    "variants": {
+      "jacobi": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.00038065388798713684,
+            "solve_s": 0.0044113993644714355,
+            "total_s": 0.004792053252458572,
+            "iterations": [
+              140
+            ],
+            "reported_error": [
+              0.03095551123783321
+            ],
+            "tolerance": [
+              0.032291502256769626
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.031054689051176244
+            ],
+            "true_relative_residual": 9.616985970318509e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.00040113553404808044,
+            "solve_s": 0.004370037466287613,
+            "total_s": 0.004771173000335693,
+            "iterations": [
+              140
+            ],
+            "reported_error": [
+              0.03095551123783321
+            ],
+            "tolerance": [
+              0.032291502256769626
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.031054689051176244
+            ],
+            "true_relative_residual": 9.616985970318509e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0003724880516529083,
+            "solve_s": 0.004285924136638641,
+            "total_s": 0.00465841218829155,
+            "iterations": [
+              140
+            ],
+            "reported_error": [
+              0.03095551123783321
+            ],
+            "tolerance": [
+              0.032291502256769626
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.031054689051176244
+            ],
+            "true_relative_residual": 9.616985970318509e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0003970116376876831,
+            "solve_s": 0.004310380667448044,
+            "total_s": 0.004707392305135727,
+            "iterations": [
+              140
+            ],
+            "reported_error": [
+              0.03095551123783321
+            ],
+            "tolerance": [
+              0.032291502256769626
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.031054689051176244
+            ],
+            "true_relative_residual": 9.616985970318509e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0003956630825996399,
+            "solve_s": 0.004298146814107895,
+            "total_s": 0.004693809896707535,
+            "iterations": [
+              140
+            ],
+            "reported_error": [
+              0.03095551123783321
+            ],
+            "tolerance": [
+              0.032291502256769626
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.031054689051176244
+            ],
+            "true_relative_residual": 9.616985970318509e-05,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.0003956630825996399,
+          "solve_s": 0.004310380667448044,
+          "total_s": 0.004707392305135727
+        }
+      },
+      "fsai_4": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (120 invalid rows)"
+      },
+      "fsai_8": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (120 invalid rows)"
+      },
+      "fsai_16": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (120 invalid rows)"
+      },
+      "fsai_32": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (120 invalid rows)"
+      }
+    },
+    "residual_units": "norm",
+    "warp_revision": "d76aecb17765957fba6ca323044205f74783b4d3",
+    "snapshot_sha256": "fa6a0016548134cc4fbac2943535b4ebc1e030064d862bc77064fbced8bc3843",
+    "repeats": 5,
+    "device": "NVIDIA L40",
+    "frame": 1,
+    "unknowns": 4906
+  }
+]

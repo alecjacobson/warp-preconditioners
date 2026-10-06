@@ -1,0 +1,881 @@
+{
+  "warp_revision": "d76aecb17765957fba6ca323044205f74783b4d3",
+  "scope": "All preconditioned iterative solve call sites in warp/examples, warp/examples/benchmarks and asv/benchmarks on the current branch; first solve per call site at CLI-default spatial/physical settings.",
+  "captured": [
+    {
+      "example": "apic_fluid",
+      "frame": 37,
+      "site": 194,
+      "settings": {
+        "quiet": true,
+        "stage_path": null,
+        "voxel_size": 0.25,
+        "opengl": false,
+        "grid_capacity_ratio": 16.0,
+        "grid_leaf_capacity_ratio": null,
+        "grid_internal_capacity_ratio": null,
+        "max_active_voxels": null,
+        "max_leaf_nodes": null,
+        "max_lower_nodes": null,
+        "max_upper_nodes": null,
+        "use_cuda_graph": false
+      },
+      "method": "cr",
+      "tol": 1e-06,
+      "maxiter": 1000,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 531441,
+          "ncol": 531441,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 1818584
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "df62b24edb900c855755dab6bb23bacd401de10d62816d15318fd84193d40716",
+      "unknowns": 531441
+    },
+    {
+      "example": "apic_fluid_multi_env",
+      "frame": 40,
+      "site": 124,
+      "settings": {
+        "quiet": true,
+        "stage_path": null,
+        "voxel_size": 0.5,
+        "env_count": 4,
+        "visual_spacing": 12.0,
+        "solve_mode": "matrix-free-batched",
+        "opengl": false
+      },
+      "method": "cr",
+      "tol": 1e-06,
+      "maxiter": 1000,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "B": {
+          "nrow": 16741,
+          "ncol": 20967,
+          "block_shape": [
+            1,
+            3
+          ],
+          "dtype": "float32",
+          "nnz": 133928
+        },
+        "Bt": {
+          "nrow": 20967,
+          "ncol": 16741,
+          "block_shape": [
+            3,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 133928
+        }
+      },
+      "kind": "matrix_free",
+      "snapshot_sha256": "eca7174ab0bd9f68d37a1c954b79f1b2a167ec7a0e2146366f049a5ef1773e5e",
+      "unknowns": 16741
+    },
+    {
+      "example": "cantilever_topology_optimization",
+      "site": 410,
+      "settings": {
+        "args": {
+          "device": "cuda:0",
+          "nx": 32,
+          "ny": 12,
+          "nz": 1,
+          "max_evals": 100,
+          "headless": true
+        }
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 3000,
+      "check_every": 0,
+      "rhs_vector_length": 3,
+      "matrices": {
+        "A": {
+          "nrow": 858,
+          "ncol": 858,
+          "block_shape": [
+            3,
+            3
+          ],
+          "dtype": "float64",
+          "nnz": 14356
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "7802e1db19b190010638e7105219c2159000a097a56d8dccf0d1c6c12745e90c",
+      "unknowns": 2574,
+      "frame": 1
+    },
+    {
+      "example": "convection_diffusion",
+      "site": 123,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 50,
+        "mesh": "grid",
+        "viscosity": 0.001,
+        "ang_vel": 1.0
+      },
+      "method": "cg",
+      "tol": 1e-12,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 10201,
+          "ncol": 10201,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 160801
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "1fa8ed77be958dc4971d5feea8aafc874d8343b98ef50aaeca197458cc10e944",
+      "unknowns": 10201,
+      "frame": 1
+    },
+    {
+      "example": "convection_diffusion_dg",
+      "site": 148,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 50,
+        "mesh": "grid",
+        "viscosity": 0.001,
+        "ang_vel": 1.0
+      },
+      "method": "bicgstab",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 22500,
+          "ncol": 22500,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 643500
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "000c0fe0e23838bed9caf18de4f111c6b9f7002f9c203afb9712f9b962e22955",
+      "unknowns": 22500,
+      "frame": 1
+    },
+    {
+      "example": "darcy_ls_optimization",
+      "site": 348,
+      "settings": {
+        "degree": 1,
+        "resolution": 100,
+        "mesh": "grid",
+        "dt": 0.05,
+        "discontinuous": false,
+        "simp": 3.0,
+        "k_min": 0.0,
+        "quiet": true
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 1000,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 10201,
+          "ncol": 10201,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 90601
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "45ab8b104a217c577e66840a4d83cf5a65e62e4b941421d8be7909f08bb7a2a9",
+      "unknowns": 10201,
+      "frame": 1
+    },
+    {
+      "example": "darcy_ls_optimization",
+      "site": 352,
+      "settings": {
+        "degree": 1,
+        "resolution": 100,
+        "mesh": "grid",
+        "dt": 0.05,
+        "discontinuous": false,
+        "simp": 3.0,
+        "k_min": 0.0,
+        "quiet": true
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 1000,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 10201,
+          "ncol": 10201,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 90601
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "c2d724c350bf2fdcb54b217625b258cf53f0585b7f1b0d98ce6bb1124ff799e1",
+      "unknowns": 10201,
+      "frame": 1
+    },
+    {
+      "example": "deformed_geometry",
+      "site": 116,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 50,
+        "mesh": "tri",
+        "serendipity": false,
+        "viscosity": 2.0
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 10201,
+          "ncol": 10201,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 115801
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "5e88fcf494df3f4bb983b6367b6d24197ba63dfe8fbc302cbaa3fbbfbd6def07",
+      "unknowns": 10201,
+      "frame": 1
+    },
+    {
+      "example": "diffusion",
+      "site": 138,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 50,
+        "mesh": "grid",
+        "serendipity": false,
+        "viscosity": 2.0,
+        "boundary_value": 5.0,
+        "boundary_compliance": 0.0,
+        "fp64": false
+      },
+      "method": "cg",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 10201,
+          "ncol": 10201,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 160801
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "ba107bbe05a47f3855cd26d92b0294baab2a399b2ee065569754beffd9c259c4",
+      "unknowns": 10201,
+      "frame": 1
+    },
+    {
+      "example": "diffusion_3d",
+      "site": 165,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 10,
+        "mesh": "grid",
+        "serendipity": false,
+        "viscosity": 2.0,
+        "boundary_compliance": 0.0
+      },
+      "method": "cg",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 9471,
+          "ncol": 9471,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 534681
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "aa5e420c3c7108e0066a8e02ba5d395b771d7e7d9fa0ab81dd37b133ac357dae",
+      "unknowns": 9471,
+      "frame": 1
+    },
+    {
+      "example": "distortion_energy",
+      "site": 171,
+      "settings": {
+        "quiet": true,
+        "degree": 1,
+        "resolution": 25,
+        "mesh": "tri"
+      },
+      "method": "cg",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 2,
+      "matrices": {
+        "A": {
+          "nrow": 676,
+          "ncol": 676,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float32",
+          "nnz": 4526
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "e6716c7dd9a9a063d8cf43245ffe15c777755805e7b6ef71088884fa40408f79",
+      "unknowns": 1352,
+      "frame": 1
+    },
+    {
+      "example": "elastic_shape_optimization",
+      "site": 402,
+      "settings": {
+        "degree": 1,
+        "resolution": 25,
+        "mesh": "tri",
+        "lr": 0.001,
+        "quiet": true
+      },
+      "method": "cg",
+      "tol": 1e-08,
+      "maxiter": 1000,
+      "check_every": 0,
+      "rhs_vector_length": 2,
+      "matrices": {
+        "A": {
+          "nrow": 156,
+          "ncol": 156,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float32",
+          "nnz": 966
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "7c7a1c986431178e45740a285b3fb07f9c1d1d3777639588ef6afa691650a9a2",
+      "unknowns": 312,
+      "frame": 1
+    },
+    {
+      "example": "elastic_shape_optimization",
+      "site": 407,
+      "settings": {
+        "degree": 1,
+        "resolution": 25,
+        "mesh": "tri",
+        "lr": 0.001,
+        "quiet": true
+      },
+      "method": "cg",
+      "tol": 1e-08,
+      "maxiter": 1000,
+      "check_every": 0,
+      "rhs_vector_length": 2,
+      "matrices": {
+        "A": {
+          "nrow": 156,
+          "ncol": 156,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float32",
+          "nnz": 966
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "bba1c3f5dc282c972543d89c3e4808ccc4023b078880b7dd1efdb0220b3c3ae1",
+      "unknowns": 312,
+      "frame": 1
+    },
+    {
+      "example": "magnetostatics",
+      "site": 244,
+      "settings": {
+        "quiet": true,
+        "mesh": "grid",
+        "resolution": 32,
+        "fp64": false,
+        "domain_radius": 2.0
+      },
+      "method": "cr",
+      "tol": 0.0001,
+      "maxiter": 250,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 104544,
+          "ncol": 104544,
+          "block_shape": [
+            1,
+            1
+          ],
+          "dtype": "float32",
+          "nnz": 3287136
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "2b4d00b1c31c3e910b1732137b07b715ffce165cf622de3f359cada21bb9f227",
+      "unknowns": 104544,
+      "frame": 1
+    },
+    {
+      "example": "mixed_elasticity",
+      "site": 243,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 25,
+        "mesh": "grid",
+        "displacement": -0.5,
+        "poisson_ratio": 0.99,
+        "nonconforming_stresses": false
+      },
+      "method": "cg",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 2,
+      "matrices": {
+        "A": {
+          "nrow": 1976,
+          "ncol": 1976,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float32",
+          "nnz": 29776
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "aa08f0f51141bd6f07870932b735caba02a43bbfb28782b6557c72ce40db8836",
+      "unknowns": 3952,
+      "frame": 1
+    },
+    {
+      "example": "navier_stokes",
+      "site": 185,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 25,
+        "Re": 1000.0,
+        "top_velocity": 1.0,
+        "mesh": "grid"
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 2601,
+          "ncol": 2601,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float64",
+          "nnz": 40401
+        },
+        "B": {
+          "nrow": 676,
+          "ncol": 2601,
+          "block_shape": [
+            1,
+            2
+          ],
+          "dtype": "float64",
+          "nnz": 15876
+        },
+        "Bt": {
+          "nrow": 2601,
+          "ncol": 676,
+          "block_shape": [
+            2,
+            1
+          ],
+          "dtype": "float64",
+          "nnz": 15876
+        }
+      },
+      "kind": "saddle",
+      "snapshot_sha256": "89390f164192d2535df101e816ca2d741a50513f071e24151e349032c15c8b59",
+      "unknowns": 5878,
+      "frame": 1
+    },
+    {
+      "example": "nonconforming_contact",
+      "site": 258,
+      "settings": {
+        "degree": 2,
+        "resolution": 32,
+        "young_modulus": 10.0,
+        "poisson_ratio": 0.9,
+        "fp64": false
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 2,
+      "matrices": {
+        "A": {
+          "nrow": 3201,
+          "ncol": 3201,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float32",
+          "nnz": 48641
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "b791336113663acf12f093209846ee8a6fc64a5de70f545fa157ccddb1047c99",
+      "unknowns": 6402,
+      "frame": 1
+    },
+    {
+      "example": "stokes",
+      "site": 138,
+      "settings": {
+        "quiet": true,
+        "mesh": "grid",
+        "degree": 2,
+        "resolution": 50,
+        "viscosity": 1.0,
+        "top_velocity": 1.0,
+        "boundary_strength": 100.0,
+        "nonconforming_pressures": false
+      },
+      "method": "cg",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 10201,
+          "ncol": 10201,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float64",
+          "nnz": 160801
+        },
+        "B": {
+          "nrow": 2601,
+          "ncol": 10201,
+          "block_shape": [
+            1,
+            2
+          ],
+          "dtype": "float64",
+          "nnz": 63001
+        },
+        "Bt": {
+          "nrow": 10201,
+          "ncol": 2601,
+          "block_shape": [
+            2,
+            1
+          ],
+          "dtype": "float64",
+          "nnz": 63001
+        }
+      },
+      "kind": "saddle",
+      "snapshot_sha256": "5c5f240c91c782f0d3c712451db45e41b0c54bfd73c0f4da5f8086a44da8b508",
+      "unknowns": 23003,
+      "frame": 1
+    },
+    {
+      "example": "stokes_transfer",
+      "site": 172,
+      "settings": {
+        "quiet": true,
+        "resolution": 50
+      },
+      "method": "cg",
+      "tol": 0.0001,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 2,
+      "matrices": {
+        "A": {
+          "nrow": 2453,
+          "ncol": 2453,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float32",
+          "nnz": 20645
+        }
+      },
+      "kind": "bsr",
+      "snapshot_sha256": "fa6a0016548134cc4fbac2943535b4ebc1e030064d862bc77064fbced8bc3843",
+      "unknowns": 4906,
+      "frame": 1
+    },
+    {
+      "example": "taylor_green",
+      "site": 646,
+      "settings": {
+        "quiet": true,
+        "degree": 2,
+        "resolution": 64,
+        "Re": 250.0,
+        "mesh": "grid"
+      },
+      "method": "cg",
+      "tol": 1e-06,
+      "maxiter": 0,
+      "check_every": 0,
+      "rhs_vector_length": 1,
+      "matrices": {
+        "A": {
+          "nrow": 16641,
+          "ncol": 16641,
+          "block_shape": [
+            2,
+            2
+          ],
+          "dtype": "float64",
+          "nnz": 263169
+        },
+        "B": {
+          "nrow": 4225,
+          "ncol": 16641,
+          "block_shape": [
+            1,
+            2
+          ],
+          "dtype": "float64",
+          "nnz": 103041
+        },
+        "Bt": {
+          "nrow": 16641,
+          "ncol": 4225,
+          "block_shape": [
+            2,
+            1
+          ],
+          "dtype": "float64",
+          "nnz": 103041
+        }
+      },
+      "kind": "saddle",
+      "snapshot_sha256": "e9a177ec2513d0f39b31fb0b668c5e5cdb88be6a0107fa1d14568e36d0727b99",
+      "unknowns": 37507,
+      "frame": 1
+    }
+  ],
+  "excluded": {
+    "diffusion_mgpu": "Explicitly disables diagonal preconditioning.",
+    "distributed/example_jacobi_{mpi,nccl,nvshmem}": "Jacobi relaxation algorithms, not Jacobi-preconditioned Krylov solves.",
+    "optim/example_fluid_checkpoint{,_custom_backward}": "Jacobi pressure iterations, not preconditioned Krylov solves."
+  },
+  "standalone_benchmark_matches": [],
+  "block_jacobi_example_matches": [],
+  "source_call_sites": [
+    {
+      "file": "warp/examples/fem/example_apic_fluid.py",
+      "line": 182,
+      "function": "cr"
+    },
+    {
+      "file": "warp/examples/fem/example_apic_fluid.py",
+      "line": 194,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_apic_fluid_multi_env.py",
+      "line": 124,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_cantilever_topology_optimization.py",
+      "line": 410,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_convection_diffusion.py",
+      "line": 123,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_convection_diffusion_dg.py",
+      "line": 148,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_darcy_ls_optimization.py",
+      "line": 348,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_darcy_ls_optimization.py",
+      "line": 352,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_deformed_geometry.py",
+      "line": 116,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_diffusion.py",
+      "line": 138,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_diffusion_3d.py",
+      "line": 165,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_distortion_energy.py",
+      "line": 171,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_elastic_shape_optimization.py",
+      "line": 402,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_elastic_shape_optimization.py",
+      "line": 407,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_magnetostatics.py",
+      "line": 244,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_mixed_elasticity.py",
+      "line": 243,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_navier_stokes.py",
+      "line": 185,
+      "function": "bsr_solve_saddle"
+    },
+    {
+      "file": "warp/examples/fem/example_nonconforming_contact.py",
+      "line": 258,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_stokes.py",
+      "line": 138,
+      "function": "bsr_solve_saddle"
+    },
+    {
+      "file": "warp/examples/fem/example_stokes_transfer.py",
+      "line": 172,
+      "function": "bsr_cg"
+    },
+    {
+      "file": "warp/examples/fem/example_taylor_green.py",
+      "line": 646,
+      "function": "cg_solve"
+    }
+  ],
+  "apic_capture_note": "Snapshot uses noncapturable assembled branch (line 194); default outer-captured CR branch is line 182. Compare isolated solve inputs, not original whole-frame graph timings.",
+  "timing": {
+    "device": "NVIDIA L40",
+    "repeats": 5,
+    "statistics": "Median of paired setup+solve wall seconds. Order reverses every trial. Synchronize before/after timed segments.",
+    "excluded": [
+      "JIT compilation",
+      "problem assembly",
+      "rendering",
+      "input copying",
+      "diagnostics",
+      "cyclic garbage collection"
+    ],
+    "included": [
+      "preconditioner construction",
+      "solver allocations and graph creation",
+      "all solver iterations"
+    ],
+    "settings": "Same original solver, input dtype, b, x0 and stopping options. FSAI varies only max_row_size in {4,8,16,32}; default is 8.",
+    "isolation": "Wait for GPU idle; reject a record if other compute PIDs appear before or after a trial.",
+    "true_residual": "Recomputed in float64 with Warp on GPU; compare its norm with the original absolute stopping target, per batch where applicable. check_every=0 device results were converted from squared norms."
+  }
+}

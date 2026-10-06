@@ -1,0 +1,638 @@
+[
+  {
+    "example": "stokes",
+    "site": 138,
+    "settings": {
+      "quiet": true,
+      "mesh": "grid",
+      "degree": 2,
+      "resolution": 50,
+      "viscosity": 1.0,
+      "top_velocity": 1.0,
+      "boundary_strength": 100.0,
+      "nonconforming_pressures": false
+    },
+    "method": "cg",
+    "tol": 0.0001,
+    "maxiter": 0,
+    "check_every": 0,
+    "rhs_vector_length": 1,
+    "matrices": {
+      "A": {
+        "nrow": 10201,
+        "ncol": 10201,
+        "block_shape": [
+          2,
+          2
+        ],
+        "dtype": "float64",
+        "nnz": 160801
+      },
+      "B": {
+        "nrow": 2601,
+        "ncol": 10201,
+        "block_shape": [
+          1,
+          2
+        ],
+        "dtype": "float64",
+        "nnz": 63001
+      },
+      "Bt": {
+        "nrow": 10201,
+        "ncol": 2601,
+        "block_shape": [
+          2,
+          1
+        ],
+        "dtype": "float64",
+        "nnz": 63001
+      }
+    },
+    "kind": "saddle",
+    "variants": {
+      "jacobi": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.0006285570561885834,
+            "solve_s": 0.03406936302781105,
+            "total_s": 0.034697920083999634,
+            "iterations": [
+              810
+            ],
+            "reported_error": [
+              0.0010418448471288815
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010418448471311613
+            ],
+            "true_relative_residual": 9.893706680942785e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0003991350531578064,
+            "solve_s": 0.033728621900081635,
+            "total_s": 0.03412775695323944,
+            "iterations": [
+              810
+            ],
+            "reported_error": [
+              0.0010418448471288815
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010418448471311613
+            ],
+            "true_relative_residual": 9.893706680942785e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0006049573421478271,
+            "solve_s": 0.03397669643163681,
+            "total_s": 0.03458165377378464,
+            "iterations": [
+              810
+            ],
+            "reported_error": [
+              0.0010418448471288815
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010418448471311613
+            ],
+            "true_relative_residual": 9.893706680942785e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.00039590150117874146,
+            "solve_s": 0.033789947628974915,
+            "total_s": 0.034185849130153656,
+            "iterations": [
+              810
+            ],
+            "reported_error": [
+              0.0010418448471288815
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010418448471311613
+            ],
+            "true_relative_residual": 9.893706680942785e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0006711892783641815,
+            "solve_s": 0.03405691683292389,
+            "total_s": 0.03472810611128807,
+            "iterations": [
+              810
+            ],
+            "reported_error": [
+              0.0010418448471288815
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010418448471311613
+            ],
+            "true_relative_residual": 9.893706680942785e-05,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.0006049573421478271,
+          "solve_s": 0.03397669643163681,
+          "total_s": 0.03458165377378464
+        }
+      },
+      "fsai_4": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.0017916001379489899,
+            "solve_s": 0.02501169964671135,
+            "total_s": 0.02680329978466034,
+            "iterations": [
+              535
+            ],
+            "reported_error": [
+              0.0010059092278213947
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010059092278225416
+            ],
+            "true_relative_residual": 9.552450036235545e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.001605600118637085,
+            "solve_s": 0.02496890351176262,
+            "total_s": 0.026574503630399704,
+            "iterations": [
+              535
+            ],
+            "reported_error": [
+              0.0010059092278213947
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010059092278225416
+            ],
+            "true_relative_residual": 9.552450036235545e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0017195679247379303,
+            "solve_s": 0.025091703981161118,
+            "total_s": 0.026811271905899048,
+            "iterations": [
+              535
+            ],
+            "reported_error": [
+              0.0010059092278213947
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010059092278225416
+            ],
+            "true_relative_residual": 9.552450036235545e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0016214922070503235,
+            "solve_s": 0.025009330362081528,
+            "total_s": 0.02663082256913185,
+            "iterations": [
+              535
+            ],
+            "reported_error": [
+              0.0010059092278213947
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010059092278225416
+            ],
+            "true_relative_residual": 9.552450036235545e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.0017956607043743134,
+            "solve_s": 0.025161288678646088,
+            "total_s": 0.0269569493830204,
+            "iterations": [
+              535
+            ],
+            "reported_error": [
+              0.0010059092278213947
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0010059092278225416
+            ],
+            "true_relative_residual": 9.552450036235545e-05,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.0017195679247379303,
+          "solve_s": 0.02501169964671135,
+          "total_s": 0.02680329978466034
+        }
+      },
+      "fsai_8": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.0047309063374996185,
+            "solve_s": 0.020230095833539963,
+            "total_s": 0.02496100217103958,
+            "iterations": [
+              409
+            ],
+            "reported_error": [
+              0.0010328690039340398
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.001032869003935045
+            ],
+            "true_relative_residual": 9.808469075707185e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.004643399268388748,
+            "solve_s": 0.02016628533601761,
+            "total_s": 0.024809684604406357,
+            "iterations": [
+              409
+            ],
+            "reported_error": [
+              0.0010328690039340398
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.001032869003935045
+            ],
+            "true_relative_residual": 9.808469075707185e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.004888806492090225,
+            "solve_s": 0.02020522579550743,
+            "total_s": 0.025094032287597656,
+            "iterations": [
+              409
+            ],
+            "reported_error": [
+              0.0010328690039340398
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.001032869003935045
+            ],
+            "true_relative_residual": 9.808469075707185e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.004725802689790726,
+            "solve_s": 0.02020953968167305,
+            "total_s": 0.024935342371463776,
+            "iterations": [
+              409
+            ],
+            "reported_error": [
+              0.0010328690039340398
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.001032869003935045
+            ],
+            "true_relative_residual": 9.808469075707185e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.005010969936847687,
+            "solve_s": 0.02026471123099327,
+            "total_s": 0.025275681167840958,
+            "iterations": [
+              409
+            ],
+            "reported_error": [
+              0.0010328690039340398
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.001032869003935045
+            ],
+            "true_relative_residual": 9.808469075707185e-05,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.0047309063374996185,
+          "solve_s": 0.02020953968167305,
+          "total_s": 0.02496100217103958
+        }
+      },
+      "fsai_16": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.029428888112306595,
+            "solve_s": 0.016990240663290024,
+            "total_s": 0.04641912877559662,
+            "iterations": [
+              316
+            ],
+            "reported_error": [
+              0.0009878079697641616
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009878079697668923
+            ],
+            "true_relative_residual": 9.380554443286377e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.029208242893218994,
+            "solve_s": 0.016985516995191574,
+            "total_s": 0.04619375988841057,
+            "iterations": [
+              316
+            ],
+            "reported_error": [
+              0.0009878079697641616
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009878079697668923
+            ],
+            "true_relative_residual": 9.380554443286377e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.03059675544500351,
+            "solve_s": 0.017381910234689713,
+            "total_s": 0.04797866567969322,
+            "iterations": [
+              316
+            ],
+            "reported_error": [
+              0.0009878079697641616
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009878079697668923
+            ],
+            "true_relative_residual": 9.380554443286377e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.029260333627462387,
+            "solve_s": 0.017076753079891205,
+            "total_s": 0.04633708670735359,
+            "iterations": [
+              316
+            ],
+            "reported_error": [
+              0.0009878079697641616
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009878079697668923
+            ],
+            "true_relative_residual": 9.380554443286377e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.02940499410033226,
+            "solve_s": 0.01699906215071678,
+            "total_s": 0.04640405625104904,
+            "iterations": [
+              316
+            ],
+            "reported_error": [
+              0.0009878079697641616
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009878079697668923
+            ],
+            "true_relative_residual": 9.380554443286377e-05,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.02940499410033226,
+          "solve_s": 0.01699906215071678,
+          "total_s": 0.04640405625104904
+        }
+      },
+      "fsai_32": {
+        "status": "ok",
+        "samples": [
+          {
+            "setup_s": 0.09321316331624985,
+            "solve_s": 0.015666484832763672,
+            "total_s": 0.10887964814901352,
+            "iterations": [
+              285
+            ],
+            "reported_error": [
+              0.0009335531307819302
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009335531307798489
+            ],
+            "true_relative_residual": 8.865332369253304e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.09367571398615837,
+            "solve_s": 0.015872973948717117,
+            "total_s": 0.10954868793487549,
+            "iterations": [
+              285
+            ],
+            "reported_error": [
+              0.0009335531307819302
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009335531307798489
+            ],
+            "true_relative_residual": 8.865332369253304e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.09487224742770195,
+            "solve_s": 0.01571594923734665,
+            "total_s": 0.1105881966650486,
+            "iterations": [
+              285
+            ],
+            "reported_error": [
+              0.0009335531307819302
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009335531307798489
+            ],
+            "true_relative_residual": 8.865332369253304e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.09402994066476822,
+            "solve_s": 0.015918340533971786,
+            "total_s": 0.10994828119874,
+            "iterations": [
+              285
+            ],
+            "reported_error": [
+              0.0009335531307819302
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009335531307798489
+            ],
+            "true_relative_residual": 8.865332369253304e-05,
+            "finite": true
+          },
+          {
+            "setup_s": 0.09423527866601944,
+            "solve_s": 0.015674401074647903,
+            "total_s": 0.10990967974066734,
+            "iterations": [
+              285
+            ],
+            "reported_error": [
+              0.0009335531307819302
+            ],
+            "tolerance": [
+              0.0010530379368714846
+            ],
+            "reported_converged": true,
+            "true_converged": true,
+            "true_residual_norms": [
+              0.0009335531307798489
+            ],
+            "true_relative_residual": 8.865332369253304e-05,
+            "finite": true
+          }
+        ],
+        "median_s": {
+          "setup_s": 0.09402994066476822,
+          "solve_s": 0.01571594923734665,
+          "total_s": 0.10990967974066734
+        }
+      }
+    },
+    "residual_units": "norm",
+    "warp_revision": "d76aecb17765957fba6ca323044205f74783b4d3",
+    "snapshot_sha256": "5c5f240c91c782f0d3c712451db45e41b0c54bfd73c0f4da5f8086a44da8b508",
+    "repeats": 5,
+    "device": "NVIDIA L40",
+    "frame": 1,
+    "unknowns": 23003
+  }
+]
