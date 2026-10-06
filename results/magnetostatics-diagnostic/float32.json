@@ -1,0 +1,30 @@
+{
+  "resolution": 32,
+  "fp64": false,
+  "n": 104544,
+  "b_norm": 92438.74603318941,
+  "q_norm": 2.07019680730779,
+  "matrix_frobenius": 2131191077.132341,
+  "Atq_norm": 0.9870452367807071,
+  "null_defect": 2.2371908447436602e-10,
+  "b_dot_q": 41339.865886214146,
+  "null_rhs_fraction": 0.2160246864332007,
+  "boundary_dofs": 6146,
+  "solves": {
+    "original": {
+      "iterations": 2000,
+      "recursive_residual": 21719.267759296123,
+      "true_relative_residual": 4.673800583969309,
+      "target_relative_residual": 0.0001
+    },
+    "compatible_control": {
+      "iterations": 30,
+      "recursive_residual": 190150.9147177578,
+      "true_relative_residual": 8.928814645697348e-05,
+      "target_relative_residual": 0.0001
+    }
+  },
+  "warp_version": "1.19.0.dev0",
+  "device": "cuda:0",
+  "maxiter": 2000
+}
