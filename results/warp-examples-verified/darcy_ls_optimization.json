@@ -1,0 +1,352 @@
+[
+  {
+    "example": "darcy_ls_optimization",
+    "site": 348,
+    "warp_revision": "d76aecb17765957fba6ca323044205f74783b4d3",
+    "snapshot_sha256": "45ab8b104a217c577e66840a4d83cf5a65e62e4b941421d8be7909f08bb7a2a9",
+    "unknowns": 10201,
+    "method": "cg",
+    "matrix_dtype": "float32",
+    "residual_and_solution_dtype": "float64",
+    "target": 1.0058164802814207e-05,
+    "inner_tol": 0.05,
+    "inner_atol": 0.0,
+    "inner_max": 1000,
+    "outer_max": 20,
+    "repeats": 5,
+    "variants": {
+      "jacobi": {
+        "status": "measured",
+        "samples": [
+          {
+            "converged": true,
+            "true_residual_norm": 2.46307572174114e-06,
+            "target": 1.0058164802814207e-05,
+            "inner_iterations": [
+              14,
+              114,
+              130,
+              107,
+              142
+            ],
+            "total_iterations": 507,
+            "corrections": 5,
+            "residual_history": [
+              10.05816415110076,
+              0.48289445651263185,
+              0.02315572496821867,
+              0.0011075699615017,
+              5.3633212952284726e-05,
+              2.46307572174114e-06
+            ],
+            "setup_s": 0.001034032553434372,
+            "solve_s": 0.01795799285173416,
+            "total_s": 0.018992025405168533,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.46307572174114e-06,
+            "target": 1.0058164802814207e-05,
+            "inner_iterations": [
+              14,
+              114,
+              130,
+              107,
+              142
+            ],
+            "total_iterations": 507,
+            "corrections": 5,
+            "residual_history": [
+              10.05816415110076,
+              0.48289445651263185,
+              0.02315572496821867,
+              0.0011075699615017,
+              5.3633212952284726e-05,
+              2.46307572174114e-06
+            ],
+            "setup_s": 0.0010573789477348328,
+            "solve_s": 0.017785415053367615,
+            "total_s": 0.018842794001102448,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.46307572174114e-06,
+            "target": 1.0058164802814207e-05,
+            "inner_iterations": [
+              14,
+              114,
+              130,
+              107,
+              142
+            ],
+            "total_iterations": 507,
+            "corrections": 5,
+            "residual_history": [
+              10.05816415110076,
+              0.48289445651263185,
+              0.02315572496821867,
+              0.0011075699615017,
+              5.3633212952284726e-05,
+              2.46307572174114e-06
+            ],
+            "setup_s": 0.0010272599756717682,
+            "solve_s": 0.01778458058834076,
+            "total_s": 0.018811840564012527,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.46307572174114e-06,
+            "target": 1.0058164802814207e-05,
+            "inner_iterations": [
+              14,
+              114,
+              130,
+              107,
+              142
+            ],
+            "total_iterations": 507,
+            "corrections": 5,
+            "residual_history": [
+              10.05816415110076,
+              0.48289445651263185,
+              0.02315572496821867,
+              0.0011075699615017,
+              5.3633212952284726e-05,
+              2.46307572174114e-06
+            ],
+            "setup_s": 0.001012459397315979,
+            "solve_s": 0.017930705100297928,
+            "total_s": 0.018943164497613907,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.46307572174114e-06,
+            "target": 1.0058164802814207e-05,
+            "inner_iterations": [
+              14,
+              114,
+              130,
+              107,
+              142
+            ],
+            "total_iterations": 507,
+            "corrections": 5,
+            "residual_history": [
+              10.05816415110076,
+              0.48289445651263185,
+              0.02315572496821867,
+              0.0011075699615017,
+              5.3633212952284726e-05,
+              2.46307572174114e-06
+            ],
+            "setup_s": 0.0010204575955867767,
+            "solve_s": 0.017886321991682053,
+            "total_s": 0.01890677958726883,
+            "finite": true
+          }
+        ],
+        "converged": true,
+        "median_s": {
+          "setup_s": 0.0010272599756717682,
+          "solve_s": 0.017886321991682053,
+          "total_s": 0.01890677958726883
+        }
+      },
+      "fsai_4": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      },
+      "fsai_8": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      },
+      "fsai_16": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      },
+      "fsai_32": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      }
+    }
+  },
+  {
+    "example": "darcy_ls_optimization",
+    "site": 352,
+    "warp_revision": "d76aecb17765957fba6ca323044205f74783b4d3",
+    "snapshot_sha256": "c2d724c350bf2fdcb54b217625b258cf53f0585b7f1b0d98ce6bb1124ff799e1",
+    "unknowns": 10201,
+    "method": "cg",
+    "matrix_dtype": "float32",
+    "residual_and_solution_dtype": "float64",
+    "target": 9.949873806355224e-06,
+    "inner_tol": 0.05,
+    "inner_atol": 0.0,
+    "inner_max": 1000,
+    "outer_max": 20,
+    "repeats": 5,
+    "variants": {
+      "jacobi": {
+        "status": "measured",
+        "samples": [
+          {
+            "converged": true,
+            "true_residual_norm": 2.118125531926608e-06,
+            "target": 9.949873806355224e-06,
+            "inner_iterations": [
+              13,
+              111,
+              130,
+              112,
+              144
+            ],
+            "total_iterations": 510,
+            "corrections": 5,
+            "residual_history": [
+              9.9498743710662,
+              0.4940384611988138,
+              0.024564081886181862,
+              0.0011727088599581615,
+              5.6847572493919275e-05,
+              2.118125531926608e-06
+            ],
+            "setup_s": 0.0010478571057319641,
+            "solve_s": 0.017818450927734375,
+            "total_s": 0.01886630803346634,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.118125531926608e-06,
+            "target": 9.949873806355224e-06,
+            "inner_iterations": [
+              13,
+              111,
+              130,
+              112,
+              144
+            ],
+            "total_iterations": 510,
+            "corrections": 5,
+            "residual_history": [
+              9.9498743710662,
+              0.4940384611988138,
+              0.024564081886181862,
+              0.0011727088599581615,
+              5.6847572493919275e-05,
+              2.118125531926608e-06
+            ],
+            "setup_s": 0.0010343752801418304,
+            "solve_s": 0.017908133566379547,
+            "total_s": 0.018942508846521378,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.118125531926608e-06,
+            "target": 9.949873806355224e-06,
+            "inner_iterations": [
+              13,
+              111,
+              130,
+              112,
+              144
+            ],
+            "total_iterations": 510,
+            "corrections": 5,
+            "residual_history": [
+              9.9498743710662,
+              0.4940384611988138,
+              0.024564081886181862,
+              0.0011727088599581615,
+              5.6847572493919275e-05,
+              2.118125531926608e-06
+            ],
+            "setup_s": 0.0010269209742546082,
+            "solve_s": 0.017784234136343002,
+            "total_s": 0.01881115511059761,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.118125531926608e-06,
+            "target": 9.949873806355224e-06,
+            "inner_iterations": [
+              13,
+              111,
+              130,
+              112,
+              144
+            ],
+            "total_iterations": 510,
+            "corrections": 5,
+            "residual_history": [
+              9.9498743710662,
+              0.4940384611988138,
+              0.024564081886181862,
+              0.0011727088599581615,
+              5.6847572493919275e-05,
+              2.118125531926608e-06
+            ],
+            "setup_s": 0.001086801290512085,
+            "solve_s": 0.017889633774757385,
+            "total_s": 0.01897643506526947,
+            "finite": true
+          },
+          {
+            "converged": true,
+            "true_residual_norm": 2.118125531926608e-06,
+            "target": 9.949873806355224e-06,
+            "inner_iterations": [
+              13,
+              111,
+              130,
+              112,
+              144
+            ],
+            "total_iterations": 510,
+            "corrections": 5,
+            "residual_history": [
+              9.9498743710662,
+              0.4940384611988138,
+              0.024564081886181862,
+              0.0011727088599581615,
+              5.6847572493919275e-05,
+              2.118125531926608e-06
+            ],
+            "setup_s": 0.001081954687833786,
+            "solve_s": 0.01791154220700264,
+            "total_s": 0.018993496894836426,
+            "finite": true
+          }
+        ],
+        "converged": true,
+        "median_s": {
+          "setup_s": 0.0010478571057319641,
+          "solve_s": 0.017889633774757385,
+          "total_s": 0.018942508846521378
+        }
+      },
+      "fsai_4": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      },
+      "fsai_8": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      },
+      "fsai_16": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      },
+      "fsai_32": {
+        "status": "unsupported",
+        "reason": "FSAI requires finite positive diagonals (10099 invalid rows)"
+      }
+    }
+  }
+]

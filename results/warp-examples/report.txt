@@ -1,6 +1,11 @@
 Warp example preconditioner comparison — 2026-10-06
 =================================================
 
+The dagger-marked cases have a verified time-to-accuracy follow-up in
+../warp-examples-verified/report.txt. It applies the same residual-correction
+procedure to both preconditioners and reports successful times or explicit
+failures, rather than treating recursive convergence as sufficient.
+
 Warp branch: alecjacobson/fsai, commit d76aecb17765957fba6ca323044205f74783b4d3
 Pull --ff-only found no new branch commits. Source checkout: /home/horde/projects/warp-fsai-review.
 

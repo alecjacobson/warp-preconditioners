@@ -1,0 +1,86 @@
+Verified time-to-accuracy comparison (2026-10-06)
+==============================================
+
+This follow-up resolves the dagger-marked entries in ../warp-examples/report.txt.
+All nine original systems and their stopping targets are retained unchanged.
+The matrix snapshots are checked against the original SHA-256 digests.
+
+Why the original entries needed qualification
+--------------------------------------------
+Most original solvers stopped using a recursively updated float32 residual.
+Recomputing b-Ax exposed residual drift and solution-storage roundoff. Some
+requested targets (such as convection-diffusion at 1e-12) are below what
+float32 solution storage can reliably attain. Magnetostatics instead hit
+its original 250-iteration cap without convergence.
+
+Common verified solve procedure
+-------------------------------
+- Keep the original float32 matrix, preconditioner dtype, and CG/CR method.
+- Accumulate the solution and recompute b-Ax in float64, using Warp on CUDA.
+- Cast each correction RHS to float32; solve A*delta=r from zero with the
+  original preconditioner, relative tolerance 0.05 and absolute tolerance 0.
+- Add delta to the float64 solution and check its true residual against the
+  original absolute stopping target. Stop only on that verified condition.
+- Same limits for every method: 20 correction solves, at most 1000 inner
+  iterations each (20000 total). Factors are constructed once per full solve.
+- The output solution is float64. This is a changed solve procedure applied
+  equally to both preconditioners, not a claim about the original float32
+  stopping behavior or its original output precision.
+
+Timings include preconditioner setup, the float64 matrix copy, workspace
+allocation, residual evaluations, transfers of scalar norms, all correction
+solves, dtype casts, updates, and solver allocations/graph creation. Input
+assembly and JIT compilation are excluded. Five trials alternate method
+order on an otherwise idle NVIDIA L40; cyclic GC runs outside timings.
+Construction and every correction remain in Warp; no SciPy backend.
+Warp revision: d76aecb17765957fba6ca323044205f74783b4d3.
+FSAI sweeps widths 4/8/16/32, otherwise default settings. Tables select the
+fastest converged FSAI by median setup+solve time. This is not exhaustive tuning.
+
+Results: milliseconds, including setup and verification
+------------------------------------------------------
+System | Absolute target | Jacobi ms | FSAI ms (width) | Conclusion
+--- | ---: | ---: | ---: | ---
+convection_diffusion | 1e-12 | 14.40 | 10.94 (w=4) | FSAI 1.32x faster
+darcy_ls_optimization (forward) | 1.01e-05 | 18.91 | Unsupported | Jacobi succeeds; FSAI rejects the matrix
+darcy_ls_optimization (adjoint) | 9.95e-06 | 18.94 | Unsupported | Jacobi succeeds; FSAI rejects the matrix
+deformed_geometry | 1e-06 | 18.85 | 13.86 (w=8) | FSAI 1.36x faster
+distortion_energy | 0.000967 | 42.44 | 15.40 (w=8) | FSAI 2.76x faster
+elastic_shape_optimization (forward) | 1e-08 | 13.52 | 12.94 (w=4) | Comparable; FSAI median advantage under 5%
+elastic_shape_optimization (adjoint) | 1e-08 | 16.36 | 15.15 (w=8) | FSAI 1.08x faster
+magnetostatics | 9.24 | Target not reached | Target not reached | Neither succeeds within the common 20000-iteration limit
+nonconforming_contact | 1e-06 | 39.89 | 25.81 (w=4) | FSAI 1.55x faster
+
+Every numerical time in this table corresponds to a verified successful
+solve in all five trials. No dagger or recursively inferred convergence is used.
+The small elastic-shape forward difference is not treated as a substantial win.
+
+Darcy: its original matrix has negative interior diagonal entries; FSAI
+rejects it before a solve. The successful Jacobi correction runs do not
+change that applicability limitation.
+
+Magnetostatics: none of the tested variants reaches the absolute target
+9.24387. After 20000 inner iterations, the Jacobi residual is about 22406;
+FSAI widths 4/8/16/32 end around 26263/27862/34157/43788 respectively.
+These are budget-exhaustion results, not times to a successful solution.
+The example source itself notes that numerically the RHS may not be in
+the image of the curl-curl matrix (example_magnetostatics.py:243). A useful
+least-squares or nullspace criterion is a separate problem specification;
+these results do not prove that the original target is mathematically impossible.
+
+Validation and reproduction
+---------------------------
+- Independent NumPy residual checks passed on scalar and 3x3 BSR toy systems
+  for CG and CR with Jacobi and FSAI, exercising the correction procedure.
+- All actual-case convergence flags equal the independently recomputed
+  float64 residual comparison; every measured output is finite.
+- Raw per-example JSON contains all five samples, correction/iteration
+  counts and true residual histories. comparison.csv separates setup/solve.
+- Original captures and their regeneration are documented in
+  ../warp-examples/report.txt.
+
+From this repository, using the FSAI Warp checkout environment:
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /path/to/warp/.venv/bin/python \
+  benchmarks/warp_example_verified.py distortion_energy
+Repeat for deformed_geometry, convection_diffusion, nonconforming_contact,
+elastic_shape_optimization, darcy_ls_optimization and magnetostatics.
