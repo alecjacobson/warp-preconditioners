@@ -1,0 +1,109 @@
+Minimal magnetostatics fix options (NVIDIA/warp #2043)
+====================================================
+
+Recommendation: express the existing current as curl(T), and assemble the
+load as integral T dot curl(v), rather than integral J dot v.
+
+History and intent
+------------------
+The example started in July 2024 as a 2D scalar-potential problem illustrating
+ImplicitField, a deformed circular domain, and field visualization:
+https://github.com/NVIDIA/warp/commit/61be2b17fcb220a5606d15d30dec6ed6298b3cc1
+
+The November 2024 vector-spaces change introduced Nedelec and Raviart-Thomas
+spaces. It deliberately converted this example to 3D H(curl), added the iron
+core and mesh choices, and introduced both CR and the incompatible-RHS comment:
+https://github.com/NVIDIA/warp/commit/ed6445f072c984c1396f368acf9198af178a50bc
+
+The April 2026 change added geometry-driven float64 support:
+https://github.com/NVIDIA/warp/commit/9d913f8ad474718c7fe056ddffc7a6489ac92cb3
+
+Interpretation: retain the 3D H(curl), ImplicitField, and deformed-geometry
+story. A second constraint system or a return to 2D would obscure that story.
+This is an inference from the changes, not a statement from the author.
+
+Why the recommended change preserves the physical load
+------------------------------------------------------
+Let r = sqrt(x*x+z*z), and use the existing coil parameters ri, ro, h, J0.
+Define T = (0, J0 * clamp(ro-r, 0, ro-ri), 0) inside |y|<h and zero outside.
+Then curl(T) = J0*(z,0,-x)/r in the coil annulus, and zero elsewhere, exactly
+the prescribed current (up to values on discontinuity surfaces). T is
+continuous at the radial interfaces; its jumps at the end caps are normal,
+so they do not introduce additional surface currents in curl(T).
+
+Integration by parts and the homogeneous tangential boundary conditions give
+  integral J dot v = integral T dot curl(v).
+The new right-hand side annihilates gradient test fields pointwise, since
+curl(grad(phi)) = 0, independent of the quadrature's integration accuracy.
+It needs no additional unknowns, matrices, solve, or tuning parameter.
+The ordinary mass form remains for the boundary projector.
+
+The candidate curl-load.patch replaces the current field by its potential,
+adds one load integrand, and updates the assembly and explanatory comments:
+19 added / 10 removed lines, net +9. It also corrects 'radial' to 'azimuthal'
+in the example description. The tested Warp checkout is unchanged.
+
+Other options
+-------------
+1. Increase quadrature order for the original load: only a few lines, but
+   orders 4 and 8 still fail the target in the tests below. Higher quadrature
+   can improve accuracy, but does not structurally enforce compatibility.
+2. Project the assembled RHS off the discrete gradient space: a principled
+   general option, but introduces a scalar space, gradient operator, boundary
+   handling and an extra Poisson-type solve. More machinery than this example
+   needs, given its current has a simple analytic potential.
+3. Return to the original 2D scalar formulation: removes this nullspace issue,
+   but loses the 3D Nedelec/H(curl) demonstration intentionally added in 2024.
+
+Mass regularization would alter the equations and introduce a parameter;
+raising the iteration limit does not repair load compatibility.
+
+CUDA checks
+-----------
+Warp 1.19.0.dev0, checkout d76aecb17765957fba6ca323044205f74783b4d3,
+NVIDIA L40, CUDA toolkit 12.6 / driver 570.158.01. All assembly and iterative
+solves use Warp. NumPy is used only for diagnostic reductions. No timings
+are claimed; this is a correctness and scope experiment.
+
+Default Grid3D resolution 32, same matrix / Jacobi + CR / target 1e-4 / cap 250.
+True relative residual is computed independently using the matrix and solution
+promoted to float64. Replay convergence is checked in batches of 10 iterations.
+
+Variant                  float32: iterations, residual   float64: iterations, residual
+Original load            250 (cap), 4.07169e-1            250 (cap), 2.38740e-1
+Original, quadrature 4    250 (cap), 7.79373e-2            250 (cap), 5.39340e-2
+Original, quadrature 8    250 (cap), 7.71238e-2            250 (cap), 4.20903e-2
+Curl load, default        70,       9.95580e-5             80,       9.82906e-5
+Curl load, quadrature 4   70,       9.34691e-5             80,       9.94715e-5
+Curl load, quadrature 8   70,       9.31576e-5             80,       9.90172e-5
+
+On the default grid the full discrete-gradient pairing G^T b is numerically
+zero for the default curl load, in both precisions. At quadrature orders 4/8,
+its relative norm is about 1e-16 for float64 and 2e-8 to 5e-8 for float32.
+This pairing norm is a compatibility diagnostic, not the residual lower bound
+from the earlier single-null-vector witness.
+
+Float32 smoke tests at resolution 16, default curl load / same cap and target:
+  tet:   60 iterations, true relative residual 8.84332e-5
+  hex:   40 iterations, true relative residual 8.88136e-5
+  nano:  40 iterations, true relative residual 8.62751e-5
+These are smaller mesh-variant smoke tests, not exhaustive parameter coverage.
+
+The complete proposed example was also run headlessly at default resolution
+in both precisions, including B=curl(A) interpolation and render-data creation.
+Its existing FEM solver wrapper checks convergence more frequently than the
+replay: it reported convergence after 66 float32 / 74 float64 iterations.
+The independently verified residuals above are from the replay.
+
+This establishes load compatibility and algebraic convergence for the tested
+cases. It does not establish mesh/quadrature convergence of the magnetic field.
+
+Reproduce with the tested Warp checkout's Python
+------------------------------------------------
+python benchmarks/warp_magnetostatics_options.py --output results/magnetostatics-options/grid32-float32.json
+python benchmarks/warp_magnetostatics_options.py --fp64 --output results/magnetostatics-options/grid32-float64.json
+python benchmarks/warp_magnetostatics_options.py --mesh tet --resolution 16 --orders -1 --iterations 250 --output results/magnetostatics-options/tet16-float32.json
+
+For the other smoke tests replace tet by hex or nano. Original is the captured
+example RHS; direct_N changes only its quadrature order; curl_-1 is the proposed
+load at automatic quadrature order; curl_N sets an explicit quadrature order.

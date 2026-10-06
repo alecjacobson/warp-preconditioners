@@ -1,0 +1,25 @@
+{
+  "fp64": false,
+  "mesh": "tet",
+  "resolution": 16,
+  "results": [
+    {
+      "name": "original",
+      "b_norm": 96600.19931320759,
+      "solve_250": {
+        "iterations": 250,
+        "recursive_relative_residual": 0.22705399901706033,
+        "true_relative_residual": 0.9505057823331327
+      }
+    },
+    {
+      "name": "curl_-1",
+      "b_norm": 32475.94844460483,
+      "solve_250": {
+        "iterations": 60,
+        "recursive_relative_residual": 8.837146750642886e-05,
+        "true_relative_residual": 8.843317925909234e-05
+      }
+    }
+  ]
+}

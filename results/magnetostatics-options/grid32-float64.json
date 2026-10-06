@@ -1,0 +1,97 @@
+{
+  "fp64": true,
+  "mesh": "grid",
+  "resolution": 32,
+  "results": [
+    {
+      "name": "original",
+      "b_norm": 92438.7466109315,
+      "gradient_pairing_norm_over_b": 0.44721359549995787,
+      "solve_250": {
+        "iterations": 250,
+        "recursive_relative_residual": 0.23874009929630635,
+        "true_relative_residual": 0.2387400992844668
+      },
+      "solve_1000": {
+        "iterations": 1000,
+        "recursive_relative_residual": 0.23826466155861215,
+        "true_relative_residual": 0.29409850714836977
+      }
+    },
+    {
+      "name": "curl_-1",
+      "b_norm": 50461.73793894251,
+      "gradient_pairing_norm_over_b": 0.0,
+      "solve_250": {
+        "iterations": 80,
+        "recursive_relative_residual": 9.829060214413426e-05,
+        "true_relative_residual": 9.829060214414793e-05
+      },
+      "solve_1000": {
+        "iterations": 80,
+        "recursive_relative_residual": 9.829060214413426e-05,
+        "true_relative_residual": 9.829060214414793e-05
+      }
+    },
+    {
+      "name": "direct_4",
+      "b_norm": 101613.28677768665,
+      "gradient_pairing_norm_over_b": 0.09126560976993264,
+      "solve_250": {
+        "iterations": 250,
+        "recursive_relative_residual": 0.053934017719486575,
+        "true_relative_residual": 0.05393401772307417
+      },
+      "solve_1000": {
+        "iterations": 1000,
+        "recursive_relative_residual": 0.05363461901464875,
+        "true_relative_residual": 0.14548157403421125
+      }
+    },
+    {
+      "name": "curl_4",
+      "b_norm": 42053.49434244473,
+      "gradient_pairing_norm_over_b": 1.3874480249910096e-16,
+      "solve_250": {
+        "iterations": 80,
+        "recursive_relative_residual": 9.947146736835394e-05,
+        "true_relative_residual": 9.947146736837334e-05
+      },
+      "solve_1000": {
+        "iterations": 80,
+        "recursive_relative_residual": 9.947146736835394e-05,
+        "true_relative_residual": 9.947146736837334e-05
+      }
+    },
+    {
+      "name": "direct_8",
+      "b_norm": 78195.55366883655,
+      "gradient_pairing_norm_over_b": 0.07938789986020278,
+      "solve_250": {
+        "iterations": 250,
+        "recursive_relative_residual": 0.04209025204431415,
+        "true_relative_residual": 0.04209025206567765
+      },
+      "solve_1000": {
+        "iterations": 1000,
+        "recursive_relative_residual": 0.040276153776165405,
+        "true_relative_residual": 0.26235653589997443
+      }
+    },
+    {
+      "name": "curl_8",
+      "b_norm": 42218.53489861313,
+      "gradient_pairing_norm_over_b": 1.0013389003674062e-16,
+      "solve_250": {
+        "iterations": 80,
+        "recursive_relative_residual": 9.901718063239586e-05,
+        "true_relative_residual": 9.90171806323883e-05
+      },
+      "solve_1000": {
+        "iterations": 80,
+        "recursive_relative_residual": 9.901718063239586e-05,
+        "true_relative_residual": 9.90171806323883e-05
+      }
+    }
+  ]
+}
